@@ -45,6 +45,26 @@ npm test            # vitest
 npm run build        # production build to dist/homelab-ui
 ```
 
+## Pre-commit hooks
+
+`.pre-commit-config.yaml` runs typecheck, format-check, and tests before each commit and push. `pre-commit` itself is a standalone tool, not an npm package, so install it once, globally:
+
+```bash
+pipx install pre-commit   # or: brew install pre-commit / pip install pre-commit
+```
+
+Then wire it into this repo (or just run `make hooks`):
+
+```bash
+pre-commit install --hook-type pre-commit --hook-type pre-push
+```
+
+Run it manually against everything at any time:
+
+```bash
+pre-commit run --all-files
+```
+
 ## Adding a page
 
 Worked example: adding a `Metrics` page. Substitute your own name throughout (route path, `NAV_ITEMS` entry, folder name).
