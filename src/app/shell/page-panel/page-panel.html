@@ -1,0 +1,30 @@
+@if (ui.panelOpen()) {
+  <div class="page-panel__backdrop" (click)="ui.closePanel()"></div>
+}
+
+<aside class="page-panel" [class.page-panel--open]="ui.panelOpen()">
+  <div class="page-panel__header">
+    <button
+      type="button"
+      class="page-panel__close"
+      title="Close"
+      aria-label="Close panel"
+      (click)="ui.closePanel()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+
+  @if (chrome.rightPanel(); as template) {
+    <ng-container [ngTemplateOutlet]="template" />
+  }
+</aside>

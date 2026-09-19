@@ -1,0 +1,26 @@
+@if (ui.navOpen()) {
+  <div class="nav-sidebar__backdrop" (click)="ui.closeNav()"></div>
+}
+
+<nav class="nav-sidebar" [class.nav-sidebar--open]="ui.navOpen()">
+  <a
+    class="nav-sidebar__link"
+    routerLink="/"
+    routerLinkActive="nav-sidebar__link--active"
+    [routerLinkActiveOptions]="{ exact: true }"
+    (click)="ui.closeNav()"
+  >
+    Home
+  </a>
+
+  @for (item of navItems; track item.path) {
+    <a
+      class="nav-sidebar__link"
+      [routerLink]="item.path"
+      routerLinkActive="nav-sidebar__link--active"
+      (click)="ui.closeNav()"
+    >
+      {{ item.label }}
+    </a>
+  }
+</nav>

@@ -1,0 +1,48 @@
+:host {
+  display: contents;
+}
+
+.nav-sidebar__backdrop {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.nav-sidebar {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 16rem;
+  max-width: 85vw;
+  padding: 3.75rem 0.75rem 1rem;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  transform: translateX(-100%);
+  transition: transform 0.22s ease;
+
+  &--open {
+    transform: translateX(0);
+  }
+}
+
+.nav-sidebar__link {
+  padding: 0.4rem 0.6rem;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  text-decoration: none;
+
+  &:hover {
+    background: var(--surface-raised);
+    color: var(--text);
+  }
+}
+
+.nav-sidebar__link--active {
+  color: var(--accent);
+}

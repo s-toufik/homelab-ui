@@ -1,0 +1,24 @@
+<ng-template appPagePanelContent>
+  <app-settings-panel
+    [knownModels]="store.knownModels"
+    [(modelName)]="store.modelName"
+    [(sessionId)]="store.sessionId"
+    (newSession)="store.newSession()"
+  />
+</ng-template>
+
+<div class="agent-page">
+  <app-conversation [messages]="store.messages()" />
+
+  @if (store.requestError()) {
+    <p class="agent-page__banner" role="alert">{{ store.requestError() }}</p>
+  }
+
+  <app-composer
+    [(draft)]="store.draft"
+    [canSend]="store.canSend()"
+    [isStreaming]="store.isStreaming()"
+    (send)="store.send()"
+    (cancel)="store.cancel()"
+  />
+</div>

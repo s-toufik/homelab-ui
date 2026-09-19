@@ -1,0 +1,55 @@
+:host {
+  display: contents;
+}
+
+.page-panel__backdrop {
+  display: block;
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+}
+
+.page-panel {
+  position: absolute;
+  inset-block: 0;
+  right: 0;
+  z-index: 5;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  width: 18rem;
+  max-width: 85vw;
+  padding: 1rem;
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  overflow-y: auto;
+  transform: translateX(100%);
+  transition: transform 0.22s ease;
+
+  &--open {
+    transform: translateX(0);
+  }
+}
+
+.page-panel__header {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.page-panel__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-raised);
+  }
+}

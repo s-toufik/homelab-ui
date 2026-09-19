@@ -1,0 +1,18 @@
+<article
+  class="message"
+  [class.message--user]="message().role === 'user'"
+  [class.message--assistant]="message().role === 'assistant'"
+>
+  <span class="message__prompt" aria-hidden="true"></span>
+  <div class="message__body">
+    @if (message().content) {
+      <div class="message__content" [innerHTML]="message().content | markdown"></div>
+    }
+    @if (message().streaming) {
+      <span class="message__cursor" aria-hidden="true"></span>
+    }
+    @if (message().error) {
+      <p class="message__error">{{ message().error }}</p>
+    }
+  </div>
+</article>

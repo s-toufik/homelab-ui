@@ -1,0 +1,11 @@
+<main class="conversation">
+  @if (messages().length === 0) {
+    <p class="conversation__empty">Ask anything to start the conversation.</p>
+  }
+
+  @for (message of messages(); track message.id) {
+    <app-message [message]="message" />
+  }
+
+  <div #scrollAnchor></div>
+</main>

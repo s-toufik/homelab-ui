@@ -1,0 +1,87 @@
+:host {
+  display: contents;
+}
+
+.composer {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  width: 90%;
+  max-width: 56rem;
+  margin-inline: auto;
+  padding-block: 0.75rem;
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.composer__line {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.composer__prompt {
+  flex: 0 0 auto;
+  color: var(--accent);
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.composer__input {
+  flex: 1 1 auto;
+  resize: none;
+  max-height: 40vh;
+  min-height: 1.4em;
+  border: none;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  line-height: 1.4;
+  padding: 0;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.composer__send {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  border: none;
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.85rem;
+  line-height: 1;
+  cursor: pointer;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--accent-hover);
+  }
+}
+
+.composer__send--stop {
+  background: var(--danger);
+
+  &:hover {
+    background: var(--danger);
+    opacity: 0.9;
+  }
+}
+
+@media (max-width: 640px) {
+  .composer {
+    width: 94%;
+  }
+}

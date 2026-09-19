@@ -1,0 +1,36 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.agent-page {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+  background: var(--surface);
+  color: var(--text);
+  overflow: hidden;
+}
+
+.agent-page__banner {
+  width: 90%;
+  max-width: 56rem;
+  margin: 0 auto 0.75rem;
+  padding: 0.6rem 1rem;
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+@media (max-width: 640px) {
+  .agent-page__banner {
+    width: 94%;
+  }
+}

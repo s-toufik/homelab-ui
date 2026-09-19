@@ -1,0 +1,56 @@
+<div class="layout">
+  <button
+    type="button"
+    class="layout__nav-toggle"
+    title="Menu"
+    aria-label="Open navigation"
+    (click)="ui.toggleNav()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+    >
+      <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  @if (chrome.rightPanel()) {
+    <button
+      type="button"
+      class="layout__panel-toggle"
+      title="Settings"
+      aria-label="Open page settings"
+      (click)="ui.togglePanel()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <line x1="4" y1="6" x2="20" y2="6" stroke-linecap="round" />
+        <circle cx="9" cy="6" r="2" />
+        <line x1="4" y1="12" x2="20" y2="12" stroke-linecap="round" />
+        <circle cx="15" cy="12" r="2" />
+        <line x1="4" y1="18" x2="20" y2="18" stroke-linecap="round" />
+        <circle cx="9" cy="18" r="2" />
+      </svg>
+    </button>
+  }
+
+  <app-nav-sidebar />
+
+  <main class="layout__content">
+    <router-outlet />
+  </main>
+
+  @if (chrome.rightPanel()) {
+    <app-page-panel />
+  }
+</div>
