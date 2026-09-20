@@ -8,7 +8,6 @@ export const KNOWN_MODELS: readonly string[] = [
   'mistral-small-3-2-24b-instruct',
   'gemma4-26b-a4b',
   'qwen3-30b-a3b-instruct-2507',
-  'qwen3-32b',
 ];
 
 export const DEFAULT_MODEL: string = KNOWN_MODELS[0];
