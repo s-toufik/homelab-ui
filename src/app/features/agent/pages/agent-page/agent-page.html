@@ -8,7 +8,7 @@
 </ng-template>
 
 <div class="agent-page">
-  <app-conversation [messages]="store.messages()" />
+  <app-conversation [messages]="store.messages()" (resend)="store.resend($event)" />
 
   @if (store.requestError()) {
     <p class="agent-page__banner" role="alert">{{ store.requestError() }}</p>
