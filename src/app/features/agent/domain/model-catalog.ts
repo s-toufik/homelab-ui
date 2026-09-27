@@ -9,4 +9,4 @@ export const KNOWN_MODELS: readonly string[] = [
   'qwen3-14b',
 ];
 
-export const DEFAULT_MODEL: string = KNOWN_MODELS[0];
+export const DEFAULT_MODEL: string = KNOWN_MODELS[2];
