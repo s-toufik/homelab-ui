@@ -1,13 +1,12 @@
 export const KNOWN_MODELS: readonly string[] = [
   'qwen3-8b',
-  'ministral-8b-instruct-2410',
+  'qwen3.5-0.8b',
+  'qwen3-1.7b',
+  'qwen3.5-2b',
   'lfm2-8b-a1b',
+  'ministral-8b-instruct-2410',
+  'gigachat3.1-10b-a1.8b',
   'qwen3-14b',
-  'gpt-oss-20b',
-  'lfm2-24b-a2b',
-  'mistral-small-3-2-24b-instruct',
-  'gemma4-26b-a4b',
-  'qwen3-30b-a3b-instruct-2507',
 ];
 
 export const DEFAULT_MODEL: string = KNOWN_MODELS[0];
