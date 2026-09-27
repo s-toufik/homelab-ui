@@ -4,20 +4,27 @@
 
 .composer {
   display: flex;
-  align-items: flex-end;
+  align-items: center;
   gap: 0.6rem;
   width: 90%;
   max-width: 56rem;
-  margin-inline: auto;
-  padding-block: 0.75rem;
-  border-top: 1px solid var(--border);
-  background: var(--surface);
+  margin: 0 auto 1rem;
+  padding: 0.65rem 0.85rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-float);
+  transition: border-color 0.15s ease;
+
+  &:focus-within {
+    border-color: var(--accent-border);
+  }
 }
 
 .composer__line {
   flex: 1 1 auto;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   min-width: 0;
 }
@@ -54,7 +61,7 @@
   width: 2rem;
   height: 2rem;
   border: none;
-  border-radius: var(--radius);
+  border-radius: 50%;
   background: var(--accent);
   color: var(--on-accent);
   font-size: 0.85rem;

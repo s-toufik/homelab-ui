@@ -17,8 +17,12 @@ function newId(): string {
 /**
  * Owns chat state and orchestrates the stream-agent-reply use case. Kept
  * separate from AgentPage so the component stays a thin view layer.
+ *
+ * Provided in root (a true app-wide singleton) so the conversation survives
+ * navigating away from and back to the agent page -- it only resets on a
+ * full page reload or an explicit `newSession()`.
  */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AgentStore {
   private readonly api = inject(AgentApiService);
 
@@ -45,6 +49,21 @@ export class AgentStore {
     if (!text || this.isStreaming()) return;
 
     this.draft.set('');
+    await this.dispatch(text);
+  }
+
+  async resend(text: string): Promise<void> {
+    const trimmed = text.trim();
+    if (!trimmed || this.isStreaming()) return;
+
+    await this.dispatch(trimmed);
+  }
+
+  cancel(): void {
+    this.abortController?.abort();
+  }
+
+  private async dispatch(text: string): Promise<void> {
     this.requestError.set(null);
     this.messages.update((current) => [
       ...current,
@@ -71,8 +90,16 @@ export class AgentStore {
           case 'token':
             this.appendToAssistant(assistantId, event.content);
             break;
+          case 'status':
+            this.setAssistantStatus(assistantId, event.content);
+            break;
+          case 'reset':
+            // What was streamed so far is not the answer (a preamble or a rejected draft).
+            this.setAssistantContent(assistantId, '');
+            break;
           case 'final':
             this.setAssistantContent(assistantId, event.content);
+            this.setAssistantStatus(assistantId, undefined);
             break;
           case 'error':
             this.setAssistantError(assistantId, event.content);
@@ -93,10 +120,6 @@ export class AgentStore {
     }
   }
 
-  cancel(): void {
-    this.abortController?.abort();
-  }
-
   private appendToAssistant(id: string, chunk: string): void {
     this.updateMessage(id, (message) => ({ ...message, content: message.content + chunk }));
   }
@@ -105,12 +128,25 @@ export class AgentStore {
     this.updateMessage(id, (message) => ({ ...message, content }));
   }
 
+  private setAssistantStatus(id: string, status: string | undefined): void {
+    this.updateMessage(id, (message) => ({ ...message, status }));
+  }
+
   private setAssistantError(id: string, error: string): void {
-    this.updateMessage(id, (message) => ({ ...message, error, streaming: false }));
+    this.updateMessage(id, (message) => ({
+      ...message,
+      error,
+      status: undefined,
+      streaming: false,
+    }));
   }
 
   private setAssistantStreaming(id: string, streaming: boolean): void {
-    this.updateMessage(id, (message) => ({ ...message, streaming }));
+    this.updateMessage(id, (message) => ({
+      ...message,
+      streaming,
+      status: streaming ? message.status : undefined,
+    }));
   }
 
   private updateMessage(id: string, updater: (message: ChatMessage) => ChatMessage): void {
