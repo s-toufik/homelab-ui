@@ -3,8 +3,10 @@
   [class.message--user]="message().role === 'user'"
   [class.message--assistant]="message().role === 'assistant'"
 >
-  <span class="message__prompt" aria-hidden="true"></span>
-  <div class="message__body">
+  <div class="message__bubble">
+    @if (message().streaming && message().status) {
+      <p class="message__status" role="status">{{ message().status }}</p>
+    }
     @if (message().content) {
       <div class="message__content" [innerHTML]="message().content | markdown"></div>
     }
@@ -15,4 +17,60 @@
       <p class="message__error">{{ message().error }}</p>
     }
   </div>
+
+  @if (message().role === 'user') {
+    <div class="message__actions">
+      <button
+        type="button"
+        class="message__action"
+        title="Copy"
+        aria-label="Copy message"
+        (click)="copy()"
+      >
+        @if (copied()) {
+          <svg
+            viewBox="0 0 24 24"
+            width="13"
+            height="13"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path d="M4 12.5 9.5 18 20 6" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        } @else {
+          <svg
+            viewBox="0 0 24 24"
+            width="13"
+            height="13"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect x="9" y="9" width="12" height="12" rx="2" />
+            <path d="M5 15V5a2 2 0 0 1 2-2h10" />
+          </svg>
+        }
+      </button>
+      <button
+        type="button"
+        class="message__action"
+        title="Send again"
+        aria-label="Send message again"
+        (click)="resend.emit(message().content)"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="13"
+          height="13"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+          <path d="M20 11a8 8 0 1 0-2.34 5.66" stroke-linecap="round" stroke-linejoin="round" />
+          <path d="M20 4v6h-6" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+    </div>
+  }
 </article>
