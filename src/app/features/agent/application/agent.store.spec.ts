@@ -1,11 +1,17 @@
 import { TestBed } from '@angular/core/testing';
+import type { AgentRequestBody } from '../domain/agent-request';
 import type { StreamEvent } from '../domain/stream-event';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
 import { AgentStore } from './agent.store';
 
-function storeStreaming(events: StreamEvent[], seen: (store: AgentStore) => void = () => {}) {
+function storeStreaming(
+  events: StreamEvent[],
+  seen: (store: AgentStore) => void = () => {},
+  bodies: AgentRequestBody[] = [],
+) {
   const api = {
-    async *stream(): AsyncGenerator<StreamEvent> {
+    async *stream(body: AgentRequestBody): AsyncGenerator<StreamEvent> {
+      bodies.push(body);
       for (const event of events) {
         yield event;
         seen(store);
@@ -43,24 +49,6 @@ describe('AgentStore', () => {
     expect(reply.status).toBeUndefined();
   });
 
-  it('drops the streamed text on reset and keeps only what follows', async () => {
-    const contents: string[] = [];
-    const store = storeStreaming(
-      [
-        event('token', 'Let me check. '),
-        event('reset'),
-        event('token', 'Done.'),
-        event('complete'),
-      ],
-      (current) => contents.push(current.messages().at(-1)!.content),
-    );
-    store.draft.set('yes');
-
-    await store.send();
-
-    expect(contents).toEqual(['Let me check. ', '', 'Done.', 'Done.']);
-  });
-
   it('replaces the bubble with the final content', async () => {
     const store = storeStreaming([
       event('token', 'draft'),
@@ -72,5 +60,18 @@ describe('AgentStore', () => {
     await store.send();
 
     expect(store.messages().at(-1)!.content).toBe('The accepted answer.');
+  });
+
+  it('sends the auto-approve choice with each message', async () => {
+    const bodies: AgentRequestBody[] = [];
+    const store = storeStreaming([event('complete')], () => {}, bodies);
+
+    store.draft.set('first');
+    await store.send();
+    store.autoApprove.set(true);
+    store.draft.set('second');
+    await store.send();
+
+    expect(bodies.map((body) => body.auto_approve)).toEqual([false, true]);
   });
 });

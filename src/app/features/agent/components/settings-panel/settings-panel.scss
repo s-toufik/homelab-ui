@@ -51,6 +51,29 @@
   }
 }
 
+.settings-panel__field--check {
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+
+  input[type='checkbox'] {
+    width: auto;
+    margin: 0;
+    accent-color: var(--accent);
+    cursor: pointer;
+  }
+
+  label {
+    color: var(--text);
+  }
+}
+
+.settings-panel__hint {
+  flex-basis: 100%;
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
 .settings-panel__action {
   display: flex;
   align-items: center;

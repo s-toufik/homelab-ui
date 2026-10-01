@@ -11,5 +11,6 @@ export class SettingsPanel {
   readonly knownModels = input.required<readonly string[]>();
   readonly modelName = model.required<string>();
   readonly sessionId = model.required<string>();
+  readonly autoApprove = model.required<boolean>();
   readonly newSession = output<void>();
 }

@@ -29,6 +29,7 @@ export class AgentStore {
   readonly knownModels = KNOWN_MODELS;
   readonly modelName = signal(DEFAULT_MODEL);
   readonly sessionId = signal(newId());
+  readonly autoApprove = signal(false);
   readonly draft = signal('');
   readonly messages = signal<ChatMessage[]>([]);
   readonly isStreaming = signal(false);
@@ -81,7 +82,12 @@ export class AgentStore {
 
     try {
       const events = this.api.stream(
-        { message: text, model_name: this.modelName(), request_id: this.sessionId() },
+        {
+          message: text,
+          model_name: this.modelName(),
+          request_id: this.sessionId(),
+          auto_approve: this.autoApprove(),
+        },
         this.abortController.signal,
       );
 
@@ -92,10 +98,6 @@ export class AgentStore {
             break;
           case 'status':
             this.setAssistantStatus(assistantId, event.content);
-            break;
-          case 'reset':
-            // What was streamed so far is not the answer (a preamble or a rejected draft).
-            this.setAssistantContent(assistantId, '');
             break;
           case 'final':
             this.setAssistantContent(assistantId, event.content);

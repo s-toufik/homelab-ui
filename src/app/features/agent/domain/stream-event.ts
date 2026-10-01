@@ -1,4 +1,4 @@
-export type StreamEventType = 'token' | 'status' | 'reset' | 'final' | 'error' | 'complete';
+export type StreamEventType = 'token' | 'status' | 'final' | 'error' | 'complete';
 
 export interface StreamEvent {
   type: StreamEventType;

@@ -41,6 +41,20 @@
   <input id="session" type="text" [ngModel]="sessionId()" (ngModelChange)="sessionId.set($event)" />
 </div>
 
+<div class="settings-panel__field settings-panel__field--check">
+  <input
+    id="auto-approve"
+    type="checkbox"
+    [ngModel]="autoApprove()"
+    (ngModelChange)="autoApprove.set($event)"
+    aria-describedby="auto-approve-hint"
+  />
+  <label for="auto-approve">Auto-approve plans</label>
+  <p id="auto-approve-hint" class="settings-panel__hint">
+    Run a plan as soon as it is written, without waiting for your "yes".
+  </p>
+</div>
+
 <button type="button" class="settings-panel__action" (click)="newSession.emit()">
   <svg
     viewBox="0 0 24 24"
