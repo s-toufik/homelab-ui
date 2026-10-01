@@ -1,3 +1,17 @@
+<button type="button" class="settings-panel__action" (click)="newSession.emit()">
+  <svg
+    viewBox="0 0 24 24"
+    width="18"
+    height="18"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.8"
+  >
+    <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+  </svg>
+  New session
+</button>
+
 <div class="settings-panel__field settings-panel__field--block">
   <label for="model">
     <svg
@@ -50,21 +64,5 @@
     aria-describedby="auto-approve-hint"
   />
   <label for="auto-approve">Auto-approve plans</label>
-  <p id="auto-approve-hint" class="settings-panel__hint">
-    Run a plan as soon as it is written, without waiting for your "yes".
-  </p>
+  <p id="auto-approve-hint" class="settings-panel__hint">Approve plans automatically.</p>
 </div>
-
-<button type="button" class="settings-panel__action" (click)="newSession.emit()">
-  <svg
-    viewBox="0 0 24 24"
-    width="18"
-    height="18"
-    fill="none"
-    stroke="currentColor"
-    stroke-width="1.8"
-  >
-    <path d="M12 5v14M5 12h14" stroke-linecap="round" />
-  </svg>
-  New session
-</button>

@@ -74,4 +74,20 @@ describe('AgentStore', () => {
 
     expect(bodies.map((body) => body.auto_approve)).toEqual([false, true]);
   });
+
+  it('shows an error under the bubble and stops streaming', async () => {
+    const store = storeStreaming([
+      event('status', 'Understanding your request'),
+      event('error', 'Traceback: boom'),
+      event('complete'),
+    ]);
+    store.draft.set('hello');
+
+    await store.send();
+
+    const reply = store.messages().at(-1)!;
+    expect(reply.error).toBe('Traceback: boom');
+    expect(reply.status).toBeUndefined();
+    expect(reply.streaming).toBe(false);
+  });
 });
