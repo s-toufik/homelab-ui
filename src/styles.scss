@@ -43,7 +43,8 @@ body {
 // never gets the _ngcontent-* attribute Angular's component-style scoping
 // relies on -- a scoped rule here would silently never match.
 .message__content {
-  word-break: break-word;
+  // Long paths and identifiers have no spaces to wrap at.
+  overflow-wrap: anywhere;
 
   > :first-child {
     margin-top: 0;
@@ -86,12 +87,35 @@ body {
     border-radius: var(--radius);
     border: 1px solid var(--border);
     background: var(--code-surface);
+    max-width: 100%;
     overflow-x: auto;
+    overflow-wrap: normal;
 
     code {
       background: none;
       padding: 0;
     }
+  }
+
+  // Tables keep their columns and scroll sideways inside the bubble.
+  table {
+    display: block;
+    max-width: 100%;
+    overflow-x: auto;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: 0.25em 0.6em;
+    border-bottom: 1px solid var(--border);
+    text-align: start;
+    overflow-wrap: normal;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
   }
 
   blockquote {

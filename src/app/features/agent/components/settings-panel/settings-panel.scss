@@ -90,3 +90,10 @@
     background: var(--surface-raised);
   }
 }
+
+@media (max-width: 640px) {
+  .settings-panel__field input,
+  .settings-panel__field select {
+    font-size: 1rem;
+  }
+}
