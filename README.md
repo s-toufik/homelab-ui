@@ -18,17 +18,25 @@ The overview lists every app in your homelab, grouped by what it does. Each tile
 
 Ask in plain words, the way you would ask a colleague: _"Summarise sales.csv by region"_, _"What's in change.md?"_, _"Which tools can you use?"_.
 
+A question it can answer straight away — _"What is a KV cache?"_ — comes back **as it is written**: the words appear one after another, so you can start reading at once.
+
+<img src="docs/screenshots/streaming.webp" alt="The agent writing its answer to 'What is a KV cache?' word by word" />
+
 When a request needs real work — reading files, crunching numbers, saving a report — the agent first shows you **its plan**. Reply **yes** and it gets to work, showing what it is doing as it goes, then gives you the result.
 
 <img src="docs/screenshots/chat.webp" alt="A conversation: the agent proposes a plan, the user replies yes, the agent answers with a table" />
 
 ## Stay in control
 
-The settings panel lets you choose the **model** that answers, start a **new conversation**, or pick up an old one by pasting its id.
+The settings panel lets you choose the **model** that answers, start a **new conversation**, or pick up an old one by pasting its id. The list of models comes from the agent itself: when a new model is added there, it shows up here.
 
 Trust the agent with a task? Turn on **Auto-approve plans** and it carries out its plans without waiting for your yes.
 
-<img src="docs/screenshots/settings.webp" alt="The settings panel: model, auto-approve, conversation id and new conversation" />
+Your model and auto-approve choices are **remembered** on that device, so they are still there after a refresh or the next day.
+
+At the bottom, **Fixed by the server** shows the steps that always use the same model whatever you pick — for example understanding your request or writing a plan.
+
+<img src="docs/screenshots/settings.webp" alt="The settings panel: model, auto-approve, conversation id, new conversation, and the steps fixed by the server with their model" />
 
 ## All your tools, one menu away
 
@@ -92,7 +100,8 @@ src/app/
 │   │   ├── domain/ application/ components/ pages/
 │   │   └── infrastructure/
 │   │       ├── agent.json       -- port + subpath of agent-orchestrator
-│   │       └── api/             -- SSE client, readiness check
+│   │       ├── api/             -- SSE client, model list (/v1/models), readiness check
+│   │       └── storage/         -- the user's model and auto-approve choices (localStorage)
 │   ├── infrastructure/          -- status of the services apps rely on, read from Prometheus
 │   │   ├── infrastructure.feature.ts  -- registers one resource per entry
 │   │   ├── domain/              -- one entry per service and the metric that says it is up
@@ -119,6 +128,8 @@ Every address is built from `shared/infrastructure/homelab-server.json` and the 
 | `{ "port": null, "subpath": "grafana" }` | `http://<your-server>/grafana`   |
 
 `healthPath` (optional) is what the status dot calls. The files are compiled in: rebuild after changing them. Every device opening the UI must be able to resolve the server name.
+
+To try the UI against a backend running on your own machine, set `homelab-server.json` to `http://localhost` and the feature's `port` to the one your backend listens on. Every other feature then points to `localhost` too, so their status shows offline unless they run locally. Don't commit these edits.
 
 ### Development
 

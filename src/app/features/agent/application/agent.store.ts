@@ -1,8 +1,9 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import type { ChatMessage } from '../domain/chat-message';
 import { NO_MODELS, type ModelListing } from '../domain/model-catalog';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
 import { AgentModelsService } from '../infrastructure/api/agent-models.service';
+import { AgentPreferencesStorage } from '../infrastructure/storage/agent-preferences.storage';
 
 function newId(): string {
   if (typeof crypto.randomUUID === 'function') {
@@ -19,14 +20,16 @@ function newId(): string {
 export class AgentStore {
   private readonly api = inject(AgentApiService);
   private readonly modelCatalog = inject(AgentModelsService);
+  private readonly preferences = inject(AgentPreferencesStorage);
+  private readonly saved = this.preferences.read();
 
   readonly modelListing = signal<ModelListing>(NO_MODELS);
   readonly modelsError = signal<string | null>(null);
   readonly modelNames = computed(() => this.modelListing().models.map((model) => model.name));
   readonly pinnedSteps = computed(() => this.modelListing().pinnedSteps);
-  readonly modelName = signal('');
+  readonly modelName = signal(this.saved.modelName);
   readonly sessionId = signal(newId());
-  readonly autoApprove = signal(false);
+  readonly autoApprove = signal(this.saved.autoApprove);
   readonly draft = signal('');
   readonly messages = signal<ChatMessage[]>([]);
   readonly isStreaming = signal(false);
@@ -36,6 +39,12 @@ export class AgentStore {
   );
 
   private abortController: AbortController | null = null;
+
+  constructor() {
+    effect(() => {
+      this.preferences.write({ modelName: this.modelName(), autoApprove: this.autoApprove() });
+    });
+  }
 
   async loadModels(): Promise<void> {
     try {

@@ -1,6 +1,14 @@
 import { Component, computed, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
+const STEP_LABELS: Readonly<Record<string, string>> = {
+  understand: 'Understand',
+  plan: 'Plan',
+  act: 'Answer',
+  review: 'Review',
+  summarize: 'Summarize',
+};
+
 @Component({
   selector: 'app-settings-panel',
   imports: [FormsModule],
@@ -16,16 +24,13 @@ export class SettingsPanel {
   readonly autoApprove = model.required<boolean>();
   readonly newSession = output<void>();
 
-  readonly pinnedNote = computed(() => {
-    const pinned = Object.entries(this.pinnedSteps());
-    if (pinned.length === 0) return null;
-    const models = new Set(pinned.map(([, name]) => name));
-    if (models.size === 1) {
-      const steps = pinned.map(([step]) => step).join(', ');
-      return `The server fixes ${[...models][0]} for: ${steps}.`;
-    }
-    return `The server fixes ${pinned.map(([step, name]) => `${step} → ${name}`).join(', ')}.`;
-  });
+  readonly pinned = computed(() =>
+    Object.entries(this.pinnedSteps()).map(([step, model]) => ({
+      step: STEP_LABELS[step] ?? step,
+      model,
+      shortName: model.split('/').pop() ?? model,
+    })),
+  );
 
   readonly copied = signal(false);
   private copiedTimeout?: ReturnType<typeof setTimeout>;
