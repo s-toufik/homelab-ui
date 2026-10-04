@@ -4,6 +4,7 @@ import { provideRouter } from '@angular/router';
 import { provideAgentFeature } from '@features/agent/agent.feature';
 import { provideAlloyFeature } from '@features/alloy/alloy.feature';
 import { provideGrafanaFeature } from '@features/grafana/grafana.feature';
+import { provideInfrastructureResources } from '@features/infrastructure/infrastructure.feature';
 import { provideKafkaUiFeature } from '@features/kafka-ui/kafka-ui.feature';
 import { provideLlmFeature } from '@features/llm/llm.feature';
 import { providePrometheusFeature } from '@features/prometheus/prometheus.feature';
@@ -19,5 +20,6 @@ export const appConfig: ApplicationConfig = {
     providePrometheusFeature(),
     provideAlloyFeature(),
     provideKafkaUiFeature(),
+    ...provideInfrastructureResources(),
   ],
 };

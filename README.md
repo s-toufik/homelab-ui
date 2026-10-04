@@ -32,9 +32,11 @@ Trust the agent with a task? Turn on **Auto-approve plans** and it carries out i
 
 ## All your tools, one menu away
 
-The menu lists every app and page. Those that open in a new tab — dashboards, metrics, logs — are marked with a small arrow, and the bottom line tells you how many of your services are answering.
+The menu lists every app and page. Those that open in a new tab — dashboards, metrics, logs — are marked with a small arrow.
 
-<img src="docs/screenshots/menu.webp" alt="The side menu: Homelab at the top, then every app with its colour" />
+Below them, **Infrastructure** shows whether your databases and Kafka are **up**, so you know at a glance that everything your apps rely on is running. The bottom line tells you how many of your services are answering.
+
+<img src="docs/screenshots/menu.webp" alt="The side menu: every app with its colour, then PostgreSQL, MongoDB and Kafka marked Up" />
 
 ## On your phone too
 
@@ -74,10 +76,14 @@ src/app/
 │   ├── application/
 │   │   ├── homelab-features.ts  -- HOMELAB_FEATURES + provideHomelabFeature()
 │   │   ├── feature-status.store.ts  -- runs each feature's health check
+│   │   ├── homelab-resources.ts -- HOMELAB_RESOURCES + provideHomelabResource()
+│   │   ├── resource-status.store.ts -- runs each resource's status check
 │   │   ├── layout.store.ts      -- open/closed state of both sidebars
 │   │   └── page-chrome.store.ts -- whatever the current page registered for the right panel
 │   ├── directives/              -- [appPagePanelContent], how a page fills the right panel
-│   └── domain/homelab-feature.ts  -- HomelabFeature: what a feature tells the shell
+│   └── domain/
+│       ├── homelab-feature.ts   -- HomelabFeature: an app or page the shell lists
+│       └── homelab-resource.ts  -- HomelabResource: has a status, nothing to open
 │
 ├── features/                    -- one folder per backend, even a plain link
 │   ├── home/                    -- the dashboard: every feature by category, with health dots
@@ -87,6 +93,10 @@ src/app/
 │   │   └── infrastructure/
 │   │       ├── agent.json       -- port + subpath of agent-orchestrator
 │   │       └── api/             -- SSE client, readiness check
+│   ├── infrastructure/          -- database and Kafka status, read from Prometheus
+│   │   ├── infrastructure.feature.ts  -- registers one resource per entry
+│   │   ├── domain/              -- PostgreSQL, MongoDB, Kafka and the metric for each
+│   │   └── infrastructure/      -- prometheus.json + PrometheusQueryService
 │   └── grafana/ prometheus/ alloy/ kafka-ui/ llm/   -- links to homelab-infra web UIs
 │       ├── <name>.feature.ts    -- registration
 │       └── infrastructure/<name>.json  -- port + subpath + health path

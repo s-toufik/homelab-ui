@@ -78,6 +78,26 @@
     }
   </ul>
 
+  @if (resourceStatus.resources.length) {
+    <h2 class="nav-sidebar__section">Infrastructure</h2>
+    <ul class="nav-sidebar__list">
+      @for (resource of resourceStatus.resources; track resource.id) {
+        @let status = resourceStatus.statuses()[resource.id] ?? 'checking';
+        <li class="nav-sidebar__resource">
+          <span class="nav-sidebar__swatch" [style.background]="resource.color"></span>
+          {{ resource.label }}
+          <span
+            class="nav-sidebar__health"
+            [class]="'nav-sidebar__health--' + status"
+            role="status"
+          >
+            {{ resourceLabel[status] }}
+          </span>
+        </li>
+      }
+    </ul>
+  }
+
   <div class="nav-sidebar__status" role="status">
     <span class="nav-sidebar__dot" [class]="'nav-sidebar__dot--' + health().level"></span>
     {{ health().label }}
