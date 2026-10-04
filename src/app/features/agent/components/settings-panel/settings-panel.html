@@ -41,14 +41,8 @@
     />
   </label>
 </section>
-@if (modelsError() || pinnedNote(); as note) {
-  <p
-    id="model-hint"
-    class="settings-panel__hint"
-    [class.settings-panel__hint--error]="!!modelsError()"
-  >
-    {{ note }}
-  </p>
+@if (modelsError(); as error) {
+  <p id="model-hint" class="settings-panel__hint settings-panel__hint--error">{{ error }}</p>
 }
 <p id="auto-approve-hint" class="settings-panel__hint">
   Auto-approve runs a plan without your approval.
@@ -128,3 +122,15 @@
 <p id="session-hint" class="settings-panel__hint">
   Paste an earlier conversation's id to continue it.
 </p>
+
+@if (pinned().length) {
+  <h3 class="settings-panel__label" id="pinned-label">Fixed by the server</h3>
+  <section class="settings-panel__group" aria-labelledby="pinned-label">
+    @for (row of pinned(); track row.step) {
+      <div class="settings-panel__row settings-panel__row--stacked">
+        <span class="settings-panel__step">{{ row.step }}</span>
+        <span class="settings-panel__model" [title]="row.model">{{ row.shortName }}</span>
+      </div>
+    }
+  </section>
+}
