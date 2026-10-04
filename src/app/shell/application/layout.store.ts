@@ -1,7 +1,5 @@
 import { Injectable, signal } from '@angular/core';
 
-/** Open/closed state of the two off-canvas sidebars. Both are retractable
- * at every screen size and start closed. */
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
   readonly navOpen = signal(false);

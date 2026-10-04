@@ -14,14 +14,6 @@ function newId(): string {
   return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-/**
- * Owns chat state and orchestrates the stream-agent-reply use case. Kept
- * separate from AgentPage so the component stays a thin view layer.
- *
- * Provided in root (a true app-wide singleton) so the conversation survives
- * navigating away from and back to the agent page -- it only resets on a
- * full page reload or an explicit `newSession()`.
- */
 @Injectable({ providedIn: 'root' })
 export class AgentStore {
   private readonly api = inject(AgentApiService);

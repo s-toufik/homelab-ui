@@ -1,4 +1,4 @@
-import { Component, input, model, output } from '@angular/core';
+import { Component, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 
 @Component({
@@ -13,4 +13,14 @@ export class SettingsPanel {
   readonly sessionId = model.required<string>();
   readonly autoApprove = model.required<boolean>();
   readonly newSession = output<void>();
+
+  readonly copied = signal(false);
+  private copiedTimeout?: ReturnType<typeof setTimeout>;
+
+  async copySessionId(): Promise<void> {
+    await navigator.clipboard.writeText(this.sessionId());
+    this.copied.set(true);
+    clearTimeout(this.copiedTimeout);
+    this.copiedTimeout = setTimeout(() => this.copied.set(false), 1500);
+  }
 }

@@ -14,8 +14,6 @@ export class Conversation {
   private readonly scrollAnchor = viewChild<ElementRef<HTMLElement>>('scrollAnchor');
 
   constructor() {
-    // Scroll to the newest content on every message-list change (new
-    // message, streamed token, error, ...).
     effect(() => {
       this.messages();
       this.scrollAnchor()?.nativeElement.scrollIntoView?.({ block: 'end' });

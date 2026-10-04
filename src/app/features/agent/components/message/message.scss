@@ -40,7 +40,7 @@
   background: var(--accent-soft);
   border: 1px solid var(--accent-border);
   border-end-end-radius: 0.3rem;
-  color: #eef2ff;
+  color: var(--on-accent-soft);
 }
 
 .message__actions {
@@ -55,7 +55,6 @@
   opacity: 1;
 }
 
-// A touch screen has no hover: keep copy and resend visible.
 @media (hover: none) {
   .message__actions {
     opacity: 1;

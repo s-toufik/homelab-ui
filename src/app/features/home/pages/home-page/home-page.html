@@ -1,12 +1,108 @@
 <div class="home-page">
-  <h1 class="home-page__title">Homelab</h1>
+  <header class="home-page__header">
+    <div>
+      <p class="home-page__eyebrow">Homelab</p>
+      <h1 class="home-page__title">{{ greeting }}</h1>
+      <p class="home-page__summary">{{ host }} · {{ summary() }}</p>
+    </div>
 
-  <div class="home-page__grid">
-    @for (item of navItems; track item.path) {
-      <a class="home-page__card" [routerLink]="item.path">
-        <span class="home-page__card-label">{{ item.label }}</span>
-        <p class="home-page__card-description">{{ item.description }}</p>
-      </a>
+    @if (showSearch) {
+      <label class="home-page__search">
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="m20 20-3.5-3.5" stroke-linecap="round" />
+        </svg>
+        <input
+          #search
+          type="search"
+          placeholder="Find an app"
+          aria-label="Find an app"
+          [ngModel]="query()"
+          (ngModelChange)="query.set($event)"
+        />
+        <kbd>/</kbd>
+      </label>
     }
-  </div>
+  </header>
+
+  @for (section of sections(); track section.category) {
+    <section class="home-page__section" [attr.aria-label]="section.category">
+      <h2 class="home-page__category">{{ section.category }}</h2>
+      <div class="home-page__grid">
+        @for (feature of section.features; track feature.id) {
+          @if (feature.entry.kind === 'page') {
+            <a class="home-page__tile" [routerLink]="feature.entry.path">
+              <ng-container
+                [ngTemplateOutlet]="tile"
+                [ngTemplateOutletContext]="{ $implicit: feature }"
+              />
+            </a>
+          } @else {
+            <a class="home-page__tile" [href]="feature.entry.url" target="_blank" rel="noopener">
+              <ng-container
+                [ngTemplateOutlet]="tile"
+                [ngTemplateOutletContext]="{ $implicit: feature }"
+              />
+            </a>
+          }
+        }
+      </div>
+    </section>
+  } @empty {
+    <p class="home-page__empty">Nothing matches "{{ query() }}".</p>
+  }
 </div>
+
+<ng-template #tile let-feature>
+  <span class="home-page__tile-top">
+    <span class="home-page__icon" [style.background]="feature.color">
+      <app-feature-icon [paths]="feature.icon" [size]="18" />
+    </span>
+    @if (feature.entry.kind === 'link') {
+      <svg
+        class="home-page__go"
+        viewBox="0 0 24 24"
+        width="15"
+        height="15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-label="Opens in a new tab"
+        role="img"
+      >
+        <path
+          d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        />
+      </svg>
+    } @else {
+      <svg
+        class="home-page__go"
+        viewBox="0 0 24 24"
+        width="15"
+        height="15"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        aria-hidden="true"
+      >
+        <path d="m9 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    }
+  </span>
+  <span class="home-page__name">{{ feature.label }}</span>
+  <span class="home-page__description">{{ feature.description }}</span>
+  @if (statuses()[feature.id]; as status) {
+    <span class="home-page__status" [class]="'home-page__status--' + status" role="status">
+      {{ statusLabel[status] }}
+    </span>
+  }
+</ng-template>

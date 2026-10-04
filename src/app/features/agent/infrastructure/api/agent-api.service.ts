@@ -1,20 +1,15 @@
 import { Injectable, inject } from '@angular/core';
 import type { AgentRequestBody } from '../../domain/agent-request';
 import type { StreamEvent, StreamEventType } from '../../domain/stream-event';
-import { ApiConfigService } from '../config/api-config.service';
+import { HomelabServer } from '@shared/infrastructure/homelab-server';
+import AGENT from '../agent.json';
 
-/**
- * Talks to agent-orchestrator's POST /v1/stream endpoint. The response is a
- * Server-Sent Events stream, which EventSource can't produce (it only sends
- * GET, no body), so this parses the "event: ...\ndata: ...\n\n" frames off
- * the fetch response body directly.
- */
 @Injectable({ providedIn: 'root' })
 export class AgentApiService {
-  private readonly config = inject(ApiConfigService);
+  private readonly server = inject(HomelabServer);
 
   async *stream(body: AgentRequestBody, signal: AbortSignal): AsyncGenerator<StreamEvent> {
-    const response = await fetch(`${this.config.baseUrl()}/v1/stream`, {
+    const response = await fetch(this.server.url(AGENT, '/v1/stream'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),
