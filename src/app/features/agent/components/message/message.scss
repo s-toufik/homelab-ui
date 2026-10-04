@@ -4,47 +4,122 @@
 
 .message {
   display: flex;
-  align-items: flex-start;
-  gap: 0.6rem;
-  width: 100%;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+  max-width: 80%;
   padding-block: 0.15rem;
 }
 
-.message__prompt {
-  flex: 0 0 auto;
+.message--user {
+  align-self: flex-end;
+  align-items: flex-end;
+}
+
+.message--assistant {
+  align-self: flex-start;
+  align-items: flex-start;
+}
+
+.message__bubble {
+  max-width: 100%;
+  min-width: 0;
+  padding: 0.7rem 1rem;
+  border-radius: var(--radius-lg);
+  line-height: 1.55;
+  box-shadow: var(--shadow-float);
+}
+
+.message--assistant .message__bubble {
+  background: var(--surface-raised);
+  border: 1px solid var(--border);
+  border-end-start-radius: 0.3rem;
+}
+
+.message--user .message__bubble {
+  background: var(--accent-soft);
+  border: 1px solid var(--accent-border);
+  border-end-end-radius: 0.3rem;
+  color: var(--on-accent-soft);
+}
+
+.message__actions {
+  display: flex;
+  gap: 0.25rem;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.message:hover .message__actions,
+.message:focus-within .message__actions {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .message__actions {
+    opacity: 1;
+  }
+}
+
+.message__action {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 1.55em;
-  font-weight: 600;
-  user-select: none;
-}
-
-.message--user .message__prompt {
-  color: var(--accent);
-
-  &::before {
-    content: '>';
-  }
-}
-
-.message--assistant .message__prompt {
+  width: 1.6rem;
+  height: 1.6rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
   color: var(--text-muted);
+  cursor: pointer;
 
-  &::before {
-    content: '·';
+  &:hover {
+    background: var(--surface-raised);
+    color: var(--text);
   }
 }
 
-.message__body {
-  min-width: 0;
-  line-height: 1.55;
+.message__status {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0 0 0.35rem;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+
+  &::before {
+    content: '';
+    width: 0.45rem;
+    height: 0.45rem;
+    border-radius: 50%;
+    background: var(--accent);
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@media (max-width: 640px) {
+  .message {
+    max-width: 90%;
+  }
+
+  .message--assistant {
+    max-width: 100%;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
 }
 
 .message__error {
   margin: 0.5rem 0 0;
   color: var(--danger);
   font-size: 0.9rem;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
 }
 
 .message__cursor {

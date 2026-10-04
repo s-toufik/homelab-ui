@@ -8,7 +8,6 @@ import { SettingsPanel } from '../../components/settings-panel/settings-panel';
 @Component({
   selector: 'app-agent-page',
   imports: [PagePanelContentDirective, SettingsPanel, Conversation, Composer],
-  providers: [AgentStore],
   templateUrl: './agent-page.html',
   styleUrl: './agent-page.scss',
 })

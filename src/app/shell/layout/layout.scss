@@ -8,7 +8,7 @@
   position: relative;
   height: 100%;
   width: 100%;
-  background: var(--surface);
+  background: var(--backdrop);
   color: var(--text);
   overflow: hidden;
 }
@@ -33,7 +33,7 @@
   padding: 0;
   border: 1px solid var(--border);
   border-radius: var(--radius);
-  background: transparent;
+  background: var(--surface);
   color: var(--text);
   cursor: pointer;
 

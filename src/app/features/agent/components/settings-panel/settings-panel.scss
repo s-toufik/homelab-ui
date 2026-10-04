@@ -1,69 +1,192 @@
 :host {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
-}
-
-.settings-panel__field {
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-size: 0.85rem;
-  color: var(--text-muted);
-
-  label {
-    display: flex;
-    cursor: pointer;
-  }
-
-  input,
-  select {
-    width: 11rem;
-    max-width: 40vw;
-    padding: 0.35rem 0.6rem;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: var(--surface);
-    color: var(--text);
-    font: inherit;
-
-    &:focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 1px;
-    }
-  }
-
-  &--block {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 0.35rem;
-
-    label {
-      align-items: center;
-      gap: 0.4rem;
-    }
-
-    input,
-    select {
-      width: 100%;
-      max-width: none;
-    }
-  }
-}
-
-.settings-panel__action {
-  display: flex;
-  align-items: center;
   gap: 0.5rem;
-  padding: 0.55rem 0.7rem;
+  font-size: 0.9rem;
+}
+
+.settings-panel__group {
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: 0.6rem;
+  background: var(--surface-raised);
+  overflow: hidden;
+
+  & + & {
+    margin-top: 0.75rem;
+  }
+}
+
+.settings-panel__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  min-height: 2.75rem;
+  padding: 0.55rem 0.8rem;
+  border: none;
   background: transparent;
   color: var(--text);
   font: inherit;
+  text-align: start;
   cursor: pointer;
 
+  & + & {
+    border-top: 1px solid var(--border);
+  }
+
+  &:focus-within {
+    background: var(--accent-soft);
+  }
+}
+
+.settings-panel__row--action {
+  justify-content: flex-start;
+  gap: 0.5rem;
+  width: 100%;
+  color: var(--accent);
+
   &:hover {
+    background: var(--accent-soft);
+  }
+
+  &:focus-visible {
+    outline: none;
+    background: var(--accent-soft);
+  }
+}
+
+.settings-panel__value {
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  min-width: 0;
+  color: var(--text-muted);
+
+  svg {
+    flex: 0 0 auto;
+  }
+}
+
+.settings-panel__row--select select {
+  min-width: 0;
+  max-width: 10rem;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: end;
+  text-overflow: ellipsis;
+  appearance: none;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: none;
+  }
+
+  option {
     background: var(--surface-raised);
+    color: var(--text);
+  }
+}
+
+.settings-panel__switch {
+  flex: 0 0 auto;
+  position: relative;
+  width: 2.4rem;
+  height: 1.4rem;
+  margin: 0;
+  border-radius: 999px;
+  background: var(--border);
+  appearance: none;
+  cursor: pointer;
+  transition: background 0.15s ease;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0.15rem;
+    left: 0.15rem;
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 50%;
+    background: var(--text-muted);
+    transition:
+      transform 0.15s ease,
+      background 0.15s ease;
+  }
+
+  &:checked {
+    background: var(--accent);
+
+    &::after {
+      transform: translateX(1rem);
+      background: var(--surface);
+    }
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+.settings-panel__hint {
+  margin: 0 0 0.75rem;
+  padding-inline: 0.3rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--text-muted);
+}
+
+.settings-panel__copy {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.2rem 0.3rem;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    outline: none;
+    color: var(--text);
+    background: var(--surface);
+  }
+}
+
+.settings-panel__row--field {
+  cursor: text;
+}
+
+.settings-panel__id {
+  width: 100%;
+  min-width: 0;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+@media (max-width: 640px) {
+  :host {
+    font-size: 1rem;
+  }
+
+  .settings-panel__id {
+    font-size: 1rem;
   }
 }

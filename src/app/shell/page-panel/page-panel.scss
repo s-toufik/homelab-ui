@@ -33,7 +33,15 @@
 
 .page-panel__header {
   display: flex;
-  justify-content: flex-end;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.page-panel__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text);
 }
 
 .page-panel__close {

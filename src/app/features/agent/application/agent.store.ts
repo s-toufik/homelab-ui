@@ -4,20 +4,24 @@ import { DEFAULT_MODEL, KNOWN_MODELS } from '../domain/model-catalog';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
 
 function newId(): string {
-  return crypto.randomUUID();
+  if (typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID();
+  }
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  bytes[6] = (bytes[6] & 0x0f) | 0x40;
+  bytes[8] = (bytes[8] & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
 }
 
-/**
- * Owns chat state and orchestrates the stream-agent-reply use case. Kept
- * separate from AgentPage so the component stays a thin view layer.
- */
-@Injectable()
+@Injectable({ providedIn: 'root' })
 export class AgentStore {
   private readonly api = inject(AgentApiService);
 
   readonly knownModels = KNOWN_MODELS;
   readonly modelName = signal(DEFAULT_MODEL);
   readonly sessionId = signal(newId());
+  readonly autoApprove = signal(false);
   readonly draft = signal('');
   readonly messages = signal<ChatMessage[]>([]);
   readonly isStreaming = signal(false);
@@ -38,6 +42,21 @@ export class AgentStore {
     if (!text || this.isStreaming()) return;
 
     this.draft.set('');
+    await this.dispatch(text);
+  }
+
+  async resend(text: string): Promise<void> {
+    const trimmed = text.trim();
+    if (!trimmed || this.isStreaming()) return;
+
+    await this.dispatch(trimmed);
+  }
+
+  cancel(): void {
+    this.abortController?.abort();
+  }
+
+  private async dispatch(text: string): Promise<void> {
     this.requestError.set(null);
     this.messages.update((current) => [
       ...current,
@@ -55,7 +74,12 @@ export class AgentStore {
 
     try {
       const events = this.api.stream(
-        { message: text, model_name: this.modelName(), request_id: this.sessionId() },
+        {
+          message: text,
+          model_name: this.modelName(),
+          request_id: this.sessionId(),
+          auto_approve: this.autoApprove(),
+        },
         this.abortController.signal,
       );
 
@@ -64,8 +88,12 @@ export class AgentStore {
           case 'token':
             this.appendToAssistant(assistantId, event.content);
             break;
+          case 'status':
+            this.setAssistantStatus(assistantId, event.content);
+            break;
           case 'final':
             this.setAssistantContent(assistantId, event.content);
+            this.setAssistantStatus(assistantId, undefined);
             break;
           case 'error':
             this.setAssistantError(assistantId, event.content);
@@ -86,10 +114,6 @@ export class AgentStore {
     }
   }
 
-  cancel(): void {
-    this.abortController?.abort();
-  }
-
   private appendToAssistant(id: string, chunk: string): void {
     this.updateMessage(id, (message) => ({ ...message, content: message.content + chunk }));
   }
@@ -98,12 +122,25 @@ export class AgentStore {
     this.updateMessage(id, (message) => ({ ...message, content }));
   }
 
+  private setAssistantStatus(id: string, status: string | undefined): void {
+    this.updateMessage(id, (message) => ({ ...message, status }));
+  }
+
   private setAssistantError(id: string, error: string): void {
-    this.updateMessage(id, (message) => ({ ...message, error, streaming: false }));
+    this.updateMessage(id, (message) => ({
+      ...message,
+      error,
+      status: undefined,
+      streaming: false,
+    }));
   }
 
   private setAssistantStreaming(id: string, streaming: boolean): void {
-    this.updateMessage(id, (message) => ({ ...message, streaming }));
+    this.updateMessage(id, (message) => ({
+      ...message,
+      streaming,
+      status: streaming ? message.status : undefined,
+    }));
   }
 
   private updateMessage(id: string, updater: (message: ChatMessage) => ChatMessage): void {

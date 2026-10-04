@@ -1,8 +1,5 @@
-/** Mirrors MessageStreamType on the backend. */
-export type StreamEventType = 'token' | 'complete' | 'error' | 'final';
+export type StreamEventType = 'token' | 'status' | 'final' | 'error' | 'complete';
 
-/** One parsed SSE frame, normalized from either AgentMessageStreamSchema
- * (token/complete/error) or AgentMessageSchema (final). */
 export interface StreamEvent {
   type: StreamEventType;
   content: string;

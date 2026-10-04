@@ -17,11 +17,6 @@ export class Composer {
   private readonly textarea = viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
 
   constructor() {
-    // Re-measure whenever draft changes for any reason -- typing (including
-    // Shift+Enter newlines) and it being cleared programmatically on send,
-    // which a plain (input) handler wouldn't catch. requestAnimationFrame
-    // defers the read past Angular's DOM patch for this change, so
-    // scrollHeight reflects the new content rather than the previous one.
     effect(() => {
       this.draft();
       requestAnimationFrame(() => this.autoGrow());

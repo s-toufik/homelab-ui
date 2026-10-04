@@ -3,12 +3,13 @@
     [knownModels]="store.knownModels"
     [(modelName)]="store.modelName"
     [(sessionId)]="store.sessionId"
+    [(autoApprove)]="store.autoApprove"
     (newSession)="store.newSession()"
   />
 </ng-template>
 
 <div class="agent-page">
-  <app-conversation [messages]="store.messages()" />
+  <app-conversation [messages]="store.messages()" (resend)="store.resend($event)" />
 
   @if (store.requestError()) {
     <p class="agent-page__banner" role="alert">{{ store.requestError() }}</p>

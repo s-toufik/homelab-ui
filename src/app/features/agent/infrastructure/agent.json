@@ -1,0 +1,5 @@
+{
+  "port": 8000,
+  "subpath": null,
+  "healthPath": "/actuator/health/readiness"
+}

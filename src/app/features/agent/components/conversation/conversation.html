@@ -4,7 +4,7 @@
   }
 
   @for (message of messages(); track message.id) {
-    <app-message [message]="message" />
+    <app-message [message]="message" (resend)="resend.emit($event)" />
   }
 
   <div #scrollAnchor></div>

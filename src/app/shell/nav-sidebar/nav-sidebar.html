@@ -2,25 +2,84 @@
   <div class="nav-sidebar__backdrop" (click)="ui.closeNav()"></div>
 }
 
-<nav class="nav-sidebar" [class.nav-sidebar--open]="ui.navOpen()">
+<nav class="nav-sidebar" [class.nav-sidebar--open]="ui.navOpen()" aria-label="Main">
   <a
-    class="nav-sidebar__link"
+    class="nav-sidebar__brand"
     routerLink="/"
-    routerLinkActive="nav-sidebar__link--active"
+    routerLinkActive="nav-sidebar__brand--active"
     [routerLinkActiveOptions]="{ exact: true }"
+    aria-label="Homelab overview"
     (click)="ui.closeNav()"
   >
-    Home
+    <span class="nav-sidebar__logo" aria-hidden="true">
+      <svg
+        viewBox="0 0 24 24"
+        width="18"
+        height="18"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <rect x="4" y="4" width="16" height="7" rx="2" />
+        <rect x="4" y="13" width="16" height="7" rx="2" />
+        <path d="M8 7.5h.01M8 16.5h.01" stroke-linecap="round" />
+      </svg>
+    </span>
+    <span class="nav-sidebar__brand-text">
+      <span class="nav-sidebar__title">Homelab</span>
+      <span class="nav-sidebar__host">{{ host }}</span>
+    </span>
   </a>
 
-  @for (item of navItems; track item.path) {
-    <a
-      class="nav-sidebar__link"
-      [routerLink]="item.path"
-      routerLinkActive="nav-sidebar__link--active"
-      (click)="ui.closeNav()"
-    >
-      {{ item.label }}
-    </a>
-  }
+  <h2 class="nav-sidebar__section">Apps</h2>
+  <ul class="nav-sidebar__list">
+    @for (feature of features; track feature.id) {
+      <li>
+        @if (feature.entry.kind === 'page') {
+          <a
+            class="nav-sidebar__link"
+            [routerLink]="feature.entry.path"
+            routerLinkActive="nav-sidebar__link--active"
+            (click)="ui.closeNav()"
+          >
+            <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
+            {{ feature.label }}
+          </a>
+        } @else {
+          <a
+            class="nav-sidebar__link"
+            [href]="feature.entry.url"
+            target="_blank"
+            rel="noopener"
+            (click)="ui.closeNav()"
+          >
+            <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
+            {{ feature.label }}
+            <svg
+              class="nav-sidebar__external"
+              viewBox="0 0 24 24"
+              width="13"
+              height="13"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              aria-label="Opens in a new tab"
+              role="img"
+            >
+              <path
+                d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </a>
+        }
+      </li>
+    }
+  </ul>
+
+  <div class="nav-sidebar__status" role="status">
+    <span class="nav-sidebar__dot" [class]="'nav-sidebar__dot--' + health().level"></span>
+    {{ health().label }}
+  </div>
 </nav>

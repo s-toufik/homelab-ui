@@ -5,5 +5,6 @@ export interface ChatMessage {
   role: ChatRole;
   content: string;
   streaming: boolean;
+  status?: string;
   error?: string;
 }
