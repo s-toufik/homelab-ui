@@ -141,6 +141,10 @@
   color: var(--text-muted);
 }
 
+.settings-panel__hint--error {
+  color: var(--danger);
+}
+
 .settings-panel__copy {
   display: flex;
   align-items: center;

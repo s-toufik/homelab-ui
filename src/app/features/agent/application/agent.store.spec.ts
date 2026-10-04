@@ -2,6 +2,8 @@ import { TestBed } from '@angular/core/testing';
 import type { AgentRequestBody } from '../domain/agent-request';
 import type { StreamEvent } from '../domain/stream-event';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
+import { AgentModelsService } from '../infrastructure/api/agent-models.service';
+import type { ModelListing } from '../domain/model-catalog';
 import { AgentStore } from './agent.store';
 
 function storeStreaming(
@@ -89,5 +91,51 @@ describe('AgentStore', () => {
     expect(reply.error).toBe('Traceback: boom');
     expect(reply.status).toBeUndefined();
     expect(reply.streaming).toBe(false);
+  });
+
+  describe('models', () => {
+    const listing: ModelListing = {
+      models: [
+        { name: 'first', contextTokens: 1, maxOutputTokens: 1, thinking: false },
+        { name: 'second', contextTokens: 1, maxOutputTokens: 1, thinking: true },
+      ],
+      pinnedSteps: { act: 'second' },
+    };
+
+    function storeListing(list: () => Promise<ModelListing>): AgentStore {
+      TestBed.configureTestingModule({
+        providers: [{ provide: AgentModelsService, useValue: { list } }],
+      });
+      return TestBed.inject(AgentStore);
+    }
+
+    it('loads the models and picks the first one', async () => {
+      const store = storeListing(async () => listing);
+
+      await store.loadModels();
+
+      expect(store.modelNames()).toEqual(['first', 'second']);
+      expect(store.pinnedSteps()).toEqual({ act: 'second' });
+      expect(store.modelName()).toBe('first');
+    });
+
+    it('keeps the chosen model when the agent still offers it', async () => {
+      const store = storeListing(async () => listing);
+      store.modelName.set('second');
+
+      await store.loadModels();
+
+      expect(store.modelName()).toBe('second');
+    });
+
+    it('reports a failure and cannot send without a model', async () => {
+      const store = storeListing(() => Promise.reject(new Error('down')));
+      store.draft.set('hello');
+
+      await store.loadModels();
+
+      expect(store.modelsError()).toContain("Couldn't load");
+      expect(store.canSend()).toBe(false);
+    });
   });
 });

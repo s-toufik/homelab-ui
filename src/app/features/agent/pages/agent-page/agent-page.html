@@ -1,6 +1,8 @@
 <ng-template appPagePanelContent>
   <app-settings-panel
-    [knownModels]="store.knownModels"
+    [models]="store.modelNames()"
+    [pinnedSteps]="store.pinnedSteps()"
+    [modelsError]="store.modelsError()"
     [(modelName)]="store.modelName"
     [(sessionId)]="store.sessionId"
     [(autoApprove)]="store.autoApprove"
