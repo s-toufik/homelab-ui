@@ -178,3 +178,45 @@
     background: var(--danger);
   }
 }
+
+.nav-sidebar__resource {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-muted);
+}
+
+.nav-sidebar__health {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-left: auto;
+  font-size: 0.75rem;
+
+  &::before {
+    content: '';
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
+  &--up {
+    color: var(--success);
+  }
+
+  &--down {
+    color: var(--danger);
+  }
+
+  &--checking::before {
+    animation: pulse 1.2s ease-in-out infinite;
+  }
+}
+
+@keyframes pulse {
+  50% {
+    opacity: 0.3;
+  }
+}

@@ -4,6 +4,7 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { FeatureStatusStore } from '../application/feature-status.store';
 import { HOMELAB_FEATURES } from '../application/homelab-features';
 import { LayoutStore } from '../application/layout.store';
+import { ResourceStatusStore } from '../application/resource-status.store';
 import { FEATURE_CATEGORIES } from '../domain/homelab-feature';
 
 @Component({
@@ -15,6 +16,13 @@ import { FEATURE_CATEGORIES } from '../domain/homelab-feature';
 export class NavSidebar {
   protected readonly ui = inject(LayoutStore);
   private readonly status = inject(FeatureStatusStore);
+  protected readonly resourceStatus = inject(ResourceStatusStore);
+  protected readonly resourceLabel = {
+    checking: 'Checking',
+    up: 'Up',
+    down: 'Down',
+    unknown: 'No data',
+  } as const;
 
   // The same apps and pages as the overview, in the same order.
   protected readonly features = [...(inject(HOMELAB_FEATURES, { optional: true }) ?? [])].sort(
@@ -34,6 +42,7 @@ export class NavSidebar {
     effect(() => {
       if (this.ui.navOpen()) {
         void this.status.refresh();
+        void this.resourceStatus.refresh();
       }
     });
   }
