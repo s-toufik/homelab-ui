@@ -2,9 +2,17 @@
   <label class="settings-panel__row settings-panel__row--select" for="model">
     <span>Model</span>
     <span class="settings-panel__value">
-      <select id="model" [ngModel]="modelName()" (ngModelChange)="modelName.set($event)">
-        @for (model of knownModels(); track model) {
+      <select
+        id="model"
+        [ngModel]="modelName()"
+        (ngModelChange)="modelName.set($event)"
+        [disabled]="models().length === 0"
+        aria-describedby="model-hint"
+      >
+        @for (model of models(); track model) {
           <option [value]="model">{{ model }}</option>
+        } @empty {
+          <option value="">{{ modelsError() ? 'Unavailable' : 'Loading…' }}</option>
         }
       </select>
       <svg
@@ -33,6 +41,15 @@
     />
   </label>
 </section>
+@if (modelsError() || pinnedNote(); as note) {
+  <p
+    id="model-hint"
+    class="settings-panel__hint"
+    [class.settings-panel__hint--error]="!!modelsError()"
+  >
+    {{ note }}
+  </p>
+}
 <p id="auto-approve-hint" class="settings-panel__hint">
   Auto-approve runs a plan without your approval.
 </p>

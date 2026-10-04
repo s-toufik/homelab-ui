@@ -1,7 +1,8 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import type { ChatMessage } from '../domain/chat-message';
-import { DEFAULT_MODEL, KNOWN_MODELS } from '../domain/model-catalog';
+import { NO_MODELS, type ModelListing } from '../domain/model-catalog';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
+import { AgentModelsService } from '../infrastructure/api/agent-models.service';
 
 function newId(): string {
   if (typeof crypto.randomUUID === 'function') {
@@ -17,18 +18,38 @@ function newId(): string {
 @Injectable({ providedIn: 'root' })
 export class AgentStore {
   private readonly api = inject(AgentApiService);
+  private readonly modelCatalog = inject(AgentModelsService);
 
-  readonly knownModels = KNOWN_MODELS;
-  readonly modelName = signal(DEFAULT_MODEL);
+  readonly modelListing = signal<ModelListing>(NO_MODELS);
+  readonly modelsError = signal<string | null>(null);
+  readonly modelNames = computed(() => this.modelListing().models.map((model) => model.name));
+  readonly pinnedSteps = computed(() => this.modelListing().pinnedSteps);
+  readonly modelName = signal('');
   readonly sessionId = signal(newId());
   readonly autoApprove = signal(false);
   readonly draft = signal('');
   readonly messages = signal<ChatMessage[]>([]);
   readonly isStreaming = signal(false);
   readonly requestError = signal<string | null>(null);
-  readonly canSend = computed(() => this.draft().trim().length > 0 && !this.isStreaming());
+  readonly canSend = computed(
+    () => this.draft().trim().length > 0 && !this.isStreaming() && this.modelName() !== '',
+  );
 
   private abortController: AbortController | null = null;
+
+  async loadModels(): Promise<void> {
+    try {
+      const listing = await this.modelCatalog.list();
+      this.modelListing.set(listing);
+      this.modelsError.set(null);
+      const names = listing.models.map((model) => model.name);
+      if (!names.includes(this.modelName())) {
+        this.modelName.set(names[0] ?? '');
+      }
+    } catch {
+      this.modelsError.set("Couldn't load the models from the agent.");
+    }
+  }
 
   newSession(): void {
     this.abortController?.abort();

@@ -34,7 +34,7 @@ Trust the agent with a task? Turn on **Auto-approve plans** and it carries out i
 
 The menu lists every app and page. Those that open in a new tab — dashboards, metrics, logs — are marked with a small arrow.
 
-Below them, **Infrastructure** shows whether your databases and Kafka are **up**, so you know at a glance that everything your apps rely on is running. The bottom line tells you how many of your services are answering.
+Below them, **Infrastructure** shows whether the services your apps rely on — databases, Kafka and whatever you add — are **up**, so you know at a glance that everything is running. The bottom line tells you how many of your services are answering.
 
 <img src="docs/screenshots/menu.webp" alt="The side menu: every app with its colour, then PostgreSQL, MongoDB and Kafka marked Up" />
 
@@ -93,11 +93,11 @@ src/app/
 │   │   └── infrastructure/
 │   │       ├── agent.json       -- port + subpath of agent-orchestrator
 │   │       └── api/             -- SSE client, readiness check
-│   ├── infrastructure/          -- database and Kafka status, read from Prometheus
+│   ├── infrastructure/          -- status of the services apps rely on, read from Prometheus
 │   │   ├── infrastructure.feature.ts  -- registers one resource per entry
-│   │   ├── domain/              -- PostgreSQL, MongoDB, Kafka and the metric for each
+│   │   ├── domain/              -- one entry per service and the metric that says it is up
 │   │   └── infrastructure/      -- prometheus.json + PrometheusQueryService
-│   └── grafana/ prometheus/ alloy/ kafka-ui/ llm/   -- links to homelab-infra web UIs
+│   └── grafana/ prometheus/ …   -- one folder per homelab-infra web UI, opened as a link
 │       ├── <name>.feature.ts    -- registration
 │       └── infrastructure/<name>.json  -- port + subpath + health path
 │
@@ -262,6 +262,25 @@ npm start
 ```
 
 Open `http://localhost:4200` — the new page should appear in the left nav and as a tile on the home dashboard, `/metrics` should route to it, and (if step 5 was done) its settings should show in the right sidebar.
+
+### Adding a link to a homelab service
+
+For a web UI the stack publishes (a dashboard, an admin console…), no page or route is needed:
+
+1. `features/<name>/infrastructure/<name>.json` — its `port`, `subpath` (or `null`) and a cheap `healthPath`.
+2. `features/<name>/<name>.feature.ts` — copy `features/grafana/grafana.feature.ts`: label, description, colour, icon, category, `entry: { kind: 'link', url: server.url(ADDRESS) }` and `checkHealth: () => server.isReachable(ADDRESS)`.
+3. List `provide<Name>Feature()` in `app.config.ts`.
+
+It appears on the overview, with its status dot, and in the menu. A new category is one more entry in `FEATURE_CATEGORIES` (`shell/domain/homelab-feature.ts`).
+
+### Adding an infrastructure status
+
+For a service with nothing to open (a database, a message broker…):
+
+1. Make sure Prometheus has a metric that is `1` or more while the service is up — usually from an exporter added in homelab-infra.
+2. Add an entry to `INFRASTRUCTURE_RESOURCES` (`features/infrastructure/domain/infrastructure-resources.ts`): `id`, `label`, `color`, and `upWhen`, the PromQL expression.
+
+It appears in the menu's Infrastructure section. A status from another source than Prometheus is a new feature registering its own `HomelabResource`.
 
 ### Path aliases
 

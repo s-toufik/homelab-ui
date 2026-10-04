@@ -13,4 +13,8 @@ import { SettingsPanel } from '../../components/settings-panel/settings-panel';
 })
 export class AgentPage {
   protected readonly store = inject(AgentStore);
+
+  constructor() {
+    void this.store.loadModels();
+  }
 }
