@@ -1,4 +1,3 @@
-/** Everything the agent reports about an answer, in the order it sent it. */
 export type AnswerMetadata = Readonly<Record<string, string>>;
 
 export interface MetadataEntry {
@@ -29,7 +28,6 @@ export function metadataEntries(metadata: AnswerMetadata | undefined): MetadataE
   }));
 }
 
-/** "(1m 5s · ↑ 3.4k · ↓ 845 tokens)", with whichever of the three parts the agent reported. */
 export function usageSummary(metadata: AnswerMetadata | undefined): string | null {
   if (!metadata) return null;
   const parts: string[] = [];

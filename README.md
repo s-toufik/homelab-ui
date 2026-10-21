@@ -104,7 +104,7 @@ src/app/
 │   │   ├── domain/ application/ components/ pages/
 │   │   │                        -- domain/answer-metadata.ts: what the agent reports about an answer
 │   │   └── infrastructure/
-│   │       ├── agent.json       -- port + subpath of agent-orchestrator
+│   │       ├── agent.json       -- port + subpath of agent-runtime
 │   │       ├── api/             -- SSE client, model list (/v1/models), readiness check
 │   │       └── storage/         -- the user's model and auto-approve choices (localStorage)
 │   ├── infrastructure/          -- status of the services apps rely on, read from Prometheus
