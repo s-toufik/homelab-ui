@@ -13,10 +13,10 @@ const SEARCH_FROM = 6;
 const STATUS_LABEL = { checking: 'Checking', online: 'Online', offline: 'Unreachable' } as const;
 
 function greeting(hour: number): string {
-  if (hour < 5) return 'I wish you a Good night';
-  if (hour < 12) return 'I wish you a Good morning';
-  if (hour < 18) return 'I wish you a Good afternoon';
-  return 'I wish you a Good evening';
+  if (hour < 5) return 'Welcome to Blue platform !';
+  if (hour < 12) return 'Good morning! Welcome to Blue platform !.';
+  if (hour < 18) return 'Good afternoon! Welcome to Blue platform !.';
+  return 'Good evening! Welcome to Blue platform !.';
 }
 
 function matches(feature: HomelabFeature, query: string): boolean {

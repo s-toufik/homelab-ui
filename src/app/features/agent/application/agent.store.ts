@@ -1,6 +1,8 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { answerMetadata } from '../domain/answer-metadata';
 import type { ChatMessage } from '../domain/chat-message';
 import { NO_MODELS, type ModelListing } from '../domain/model-catalog';
+import type { StreamEvent } from '../domain/stream-event';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
 import { AgentModelsService } from '../infrastructure/api/agent-models.service';
 import { AgentPreferencesStorage } from '../infrastructure/storage/agent-preferences.storage';
@@ -123,6 +125,7 @@ export class AgentStore {
             break;
           case 'final':
             this.setAssistantContent(assistantId, event.content);
+            this.setAssistantMetadata(assistantId, event.metadata);
             this.setAssistantStatus(assistantId, undefined);
             break;
           case 'error':
@@ -150,6 +153,10 @@ export class AgentStore {
 
   private setAssistantContent(id: string, content: string): void {
     this.updateMessage(id, (message) => ({ ...message, content }));
+  }
+
+  private setAssistantMetadata(id: string, raw: StreamEvent['metadata']): void {
+    this.updateMessage(id, (message) => ({ ...message, metadata: answerMetadata(raw) }));
   }
 
   private setAssistantStatus(id: string, status: string | undefined): void {

@@ -22,9 +22,13 @@ A question it can answer straight away — _"What is a KV cache?"_ — comes bac
 
 <img src="docs/screenshots/streaming.webp" alt="The agent writing its answer to 'What is a KV cache?' word by word" />
 
-When a request needs real work — reading files, crunching numbers, saving a report — the agent first shows you **its plan**. Reply **yes** and it gets to work, showing what it is doing as it goes, then gives you the result.
+When a request needs real work — reading files, crunching numbers, saving a report — the agent first shows you **its plan**. Reply **yes** and it gets to work, showing what it is doing as it goes, then gives you the result. Reply **Drop plan** to cancel it, or say what to change and it comes back with a new plan.
 
-<img src="docs/screenshots/chat.webp" alt="A conversation: the agent proposes a plan, the user replies yes, the agent answers with a table" />
+<img src="docs/screenshots/chat.webp" alt="A conversation: the agent proposes a plan, the user replies yes, the agent answers with a table; under each answer, the time it took and the tokens it used" />
+
+Under each answer you see how long it took and how many tokens went in and out, like _(21s · ↑ 9.9k · ↓ 642 tokens)_. Hover over the answer for a button that copies it, and an arrow that opens everything the agent reported about it: the model, the tools it used, the steps it took, and any detail the agent adds later.
+
+<img src="docs/screenshots/answer-details.webp" width="532" alt="An answer with its details open: elapsed time, input and output tokens, model, outcome, tools used, iteration and max iteration" />
 
 ## Stay in control
 
@@ -98,6 +102,7 @@ src/app/
 │   ├── agent/                   -- chat page (reference example for a page)
 │   │   ├── agent.feature.ts     -- registration
 │   │   ├── domain/ application/ components/ pages/
+│   │   │                        -- domain/answer-metadata.ts: what the agent reports about an answer
 │   │   └── infrastructure/
 │   │       ├── agent.json       -- port + subpath of agent-orchestrator
 │   │       ├── api/             -- SSE client, model list (/v1/models), readiness check
@@ -130,6 +135,22 @@ Every address is built from `shared/infrastructure/homelab-server.json` and the 
 `healthPath` (optional) is what the status dot calls. The files are compiled in: rebuild after changing them. Every device opening the UI must be able to resolve the server name.
 
 To try the UI against a backend running on your own machine, set `homelab-server.json` to `http://localhost` and the feature's `port` to the one your backend listens on. Every other feature then points to `localhost` too, so their status shows offline unless they run locally. Don't commit these edits.
+
+### Answer details
+
+The agent's `final` event carries a `metadata` object. The store keeps it on the answer as it is (`domain/answer-metadata.ts` only turns every value into text and drops empty ones), and the message component shows it in two ways:
+
+```text
+ final event ─► metadata ─► answerMetadata() ─► ChatMessage.metadata
+                                                  │
+                    ┌─────────────────────────────┴───────────────────────┐
+                    ▼                                                     ▼
+   usageSummary(): "(21s · ↑ 9.9k · ↓ 642 tokens)"      metadataEntries(): every key, in the
+   from elapsed_time, input_tokens, output_tokens       agent's order, labelled from its name
+   (missing ones are left out)                          (shown under the arrow)
+```
+
+To show a new detail, add it to the agent's metadata: it appears under the arrow with a label made from its key (`cache_hit_ratio` → "Cache hit ratio"), with no change here. Only a field that should join the one-line summary needs code, in `usageSummary()`.
 
 ### Development
 
