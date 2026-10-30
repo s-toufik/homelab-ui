@@ -15,7 +15,7 @@ export class AgentModelsService {
   private readonly server = inject(HomelabServer);
 
   async list(): Promise<ModelListing> {
-    const response = await fetch(this.server.url(AGENT, '/v1/models'), {
+    const response = await fetch(this.server.api(AGENT, '/v1/models'), {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
     if (!response.ok) {

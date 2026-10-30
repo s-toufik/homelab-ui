@@ -1,0 +1,100 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.tasker-page {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tasker-page__toolbar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+  padding: 0 24px 0 64px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.tasker-page__toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.tasker-page__brand {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.tasker-page__name {
+  min-width: 220px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+
+  &:focus-visible {
+    outline: none;
+    border-color: var(--accent);
+  }
+}
+
+.tasker-page__status {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.tasker-page__status--warning {
+  color: var(--warning);
+}
+
+.tasker-page__body {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.tasker-page__panes {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.tasker-page__side {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 0;
+  flex-shrink: 0;
+  min-height: 0;
+  border-left: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.tasker-page__resize-handle {
+  position: absolute;
+  top: 0;
+  left: -3px;
+  z-index: 5;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+
+  &:hover,
+  &:active {
+    background: var(--accent-border);
+  }
+}

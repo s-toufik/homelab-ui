@@ -1,0 +1,91 @@
+<div class="status-page">
+  <header class="status-page__header">
+    <div>
+      <p class="status-page__eyebrow">Homelab</p>
+      <h1 class="status-page__title">Status</h1>
+      <p class="status-page__summary">
+        @if (store.checkedAt(); as checkedAt) {
+          <strong>{{ store.summary().ready }} of {{ store.summary().total }} ready</strong>
+          @if (store.summary().notReady) {
+            · <span class="status-page__bad">{{ store.summary().notReady }} not ready</span>
+          }
+          @if (store.summary().unknown) {
+            · {{ store.summary().unknown }} unknown
+          }
+          · checked at {{ checkedAt | date: 'HH:mm:ss' }}, every 30 s
+        } @else {
+          Checking every container…
+        }
+      </p>
+    </div>
+    <button
+      type="button"
+      class="status-page__refresh"
+      [disabled]="store.refreshing()"
+      (click)="store.refresh()"
+    >
+      {{ store.refreshing() ? 'Checking…' : 'Check now' }}
+    </button>
+  </header>
+
+  <div class="status-page__groups">
+    @for (section of store.groups; track section.group) {
+      <section class="status-page__group" [attr.aria-label]="section.group">
+        <h2 class="status-page__group-title">{{ section.group }}</h2>
+        <ul class="status-page__list">
+          @for (service of section.services; track service.id) {
+            @let current = state(service);
+            <li class="status-page__service">
+              <span
+                class="status-page__state"
+                [class]="'status-page__state status-page__state--' + current"
+                role="status"
+              >
+                {{ stateLabel[current] }}
+              </span>
+              <div class="status-page__body">
+                <div class="status-page__name">
+                  {{ service.label }}
+                  <code class="status-page__folder">{{ service.folder }}</code>
+                </div>
+                <p class="status-page__description">{{ service.description }}</p>
+                @if (service.links.length || connection(service)) {
+                  <div class="status-page__access">
+                    @for (link of service.links; track link.label) {
+                      <a
+                        class="status-page__link"
+                        [href]="href(link)"
+                        target="_blank"
+                        rel="noopener"
+                      >
+                        {{ link.label }}
+                      </a>
+                    }
+                    @if (connection(service); as text) {
+                      <button
+                        type="button"
+                        class="status-page__connection"
+                        [attr.aria-label]="'Copy ' + text"
+                        (click)="copy(service)"
+                      >
+                        <code>{{ text }}</code>
+                        <span class="status-page__copy">
+                          {{ copied() === service.id ? 'Copied' : 'Copy' }}
+                        </span>
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+  </div>
+
+  <p class="status-page__note">
+    One-shot jobs (db-migrate, db-provision, keycloak-sync) run at each start and then stop;
+    <code>make verify</code> on the server checks them.
+  </p>
+</div>

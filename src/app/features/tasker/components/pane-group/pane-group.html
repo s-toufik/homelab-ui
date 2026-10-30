@@ -1,0 +1,129 @@
+<div
+  class="pane-group"
+  [class.pane-group--focused]="isFocused()"
+  (pointerdown)="workspace.focusGroup(group().id)"
+>
+  <div class="pane-group__bar" (dragover)="onBarDragOver($event)" (drop)="onDrop($event, 'center')">
+    <div class="pane-group__tabs" role="tablist">
+      @for (tab of tabs(); track tab.id) {
+        <div
+          class="pane-group__tab"
+          role="tab"
+          draggable="true"
+          [class.pane-group__tab--active]="tab.id === group().active"
+          [attr.aria-selected]="tab.id === group().active"
+          (click)="workspace.activateTab(group().id, tab.id)"
+          (dragstart)="onTabDragStart($event, tab.id)"
+          (dragend)="onDragEnd()"
+        >
+          <span class="pane-group__tab-name">{{ tab.name() }}</span>
+          @if (tab.dirty()) {
+            <span class="pane-group__dirty" title="Unsaved changes"></span>
+          }
+          <button
+            type="button"
+            class="pane-group__tab-close"
+            aria-label="Close tab"
+            (click)="close($event, tab.id)"
+          >
+            ×
+          </button>
+        </div>
+      }
+    </div>
+
+    <div class="pane-group__actions">
+      <button
+        type="button"
+        class="pane-group__icon"
+        aria-label="Split right with a new canvas"
+        title="Split right"
+        (click)="workspace.splitWithNewCanvas(group().id, 'right')"
+      >
+        <app-feature-icon [paths]="icons.splitRight" [size]="15" />
+      </button>
+      <button
+        type="button"
+        class="pane-group__icon"
+        aria-label="Split down with a new canvas"
+        title="Split down"
+        (click)="workspace.splitWithNewCanvas(group().id, 'bottom')"
+      >
+        <app-feature-icon [paths]="icons.splitDown" [size]="15" />
+      </button>
+      @if (activeDocument(); as document) {
+        <span class="pane-group__divider"></span>
+        <button
+          type="button"
+          class="pane-group__icon"
+          aria-label="Auto-arrange blocks"
+          title="Layout"
+          (click)="arrange(document)"
+        >
+          <app-feature-icon [paths]="icons.layout" [size]="15" />
+        </button>
+        <button
+          type="button"
+          class="pane-group__icon"
+          aria-label="Recenter view"
+          title="Recenter"
+          (click)="recenter()"
+        >
+          <app-feature-icon [paths]="icons.recenter" [size]="15" />
+        </button>
+        <button
+          type="button"
+          class="pane-group__button"
+          [disabled]="document.saving()"
+          (click)="workspace.save(document.id)"
+        >
+          {{ document.saving() ? 'Saving…' : 'Save' }}
+        </button>
+        <button
+          type="button"
+          class="pane-group__button pane-group__button--primary"
+          [disabled]="document.running()"
+          (click)="document.run()"
+        >
+          {{ document.running() ? 'Running…' : 'Run' }}
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="pane-group__content">
+    @if (activeDocument(); as document) {
+      @if (document.saveError(); as error) {
+        <div class="pane-group__error" role="alert">
+          {{ error }}
+          <button type="button" aria-label="Dismiss" (click)="document.saveError.set(null)">
+            ×
+          </button>
+        </div>
+      }
+      @for (current of [document]; track current.id) {
+        <app-tasker-canvas [store]="current" />
+      }
+    } @else {
+      <div class="pane-group__empty">
+        <p>No canvas open in this pane.</p>
+        <button type="button" class="pane-group__button" (click)="workspace.newCanvas(group().id)">
+          New canvas
+        </button>
+      </div>
+    }
+
+    @if (workspace.dragging()) {
+      <div
+        class="pane-group__drop"
+        (dragover)="onContentDragOver($event)"
+        (dragleave)="dropEdge.set(null)"
+        (drop)="onDrop($event, dropEdge())"
+      >
+        @if (dropEdge(); as edge) {
+          <div [class]="'pane-group__drop-preview pane-group__drop-preview--' + edge"></div>
+        }
+      </div>
+    }
+  </div>
+</div>

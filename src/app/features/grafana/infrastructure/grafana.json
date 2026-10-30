@@ -1,4 +1,5 @@
 {
+  "key": "grafana",
   "port": 3000,
   "subpath": null,
   "healthPath": "/api/health"

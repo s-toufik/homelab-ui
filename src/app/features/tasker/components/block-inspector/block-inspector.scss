@@ -1,0 +1,247 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  box-sizing: border-box;
+  padding: 20px;
+  overflow-y: auto;
+  font-size: 13px;
+}
+
+.block-inspector__primary {
+  padding: 9px 0;
+  border: 1px solid var(--accent-border);
+  border-radius: var(--radius);
+  background: var(--accent);
+  color: var(--on-accent);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--accent-hover);
+  }
+}
+
+.block-inspector__error {
+  margin: 8px 0 0;
+  color: var(--danger);
+  font-size: 12px;
+  word-break: break-word;
+}
+
+.block-inspector__row--favorite {
+  margin-top: 14px;
+}
+
+.block-inspector__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.block-inspector__label {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.block-inspector__title {
+  margin-top: 4px;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.block-inspector__close {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
+
+.block-inspector__field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 14px;
+
+  > span {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  input,
+  select,
+  textarea {
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    resize: vertical;
+
+    &:focus-visible {
+      outline: none;
+      border-color: var(--accent);
+    }
+  }
+}
+
+.block-inspector__row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+
+  input {
+    flex: 1;
+    min-width: 0;
+    padding: 7px 9px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: var(--surface);
+    color: var(--text);
+    font-family: var(--font-mono);
+    font-size: 11px;
+  }
+
+  button {
+    flex: 0 0 auto;
+    width: 28px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+
+    &:hover {
+      color: var(--danger);
+      border-color: var(--danger);
+    }
+  }
+}
+
+.block-inspector__add {
+  padding: 7px 0;
+  width: 100%;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--accent-border);
+  }
+}
+
+.block-inspector__hint {
+  margin: 0 0 14px;
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+
+  code {
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: var(--surface);
+    font-family: var(--font-mono);
+    color: var(--code-text);
+  }
+}
+
+.block-inspector__result {
+  margin: 14px 0;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+
+  pre {
+    margin: 6px 0 0;
+    white-space: pre-wrap;
+    word-break: break-word;
+    font-size: 11px;
+    font-family: var(--font-mono);
+    color: var(--text);
+  }
+}
+
+.block-inspector__result--error pre {
+  color: var(--danger);
+}
+
+.block-inspector__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.block-inspector__favorite {
+  width: 100%;
+  padding: 9px 0;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+    border-color: var(--accent-border);
+  }
+}
+
+.block-inspector__run {
+  padding: 9px 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.block-inspector__remove {
+  padding: 9px 0;
+  border: none;
+  background: transparent;
+  color: var(--danger);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

@@ -75,6 +75,26 @@ describe('AgentStore', () => {
     expect(store.messages().at(-1)!.content).toBe('The accepted answer.');
   });
 
+  it('keeps everything the final event reports about the answer', async () => {
+    const store = storeStreaming([
+      {
+        type: 'final',
+        content: 'Done.',
+        metadata: { elapsed_time: '4s', input_tokens: '1200', a_new_field: 'shown too' },
+      },
+      event('complete'),
+    ]);
+    store.draft.set('hello');
+
+    await store.send();
+
+    expect(store.messages().at(-1)!.metadata).toEqual({
+      elapsed_time: '4s',
+      input_tokens: '1200',
+      a_new_field: 'shown too',
+    });
+  });
+
   it('sends the auto-approve choice with each message', async () => {
     const bodies: AgentRequestBody[] = [];
     const store = storeStreaming([event('complete')], () => {}, bodies);

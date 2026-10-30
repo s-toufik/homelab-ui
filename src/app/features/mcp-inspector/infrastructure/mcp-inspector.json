@@ -1,0 +1,6 @@
+{
+  "key": "mcp-inspector",
+  "port": 6274,
+  "subpath": null,
+  "healthPath": "/"
+}

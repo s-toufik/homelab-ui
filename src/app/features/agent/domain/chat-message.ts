@@ -1,3 +1,5 @@
+import type { AnswerMetadata } from './answer-metadata';
+
 export type ChatRole = 'user' | 'assistant';
 
 export interface ChatMessage {
@@ -7,4 +9,5 @@ export interface ChatMessage {
   streaming: boolean;
   status?: string;
   error?: string;
+  metadata?: AnswerMetadata;
 }

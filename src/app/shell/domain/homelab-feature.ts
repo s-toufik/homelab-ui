@@ -1,4 +1,10 @@
-export const FEATURE_CATEGORIES = ['AI', 'Observability', 'Streaming'] as const;
+export const FEATURE_CATEGORIES = [
+  'Platform',
+  'AI',
+  'Automation',
+  'Observability',
+  'Streaming',
+] as const;
 
 export type FeatureCategory = (typeof FEATURE_CATEGORIES)[number];
 

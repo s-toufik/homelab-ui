@@ -1,0 +1,63 @@
+<div class="workflow-list__header">
+  <h2 class="workflow-list__label">Workflows</h2>
+  <button type="button" class="workflow-list__new" (click)="workspace.newCanvas()">
+    + New canvas
+  </button>
+</div>
+
+@switch (workspace.listState()) {
+  @case ('loading') {
+    <p class="workflow-list__hint">Loading saved workflows…</p>
+  }
+  @case ('error') {
+    <div class="workflow-list__error" role="alert">
+      <p>{{ workspace.listError() }}</p>
+      <p class="workflow-list__hint">Check the Tasker database address in Settings → Connectors.</p>
+      <button type="button" class="workflow-list__retry" (click)="workspace.refreshList()">
+        Retry
+      </button>
+    </div>
+  }
+  @default {
+    @if (workspace.listError(); as error) {
+      <div class="workflow-list__error" role="alert">
+        <p>{{ error }}</p>
+        <button type="button" class="workflow-list__retry" (click)="workspace.listError.set(null)">
+          Dismiss
+        </button>
+      </div>
+    }
+    <div class="workflow-list__items">
+      @for (workflow of workspace.workflows(); track workflow.id) {
+        <div
+          class="workflow-list__item"
+          draggable="true"
+          [class.workflow-list__item--open]="isOpen(workflow.id)"
+          (dragstart)="onDragStart($event, workflow.id)"
+          (dragend)="onDragEnd()"
+        >
+          <button
+            type="button"
+            class="workflow-list__open"
+            (click)="workspace.openWorkflow(workflow.id)"
+          >
+            <span class="workflow-list__name">{{ workflow.name }}</span>
+            <span class="workflow-list__meta">{{ updated(workflow) }}</span>
+          </button>
+          <button
+            type="button"
+            class="workflow-list__delete"
+            aria-label="Delete workflow"
+            (click)="workspace.deleteWorkflow(workflow.id)"
+          >
+            ×
+          </button>
+        </div>
+      } @empty {
+        <p class="workflow-list__hint">
+          No saved workflows yet. Press Save on a canvas to store it here.
+        </p>
+      }
+    </div>
+  }
+}

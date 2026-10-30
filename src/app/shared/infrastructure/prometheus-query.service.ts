@@ -14,7 +14,7 @@ export class PrometheusQueryService {
   private readonly server = inject(HomelabServer);
 
   async value(expression: string): Promise<number | null> {
-    const url = this.server.url(
+    const url = this.server.api(
       PROMETHEUS,
       `/api/v1/query?query=${encodeURIComponent(expression)}`,
     );

@@ -1,0 +1,6 @@
+{
+  "key": "prometheus",
+  "port": 9090,
+  "subpath": null,
+  "api": "/api/prometheus"
+}

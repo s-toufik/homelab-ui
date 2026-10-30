@@ -1,5 +1,7 @@
 {
+  "key": "agent",
   "port": 8000,
   "subpath": null,
-  "healthPath": "/actuator/health/readiness"
+  "healthPath": "/actuator/health/readiness",
+  "api": "/api/agent"
 }

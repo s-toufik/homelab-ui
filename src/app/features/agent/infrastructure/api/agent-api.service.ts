@@ -9,7 +9,7 @@ export class AgentApiService {
   private readonly server = inject(HomelabServer);
 
   async *stream(body: AgentRequestBody, signal: AbortSignal): AsyncGenerator<StreamEvent> {
-    const response = await fetch(this.server.url(AGENT, '/v1/stream'), {
+    const response = await fetch(this.server.api(AGENT, '/v1/stream'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

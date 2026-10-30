@@ -1,0 +1,6 @@
+{
+  "key": "keycloak",
+  "port": 8443,
+  "subpath": "realms/homelab/account",
+  "healthPath": "/realms/homelab"
+}

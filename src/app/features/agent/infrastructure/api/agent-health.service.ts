@@ -10,7 +10,7 @@ export class AgentHealthService {
 
   async isReady(): Promise<boolean> {
     try {
-      const response = await fetch(this.server.url(AGENT, AGENT.healthPath), {
+      const response = await fetch(this.server.api(AGENT, AGENT.healthPath), {
         signal: AbortSignal.timeout(TIMEOUT_MS),
       });
       return response.ok;

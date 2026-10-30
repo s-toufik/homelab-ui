@@ -1,0 +1,36 @@
+<div class="tasker-page">
+  <div class="tasker-page__toolbar">
+    <div class="tasker-page__toolbar-left">
+      <span class="tasker-page__brand">Tasker</span>
+      @if (document(); as document) {
+        <input
+          type="text"
+          class="tasker-page__name"
+          aria-label="Workflow name"
+          [ngModel]="document.name()"
+          (ngModelChange)="document.rename($event)"
+        />
+        <span
+          class="tasker-page__status"
+          [class.tasker-page__status--warning]="document.dirty() || document.saveError()"
+        >
+          {{ status() }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <div class="tasker-page__body">
+    <app-block-palette />
+    <app-pane-layout class="tasker-page__panes" [node]="workspace.layout()" />
+    <aside class="tasker-page__side" [style.flex-basis.px]="sideWidth()">
+      <div
+        class="tasker-page__resize-handle"
+        aria-hidden="true"
+        (pointerdown)="startResize($event)"
+      ></div>
+      <app-workflow-list />
+      <app-block-inspector />
+    </aside>
+  </div>
+</div>

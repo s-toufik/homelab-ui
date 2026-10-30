@@ -1,0 +1,6 @@
+{
+  "key": "tasker-api",
+  "port": 3001,
+  "subpath": null,
+  "api": "/api/tasker"
+}

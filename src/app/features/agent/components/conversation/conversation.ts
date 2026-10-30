@@ -1,6 +1,8 @@
-import { Component, ElementRef, effect, input, output, viewChild } from '@angular/core';
+import { Component, ElementRef, afterRenderEffect, input, output, viewChild } from '@angular/core';
 import type { ChatMessage } from '../../domain/chat-message';
 import { Message } from '../message/message';
+
+const NEAR_BOTTOM_PX = 80;
 
 @Component({
   selector: 'app-conversation',
@@ -13,10 +15,25 @@ export class Conversation {
   readonly resend = output<string>();
   private readonly scrollAnchor = viewChild<ElementRef<HTMLElement>>('scrollAnchor');
 
+  private stickToBottom = true;
+  private previousCount = 0;
+
   constructor() {
-    effect(() => {
-      this.messages();
-      this.scrollAnchor()?.nativeElement.scrollIntoView?.({ block: 'end' });
+    afterRenderEffect(() => {
+      const messages = this.messages();
+      if (messages.length !== this.previousCount) {
+        this.previousCount = messages.length;
+        this.stickToBottom = true;
+      }
+      if (this.stickToBottom) {
+        this.scrollAnchor()?.nativeElement.scrollIntoView?.({ block: 'end' });
+      }
     });
+  }
+
+  onScroll(event: Event): void {
+    const element = event.target as HTMLElement;
+    const distanceFromBottom = element.scrollHeight - element.scrollTop - element.clientHeight;
+    this.stickToBottom = distanceFromBottom < NEAR_BOTTOM_PX;
   }
 }

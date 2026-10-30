@@ -1,20 +1,12 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import { newId } from '@shared/utils/uuid';
+import { answerMetadata } from '../domain/answer-metadata';
 import type { ChatMessage } from '../domain/chat-message';
 import { NO_MODELS, type ModelListing } from '../domain/model-catalog';
+import type { StreamEvent } from '../domain/stream-event';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
 import { AgentModelsService } from '../infrastructure/api/agent-models.service';
 import { AgentPreferencesStorage } from '../infrastructure/storage/agent-preferences.storage';
-
-function newId(): string {
-  if (typeof crypto.randomUUID === 'function') {
-    return crypto.randomUUID();
-  }
-  const bytes = crypto.getRandomValues(new Uint8Array(16));
-  bytes[6] = (bytes[6] & 0x0f) | 0x40;
-  bytes[8] = (bytes[8] & 0x3f) | 0x80;
-  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
-  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
-}
 
 @Injectable({ providedIn: 'root' })
 export class AgentStore {
@@ -123,6 +115,7 @@ export class AgentStore {
             break;
           case 'final':
             this.setAssistantContent(assistantId, event.content);
+            this.setAssistantMetadata(assistantId, event.metadata);
             this.setAssistantStatus(assistantId, undefined);
             break;
           case 'error':
@@ -150,6 +143,10 @@ export class AgentStore {
 
   private setAssistantContent(id: string, content: string): void {
     this.updateMessage(id, (message) => ({ ...message, content }));
+  }
+
+  private setAssistantMetadata(id: string, raw: StreamEvent['metadata']): void {
+    this.updateMessage(id, (message) => ({ ...message, metadata: answerMetadata(raw) }));
   }
 
   private setAssistantStatus(id: string, status: string | undefined): void {
