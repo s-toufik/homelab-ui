@@ -1,4 +1,5 @@
 {
+  "key": "llm",
   "port": 8090,
   "subpath": "ui",
   "healthPath": "/health"

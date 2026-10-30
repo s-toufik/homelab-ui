@@ -1,0 +1,249 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+
+.pane-group {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+  box-shadow: inset 0 2px 0 transparent;
+}
+
+.pane-group--focused .pane-group__bar {
+  box-shadow: inset 0 2px 0 var(--accent);
+}
+
+.pane-group__bar {
+  display: flex;
+  flex: 0 0 auto;
+  flex-wrap: wrap;
+  align-items: stretch;
+  min-height: 38px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface-raised);
+}
+
+.pane-group__tabs {
+  display: flex;
+  flex: 1 1 140px;
+  min-width: 0;
+  min-height: 38px;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.pane-group__tab {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 6px;
+  max-width: 200px;
+  padding: 0 6px 0 12px;
+  border-right: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  user-select: none;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
+
+.pane-group__tab--active {
+  background: var(--surface);
+  color: var(--text);
+  font-weight: 600;
+}
+
+.pane-group__tab-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pane-group__dirty {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.pane-group__tab-close {
+  flex: 0 0 auto;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: none;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
+
+.pane-group__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 38px;
+  margin-left: auto;
+  padding: 0 8px;
+}
+
+.pane-group__divider {
+  width: 1px;
+  height: 18px;
+  margin: 0 4px;
+  background: var(--border);
+}
+
+.pane-group__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--border);
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}
+
+.pane-group__button {
+  padding: 5px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.pane-group__button--primary {
+  border-color: var(--accent-border);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-weight: 600;
+
+  &:hover {
+    background: var(--accent-hover);
+  }
+}
+
+.pane-group__content {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.pane-group__error {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  max-width: 80%;
+  padding: 8px 8px 8px 14px;
+  transform: translateX(-50%);
+  border: 1px solid var(--danger);
+  border-radius: var(--radius);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: 12px;
+
+  button {
+    border: none;
+    background: transparent;
+    color: inherit;
+    font-size: 14px;
+    cursor: pointer;
+  }
+}
+
+.pane-group__empty {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  background: var(--surface);
+  color: var(--text-muted);
+  font-size: 13px;
+
+  p {
+    margin: 0;
+  }
+}
+
+.pane-group__drop {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+}
+
+.pane-group__drop-preview {
+  position: absolute;
+  border: 2px dashed var(--accent);
+  border-radius: var(--radius);
+  background: var(--accent-soft);
+  pointer-events: none;
+  transition: all 120ms ease;
+}
+
+.pane-group__drop-preview--center {
+  inset: 8px;
+}
+
+.pane-group__drop-preview--left {
+  inset: 8px 50% 8px 8px;
+}
+
+.pane-group__drop-preview--right {
+  inset: 8px 8px 8px 50%;
+}
+
+.pane-group__drop-preview--top {
+  inset: 8px 8px 50% 8px;
+}
+
+.pane-group__drop-preview--bottom {
+  inset: 50% 8px 8px 8px;
+}

@@ -1,0 +1,24 @@
+@if (split(); as split) {
+  <div
+    #container
+    class="pane-layout__split"
+    [class.pane-layout__split--column]="split.direction === 'column'"
+  >
+    @for (child of split.children; track child.id; let index = $index, last = $last) {
+      <app-pane-layout
+        class="pane-layout__child"
+        [node]="child"
+        [style.flex]="split.sizes[index] + ' 1 0'"
+      />
+      @if (!last) {
+        <div
+          class="pane-layout__gutter"
+          aria-hidden="true"
+          (pointerdown)="startResize($event, index, container)"
+        ></div>
+      }
+    }
+  </div>
+} @else if (group(); as group) {
+  <app-pane-group [group]="group" />
+}

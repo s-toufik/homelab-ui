@@ -1,0 +1,165 @@
+@if (store.isOpen()) {
+  <div class="settings-modal__backdrop" (click)="store.close()"></div>
+
+  <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
+    <nav class="settings-modal__rail">
+      <h2 id="settings-title" class="settings-modal__title">Settings</h2>
+      @for (tab of tabs; track tab) {
+        <button
+          type="button"
+          class="settings-modal__tab"
+          [class.settings-modal__tab--active]="store.activeTab() === tab"
+          (click)="selectTab(tab)"
+        >
+          {{ tabLabels[tab] }}
+        </button>
+      }
+    </nav>
+
+    <div class="settings-modal__pane">
+      <button
+        type="button"
+        class="settings-modal__close"
+        title="Close"
+        aria-label="Close settings"
+        (click)="store.close()"
+      >
+        <svg
+          viewBox="0 0 24 24"
+          width="16"
+          height="16"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.8"
+        >
+          <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+        </svg>
+      </button>
+
+      @switch (store.activeTab()) {
+        @case ('general') {
+          <h3 class="settings-modal__label">Status</h3>
+          <section class="settings-modal__group">
+            <div class="settings-modal__row">
+              <span>Homelab host</span>
+              <span class="settings-modal__value">{{ host }}</span>
+            </div>
+            <div class="settings-modal__row">
+              <span>Services reachable</span>
+              <span class="settings-modal__value">{{ summary() }}</span>
+            </div>
+          </section>
+          <button type="button" class="settings-modal__action" (click)="refreshStatus()">
+            Refresh status
+          </button>
+        }
+
+        @case ('connectors') {
+          <h3 class="settings-modal__label">Connections</h3>
+          <section class="settings-modal__group">
+            <div class="settings-modal__row settings-modal__row--stacked">
+              <label for="connection-host">Homelab host</label>
+              <input
+                id="connection-host"
+                class="settings-modal__input"
+                type="text"
+                spellcheck="false"
+                autocomplete="off"
+                autocapitalize="off"
+                placeholder="http://sirius"
+                [ngModel]="connectionHost()"
+                (ngModelChange)="updateConnectionHost($event)"
+              />
+            </div>
+
+            @for (service of services(); track service.key) {
+              <div class="settings-modal__row settings-modal__row--stacked">
+                <span>{{ service.label }}</span>
+                <div class="settings-modal__service">
+                  <input
+                    class="settings-modal__input settings-modal__input--port"
+                    type="text"
+                    inputmode="numeric"
+                    spellcheck="false"
+                    autocomplete="off"
+                    [placeholder]="service.defaultPort === null ? 'port' : '' + service.defaultPort"
+                    [ngModel]="service.port"
+                    (ngModelChange)="updateServicePort(service.key, $event)"
+                    [attr.aria-label]="service.label + ' port'"
+                  />
+                  <input
+                    class="settings-modal__input settings-modal__input--subpath"
+                    type="text"
+                    spellcheck="false"
+                    autocomplete="off"
+                    [placeholder]="service.defaultSubpath ?? 'subpath'"
+                    [ngModel]="service.subpath"
+                    (ngModelChange)="updateServiceSubpath(service.key, $event)"
+                    [attr.aria-label]="service.label + ' subpath'"
+                  />
+                </div>
+              </div>
+            }
+          </section>
+          <p class="settings-modal__hint">
+            Leave a field blank to use its default. Connection changes apply after a reload.
+          </p>
+          <div class="settings-modal__actions">
+            <button
+              type="button"
+              class="settings-modal__action"
+              [disabled]="!connectionsDirty()"
+              (click)="saveConnectionsAndReload()"
+            >
+              Save &amp; reload
+            </button>
+            <button
+              type="button"
+              class="settings-modal__action settings-modal__action--muted"
+              (click)="resetConnections()"
+            >
+              Reset to defaults
+            </button>
+          </div>
+        }
+
+        @case ('appearance') {
+          <h3 class="settings-modal__label">Creative themes</h3>
+          <section class="settings-modal__group settings-modal__group--grid">
+            @for (option of creativeThemes; track option.id) {
+              <button
+                type="button"
+                class="settings-modal__theme"
+                [class.settings-modal__theme--active]="palette() === option.id"
+                (click)="setPalette(option.id)"
+              >
+                <span class="settings-modal__theme-dot" [style.background]="option.swatch"></span>
+                {{ option.label }}
+              </button>
+            }
+          </section>
+        }
+
+        @case ('about') {
+          <h3 class="settings-modal__label">Homelab</h3>
+          <section class="settings-modal__group">
+            <p class="settings-modal__about">
+              Everything running in your homelab, in one place — and an assistant that can do the
+              work for you.
+            </p>
+          </section>
+          <section class="settings-modal__group">
+            <div class="settings-modal__row">
+              <span>Version</span>
+              <span class="settings-modal__value">0.0.0</span>
+            </div>
+            <div class="settings-modal__row">
+              <span>Built with</span>
+              <span class="settings-modal__value">Angular</span>
+            </div>
+          </section>
+        }
+      }
+    </div>
+  </div>
+}

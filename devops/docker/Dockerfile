@@ -1,4 +1,6 @@
-FROM node:22-alpine AS builder
+# The build output is static files, the same for every CPU: build once on the builder's own
+# platform, then copy it into an nginx image for each target platform (amd64 for the server).
+FROM --platform=$BUILDPLATFORM node:22-alpine AS builder
 
 WORKDIR /app
 COPY package.json package-lock.json ./

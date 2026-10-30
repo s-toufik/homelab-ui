@@ -1,5 +1,7 @@
 {
+  "key": "prometheus",
   "port": 9090,
   "subpath": null,
-  "healthPath": "/-/ready"
+  "healthPath": "/-/ready",
+  "api": "/api/prometheus"
 }

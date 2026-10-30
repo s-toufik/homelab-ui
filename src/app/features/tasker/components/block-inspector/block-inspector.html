@@ -1,0 +1,247 @@
+@if (!document()) {
+  <p class="block-inspector__hint">Open or create a canvas to start building.</p>
+} @else if (selectionCount() > 1) {
+  <div class="block-inspector__header">
+    <div>
+      <div class="block-inspector__label">Selection</div>
+      <div class="block-inspector__title">{{ selectionCount() }} blocks selected</div>
+    </div>
+    <button
+      type="button"
+      class="block-inspector__close"
+      aria-label="Clear selection"
+      (click)="document()?.select(null)"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+  <p class="block-inspector__hint">
+    Combine them into one reusable block. Connections coming in and out of the selection are rewired
+    to the new block, and you can save it as a favorite afterwards.
+  </p>
+  <label class="block-inspector__field">
+    <span>Block name</span>
+    <input type="text" [ngModel]="groupName()" (ngModelChange)="groupName.set($event)" />
+  </label>
+  <div class="block-inspector__actions">
+    <button type="button" class="block-inspector__primary" (click)="groupSelection()">
+      Group into one block
+    </button>
+    <button type="button" class="block-inspector__remove" (click)="document()?.removeSelected()">
+      Remove {{ selectionCount() }} blocks
+    </button>
+  </div>
+} @else if (block(); as block) {
+  <div class="block-inspector__header">
+    <div>
+      <div class="block-inspector__label">Selected block</div>
+      <div class="block-inspector__title">{{ meta()?.label }}</div>
+    </div>
+    <button
+      type="button"
+      class="block-inspector__close"
+      aria-label="Deselect block"
+      (click)="document()?.select(null)"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+
+  @switch (block.config.kind) {
+    @case ('trigger') {
+      <p class="block-inspector__hint">
+        Starts the workflow when you press Run. Connect its output to the first step.
+      </p>
+    }
+
+    @case ('code') {
+      <p class="block-inspector__hint">
+        Write a JS function body. <code>input</code> holds the previous block's output, and
+        <code>await agent.ask(message)</code> asks the homelab agent and returns its reply.
+      </p>
+      <label class="block-inspector__field">
+        <span>Script</span>
+        <textarea
+          rows="9"
+          placeholder="return input;"
+          [ngModel]="block.config.script"
+          (ngModelChange)="patchCode({ script: $event })"
+        ></textarea>
+      </label>
+    }
+
+    @case ('http') {
+      <p class="block-inspector__hint">
+        Reference an earlier block's result with {{ '{{blockId.field}}' }}.
+      </p>
+      <label class="block-inspector__field">
+        <span>Method</span>
+        <select [ngModel]="block.config.method" (ngModelChange)="patchHttp({ method: $event })">
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+        </select>
+      </label>
+      <label class="block-inspector__field">
+        <span>URL</span>
+        <input
+          type="text"
+          placeholder="https://example.com/api"
+          [ngModel]="block.config.url"
+          (ngModelChange)="patchHttp({ url: $event })"
+        />
+      </label>
+      <div class="block-inspector__field">
+        <span>Headers</span>
+        @for (header of block.config.headers; track $index) {
+          <div class="block-inspector__row">
+            <input
+              type="text"
+              placeholder="Header"
+              [ngModel]="header.key"
+              (ngModelChange)="updateHeader($index, { key: $event, value: header.value })"
+            />
+            <input
+              type="text"
+              placeholder="Value"
+              [ngModel]="header.value"
+              (ngModelChange)="updateHeader($index, { key: header.key, value: $event })"
+            />
+            <button type="button" aria-label="Remove header" (click)="removeHeader($index)">
+              ×
+            </button>
+          </div>
+        }
+        <button type="button" class="block-inspector__add" (click)="addHeader()">
+          + Add header
+        </button>
+      </div>
+      <label class="block-inspector__field">
+        <span>Body</span>
+        <textarea
+          rows="4"
+          placeholder="Request body"
+          [ngModel]="block.config.body"
+          (ngModelChange)="patchHttp({ body: $event })"
+        ></textarea>
+      </label>
+    }
+
+    @case ('transform') {
+      <div class="block-inspector__field">
+        <span>Field mapping</span>
+        @for (mapping of block.config.mappings; track $index) {
+          <div class="block-inspector__row">
+            <input
+              type="text"
+              placeholder="from.path"
+              [ngModel]="mapping.from"
+              (ngModelChange)="updateMapping($index, { from: $event, to: mapping.to })"
+            />
+            <input
+              type="text"
+              placeholder="to"
+              [ngModel]="mapping.to"
+              (ngModelChange)="updateMapping($index, { from: mapping.from, to: $event })"
+            />
+            <button type="button" aria-label="Remove mapping" (click)="removeMapping($index)">
+              ×
+            </button>
+          </div>
+        }
+        <button type="button" class="block-inspector__add" (click)="addMapping()">
+          + Add field
+        </button>
+      </div>
+    }
+
+    @case ('output') {
+      <p class="block-inspector__hint">
+        Shows the final payload once the workflow finishes running.
+      </p>
+    }
+
+    @case ('group') {
+      <p class="block-inspector__hint">
+        Runs its {{ block.config.blocks.length }} inner blocks as one step: its input feeds the
+        inner entry blocks and its output is the result of the inner exit blocks.
+      </p>
+      <label class="block-inspector__field">
+        <span>Block name</span>
+        <input
+          type="text"
+          [ngModel]="block.config.name"
+          (ngModelChange)="patchGroup({ name: $event })"
+        />
+      </label>
+      <button type="button" class="block-inspector__add" (click)="document()?.ungroup(block.id)">
+        Ungroup to edit the inner blocks
+      </button>
+    }
+  }
+
+  @if (document()?.results()?.[block.id]; as result) {
+    <div class="block-inspector__result" [class]="'block-inspector__result--' + result.status">
+      <div class="block-inspector__label">Last run</div>
+      @if (result.status === 'error') {
+        <pre>{{ result.error }}</pre>
+      } @else {
+        <pre>{{ formatOutput(result.output) }}</pre>
+      }
+    </div>
+  }
+
+  @if (savingName() !== null) {
+    <div class="block-inspector__row block-inspector__row--favorite">
+      <input
+        type="text"
+        placeholder="Favorite name"
+        [ngModel]="savingName()"
+        (ngModelChange)="savingName.set($event)"
+      />
+      <button type="button" aria-label="Confirm favorite name" (click)="confirmSaveFavorite()">
+        ✓
+      </button>
+      <button type="button" aria-label="Cancel" (click)="cancelSaveFavorite()">×</button>
+    </div>
+  } @else {
+    <button type="button" class="block-inspector__favorite" (click)="startSaveFavorite()">
+      Save as favorite
+    </button>
+  }
+  @if (favorites.error(); as error) {
+    <p class="block-inspector__error" role="alert">{{ error }}</p>
+  }
+
+  <div class="block-inspector__actions">
+    <button type="button" class="block-inspector__run" (click)="runSelected()">
+      Run this block
+    </button>
+    <button type="button" class="block-inspector__remove" (click)="document()?.removeSelected()">
+      Remove block
+    </button>
+  </div>
+} @else {
+  <p class="block-inspector__hint">
+    Select a block to configure it. Shift-click several blocks to group them into one.
+  </p>
+}

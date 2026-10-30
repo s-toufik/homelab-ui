@@ -8,7 +8,7 @@
   position: relative;
   height: 100%;
   width: 100%;
-  background: var(--backdrop);
+  background: var(--backdrop-glow), var(--surface);
   color: var(--text);
   overflow: hidden;
 }

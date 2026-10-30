@@ -1,5 +1,6 @@
 import { Component, computed, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { copyText } from '@shared/utils/clipboard';
 
 const STEP_LABELS: Readonly<Record<string, string>> = {
   understand: 'Understand',
@@ -36,7 +37,8 @@ export class SettingsPanel {
   private copiedTimeout?: ReturnType<typeof setTimeout>;
 
   async copySessionId(): Promise<void> {
-    await navigator.clipboard.writeText(this.sessionId());
+    const copied = await copyText(this.sessionId());
+    if (!copied) return;
     this.copied.set(true);
     clearTimeout(this.copiedTimeout);
     this.copiedTimeout = setTimeout(() => this.copied.set(false), 1500);

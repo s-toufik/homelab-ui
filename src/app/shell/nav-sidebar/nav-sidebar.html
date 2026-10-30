@@ -1,15 +1,21 @@
-@if (ui.navOpen()) {
+@if (ui.navPinned()) {
   <div class="nav-sidebar__backdrop" (click)="ui.closeNav()"></div>
 }
 
-<nav class="nav-sidebar" [class.nav-sidebar--open]="ui.navOpen()" aria-label="Main">
+<nav
+  class="nav-sidebar"
+  [class.nav-sidebar--open]="ui.navOpen()"
+  aria-label="Main"
+  (mouseenter)="ui.hoverNav(true)"
+  (mouseleave)="ui.hoverNav(false)"
+>
   <a
     class="nav-sidebar__brand"
     routerLink="/"
     routerLinkActive="nav-sidebar__brand--active"
     [routerLinkActiveOptions]="{ exact: true }"
     aria-label="Homelab overview"
-    (click)="ui.closeNav()"
+    (click)="ui.collapseNavPeek()"
   >
     <span class="nav-sidebar__logo" aria-hidden="true">
       <svg
@@ -31,6 +37,36 @@
     </span>
   </a>
 
+  <button type="button" class="nav-sidebar__settings" (click)="settings.open()">
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+    >
+      <circle cx="12" cy="12" r="3" />
+      <path
+        d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1Z"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+    Settings
+  </button>
+
+  @if (session.user(); as user) {
+    <div class="nav-sidebar__account">
+      <span class="nav-sidebar__avatar" aria-hidden="true">{{ initial(user.username) }}</span>
+      <span class="nav-sidebar__account-name">
+        <span class="nav-sidebar__account-label">Signed in as</span>
+        {{ user.username }}
+      </span>
+      <a class="nav-sidebar__signout" [href]="session.signOutUrl">Sign out</a>
+    </div>
+  }
+
   <h2 class="nav-sidebar__section">Apps</h2>
   <ul class="nav-sidebar__list">
     @for (feature of features; track feature.id) {
@@ -40,7 +76,7 @@
             class="nav-sidebar__link"
             [routerLink]="feature.entry.path"
             routerLinkActive="nav-sidebar__link--active"
-            (click)="ui.closeNav()"
+            (click)="ui.collapseNavPeek()"
           >
             <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
             {{ feature.label }}
@@ -51,7 +87,7 @@
             [href]="feature.entry.url"
             target="_blank"
             rel="noopener"
-            (click)="ui.closeNav()"
+            (click)="ui.collapseNavPeek()"
           >
             <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
             {{ feature.label }}
@@ -97,9 +133,4 @@
       }
     </ul>
   }
-
-  <div class="nav-sidebar__status" role="status">
-    <span class="nav-sidebar__dot" [class]="'nav-sidebar__dot--' + health().level"></span>
-    {{ health().label }}
-  </div>
 </nav>

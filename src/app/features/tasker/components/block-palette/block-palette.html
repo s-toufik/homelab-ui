@@ -1,0 +1,54 @@
+<h2 class="block-palette__label">Blocks</h2>
+@for (meta of kinds; track meta.kind) {
+  <button type="button" class="block-palette__item" (click)="workspace.addBlock(meta.kind)">
+    <span
+      class="block-palette__icon"
+      [style.background]="meta.color + '22'"
+      [style.color]="meta.color"
+    >
+      <app-feature-icon [paths]="meta.icon" [size]="14" />
+    </span>
+    {{ meta.label }}
+  </button>
+}
+
+<h2 class="block-palette__label block-palette__label--favorites">Favorites</h2>
+@switch (favorites.state()) {
+  @case ('loading') {
+    <p class="block-palette__hint">Loading…</p>
+  }
+  @case ('error') {
+    <p class="block-palette__hint block-palette__hint--error">{{ favorites.error() }}</p>
+    <button type="button" class="block-palette__retry" (click)="favorites.load()">Retry</button>
+  }
+  @default {
+    @for (favorite of favorites.favorites(); track favorite.id) {
+      <div class="block-palette__favorite">
+        <button
+          type="button"
+          class="block-palette__item"
+          (click)="workspace.addBlockWithConfig(favorite.config)"
+        >
+          <span
+            class="block-palette__icon"
+            [style.background]="kindMeta(favorite).color + '22'"
+            [style.color]="kindMeta(favorite).color"
+          >
+            <app-feature-icon [paths]="kindMeta(favorite).icon" [size]="14" />
+          </span>
+          {{ favorite.name }}
+        </button>
+        <button
+          type="button"
+          class="block-palette__remove"
+          aria-label="Remove favorite"
+          (click)="favorites.remove(favorite.id)"
+        >
+          ×
+        </button>
+      </div>
+    } @empty {
+      <p class="block-palette__hint">Configure a block and press "Save as favorite".</p>
+    }
+  }
+}

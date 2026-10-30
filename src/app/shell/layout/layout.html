@@ -4,6 +4,8 @@
     class="layout__nav-toggle"
     title="Menu"
     aria-label="Open navigation"
+    (mouseenter)="ui.hoverNav(true)"
+    (mouseleave)="ui.hoverNav(false)"
     (click)="ui.toggleNav()"
   >
     <svg
@@ -24,6 +26,8 @@
       class="layout__panel-toggle"
       title="Settings"
       aria-label="Open page settings"
+      (mouseenter)="ui.hoverPanel(true)"
+      (mouseleave)="ui.hoverPanel(false)"
       (click)="ui.togglePanel()"
     >
       <svg
@@ -53,4 +57,6 @@
   @if (chrome.rightPanel()) {
     <app-page-panel />
   }
+
+  <app-settings-modal />
 </div>

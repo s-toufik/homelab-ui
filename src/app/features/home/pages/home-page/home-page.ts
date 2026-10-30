@@ -14,9 +14,9 @@ const STATUS_LABEL = { checking: 'Checking', online: 'Online', offline: 'Unreach
 
 function greeting(hour: number): string {
   if (hour < 5) return 'Welcome to Blue platform !';
-  if (hour < 12) return 'Good morning! Welcome to Blue platform !.';
-  if (hour < 18) return 'Good afternoon! Welcome to Blue platform !.';
-  return 'Good evening! Welcome to Blue platform !.';
+  if (hour < 12) return 'Good morning! Welcome to Blue platform !';
+  if (hour < 18) return 'Good afternoon! Welcome to Blue platform !';
+  return 'Good evening! Welcome to Blue platform !';
 }
 
 function matches(feature: HomelabFeature, query: string): boolean {

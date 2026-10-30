@@ -1,8 +1,13 @@
-@if (ui.panelOpen()) {
+@if (ui.panelPinned()) {
   <div class="page-panel__backdrop" (click)="ui.closePanel()"></div>
 }
 
-<aside class="page-panel" [class.page-panel--open]="ui.panelOpen()">
+<aside
+  class="page-panel"
+  [class.page-panel--open]="ui.panelOpen()"
+  (mouseenter)="ui.hoverPanel(true)"
+  (mouseleave)="ui.hoverPanel(false)"
+>
   <div class="page-panel__header">
     <h2 class="page-panel__title">Settings</h2>
     <button

@@ -1,4 +1,5 @@
 {
+  "key": "kafka-ui",
   "port": 8080,
   "subpath": null,
   "healthPath": "/actuator/health"

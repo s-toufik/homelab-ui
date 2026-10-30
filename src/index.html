@@ -7,6 +7,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#070b16" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <script>
+      (function () {
+        try {
+          var saved =
+            JSON.parse(localStorage.getItem('homelab-ui.theme-preferences') || 'null') || {};
+          var palette = [
+            'classic',
+            'terminal',
+            'paper',
+            'nightshift',
+            'aurora',
+            'arcade',
+            'nord',
+            'neon',
+            'sandstone',
+          ].includes(saved.palette)
+            ? saved.palette
+            : 'classic';
+          document.documentElement.setAttribute('data-palette', palette);
+        } catch (e) {}
+      })();
+    </script>
   </head>
   <body>
     <app-root></app-root>

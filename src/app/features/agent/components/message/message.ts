@@ -1,6 +1,7 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, computed, input, output, signal } from '@angular/core';
 import { MarkdownPipe } from '@shared/pipes/markdown.pipe';
+import { copyText } from '@shared/utils/clipboard';
 import { metadataEntries, usageSummary } from '../../domain/answer-metadata';
 import type { ChatMessage } from '../../domain/chat-message';
 
@@ -25,7 +26,8 @@ export class Message {
   private copiedTimeout?: ReturnType<typeof setTimeout>;
 
   async copy(): Promise<void> {
-    await navigator.clipboard.writeText(this.message().content);
+    const copied = await copyText(this.message().content);
+    if (!copied) return;
     this.copied.set(true);
     clearTimeout(this.copiedTimeout);
     this.copiedTimeout = setTimeout(() => this.copied.set(false), 1500);

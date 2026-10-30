@@ -32,32 +32,34 @@
     }
   </header>
 
-  @for (section of sections(); track section.category) {
-    <section class="home-page__section" [attr.aria-label]="section.category">
-      <h2 class="home-page__category">{{ section.category }}</h2>
-      <div class="home-page__grid">
-        @for (feature of section.features; track feature.id) {
-          @if (feature.entry.kind === 'page') {
-            <a class="home-page__tile" [routerLink]="feature.entry.path">
-              <ng-container
-                [ngTemplateOutlet]="tile"
-                [ngTemplateOutletContext]="{ $implicit: feature }"
-              />
-            </a>
-          } @else {
-            <a class="home-page__tile" [href]="feature.entry.url" target="_blank" rel="noopener">
-              <ng-container
-                [ngTemplateOutlet]="tile"
-                [ngTemplateOutletContext]="{ $implicit: feature }"
-              />
-            </a>
+  <div class="home-page__panels">
+    @for (section of sections(); track section.category) {
+      <section class="home-page__panel" [attr.aria-label]="section.category">
+        <h2 class="home-page__category">{{ section.category }}</h2>
+        <div class="home-page__grid">
+          @for (feature of section.features; track feature.id) {
+            @if (feature.entry.kind === 'page') {
+              <a class="home-page__tile" [routerLink]="feature.entry.path">
+                <ng-container
+                  [ngTemplateOutlet]="tile"
+                  [ngTemplateOutletContext]="{ $implicit: feature }"
+                />
+              </a>
+            } @else {
+              <a class="home-page__tile" [href]="feature.entry.url" target="_blank" rel="noopener">
+                <ng-container
+                  [ngTemplateOutlet]="tile"
+                  [ngTemplateOutletContext]="{ $implicit: feature }"
+                />
+              </a>
+            }
           }
-        }
-      </div>
-    </section>
-  } @empty {
-    <p class="home-page__empty">Nothing matches "{{ query() }}".</p>
-  }
+        </div>
+      </section>
+    } @empty {
+      <p class="home-page__empty">Nothing matches "{{ query() }}".</p>
+    }
+  </div>
 </div>
 
 <ng-template #tile let-feature>
