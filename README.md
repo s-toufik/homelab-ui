@@ -21,7 +21,7 @@ The **Status** page lists every container of the homelab, grouped the way the se
 Every service also carries what you need to use it:
 
 - **links** to its web interfaces — Grafana's dashboards and Explore, Prometheus queries and targets, Kafka UI, Alloy's pipeline graph, the LLM playground, the agent's API docs, your Keycloak account;
-- its **connection address**, ready to copy — `postgres:5432` style for PostgreSQL, the MongoDB URI, Kafka's bootstrap server, the OTLP endpoints, the LLM's OpenAI-compatible URL;
+- its **connection address**, ready to copy — the MongoDB URI, Kafka's bootstrap server, the OTLP endpoints, the LLM's OpenAI-compatible URL;
 - the **folder** it lives in on the server, for when you need to look at its configuration.
 
 <img src="docs/screenshots/status.webp" alt="The Status page: 24 of 24 ready, with Gateway, Repository, Message broker, Observability, AI and Apps panels listing each container as Ready, its folder, links and a copyable connection address" />
