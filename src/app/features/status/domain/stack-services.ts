@@ -2,8 +2,6 @@ import type { StackService } from './stack-service';
 
 const health = (key: string) => ({ kind: 'health', key }) as const;
 const metric = (query: string) => ({ kind: 'metric', query }) as const;
-const running = (container: string) =>
-  metric(`(time() - max(container_last_seen{name="${container}"})) < bool 60`);
 
 export const STACK_SERVICES: readonly StackService[] = [
   {
@@ -39,9 +37,8 @@ export const STACK_SERVICES: readonly StackService[] = [
     group: 'Repository',
     folder: 'repository/postgres',
     description: 'Relational database (Tasker, Keycloak accounts, your projects).',
-    check: metric('pg_up'),
+    check: metric('cnpg_collector_up'),
     links: [],
-    connection: '{host}:5432',
   },
   {
     id: 'postgrest',
@@ -94,15 +91,6 @@ export const STACK_SERVICES: readonly StackService[] = [
     ],
   },
   {
-    id: 'cadvisor',
-    label: 'cAdvisor',
-    group: 'Observability',
-    folder: 'observability/metrics/cadvisor',
-    description: 'Container metrics.',
-    check: health('cadvisor'),
-    links: [],
-  },
-  {
     id: 'kafka-exporter',
     label: 'kafka-exporter',
     group: 'Observability',
@@ -110,15 +98,6 @@ export const STACK_SERVICES: readonly StackService[] = [
     description: 'Kafka metrics for Prometheus.',
     check: health('kafka-exporter'),
     links: [{ label: 'Metrics', port: 9308, path: '/metrics' }],
-  },
-  {
-    id: 'postgres-exporter',
-    label: 'postgres-exporter',
-    group: 'Observability',
-    folder: 'observability/metrics/postgres-exporter',
-    description: 'PostgreSQL metrics for Prometheus.',
-    check: health('postgres-exporter'),
-    links: [],
   },
   {
     id: 'mongodb-exporter',
@@ -195,12 +174,12 @@ export const STACK_SERVICES: readonly StackService[] = [
     connection: 'https://{host}:8090/v1 (Authorization: Bearer <LLM_GATEWAY_API_KEY>)',
   },
   {
-    id: 'llm-sd-exporter',
-    label: 'llm-sd-exporter',
+    id: 'llm-sd',
+    label: 'llm-sd',
     group: 'AI',
-    folder: 'ai/llm/exporter',
+    folder: 'ai/llm',
     description: 'Tells Prometheus which models are loaded.',
-    check: running('llm-sd-exporter'),
+    check: health('llm-sd'),
     links: [],
   },
   {
