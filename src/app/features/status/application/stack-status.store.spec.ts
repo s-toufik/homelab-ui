@@ -30,7 +30,7 @@ describe('StackStatusStore', () => {
       'Repository',
       'Message broker',
       'Observability',
-      'AI',
+      'LLM',
       'Apps',
     ]);
   });

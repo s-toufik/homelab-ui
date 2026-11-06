@@ -3,7 +3,7 @@ export const SERVICE_GROUPS = [
   'Repository',
   'Message broker',
   'Observability',
-  'AI',
+  'LLM',
   'Apps',
 ] as const;
 
