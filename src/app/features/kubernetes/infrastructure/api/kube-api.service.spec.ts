@@ -1,5 +1,6 @@
+import { TestBed } from '@angular/core/testing';
 import { kindById, podState, toRow } from '../../domain/resources';
-import { cronJobRun, parseCpu, parseMemory } from './kube-api.service';
+import { KubeApiService, cronJobRun, parseCpu, parseMemory } from './kube-api.service';
 
 describe('Kubernetes API helpers', () => {
   it('parses CPU and memory quantities', () => {
@@ -42,5 +43,18 @@ describe('Kubernetes API helpers', () => {
     );
     expect(job.metadata.name).toBe('backups-postgres-manual-1000');
     expect(job.spec).toEqual({ template: { spec: { containers: [] } } });
+  });
+
+  it('asks for logs with Accept */*, which the Kubernetes API accepts for plain-text logs', async () => {
+    const fetch = vi.fn().mockResolvedValue(new Response('2026-11-07T18:20:01Z started'));
+    vi.stubGlobal('fetch', fetch);
+
+    const text = await TestBed.inject(KubeApiService).logs('homelab', 'caddy-1', 'caddy', false);
+
+    const [url, init] = fetch.mock.calls[0] as [string, RequestInit];
+    expect(text).toBe('2026-11-07T18:20:01Z started');
+    expect(url).toContain('/api/v1/namespaces/homelab/pods/caddy-1/log?container=caddy');
+    expect((init.headers as Record<string, string>)['Accept']).toBe('*/*');
+    vi.unstubAllGlobals();
   });
 });

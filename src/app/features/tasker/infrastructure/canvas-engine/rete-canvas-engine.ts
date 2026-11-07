@@ -7,7 +7,12 @@ import type {
   CanvasEngineCallbacks,
   CanvasEngineState,
 } from '../../domain/canvas-engine';
-import type { BlockConfig, WorkflowBlock, WorkflowConnection } from '../../domain/workflow';
+import {
+  blockTitle,
+  type BlockConfig,
+  type WorkflowBlock,
+  type WorkflowConnection,
+} from '../../domain/workflow';
 import { injectCanvasEngineStyles } from './rete-canvas-engine.styles';
 
 const NODE_WIDTH = 220;
@@ -162,7 +167,11 @@ export class ReteCanvasEngine implements CanvasEngine {
         await this.place(block);
       }
 
-      const signature = JSON.stringify({ config: block.config, result: state.results[block.id] });
+      const signature = JSON.stringify({
+        label: block.label,
+        config: block.config,
+        result: state.results[block.id],
+      });
       if (this.signatures.get(block.id) !== signature) {
         this.signatures.set(block.id, signature);
         await area.update('node', block.id);
@@ -278,7 +287,7 @@ export class ReteCanvasEngine implements CanvasEngine {
     text.className = 'tasker-rete-node__text';
     const title = document.createElement('span');
     title.className = 'tasker-rete-node__title';
-    title.textContent = block.config.kind === 'group' ? block.config.name : meta.label;
+    title.textContent = blockTitle(block);
     const subtitle = document.createElement('span');
     subtitle.className = 'tasker-rete-node__subtitle';
     subtitle.textContent = subtitleFor(block.config);

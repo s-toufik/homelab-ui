@@ -43,8 +43,8 @@
 } @else if (block(); as block) {
   <div class="block-inspector__header">
     <div>
-      <div class="block-inspector__label">Selected block</div>
-      <div class="block-inspector__title">{{ meta()?.label }}</div>
+      <div class="block-inspector__label">{{ meta()?.label }}</div>
+      <div class="block-inspector__title">{{ title() }}</div>
     </div>
     <button
       type="button"
@@ -64,6 +64,16 @@
       </svg>
     </button>
   </div>
+
+  <label class="block-inspector__field">
+    <span>Block name</span>
+    <input
+      type="text"
+      [placeholder]="meta()?.label ?? ''"
+      [ngModel]="block.label ?? (block.config.kind === 'group' ? block.config.name : '')"
+      (ngModelChange)="rename($event)"
+    />
+  </label>
 
   @switch (block.config.kind) {
     @case ('trigger') {
@@ -185,14 +195,6 @@
         Runs its {{ block.config.blocks.length }} inner blocks as one step: its input feeds the
         inner entry blocks and its output is the result of the inner exit blocks.
       </p>
-      <label class="block-inspector__field">
-        <span>Block name</span>
-        <input
-          type="text"
-          [ngModel]="block.config.name"
-          (ngModelChange)="patchGroup({ name: $event })"
-        />
-      </label>
       <button type="button" class="block-inspector__add" (click)="document()?.ungroup(block.id)">
         Ungroup to edit the inner blocks
       </button>
