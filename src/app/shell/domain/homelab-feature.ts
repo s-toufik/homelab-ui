@@ -8,7 +8,7 @@ export const FEATURE_CATEGORIES = [
 
 export type FeatureCategory = (typeof FEATURE_CATEGORIES)[number];
 
-export type FeatureEntry = { kind: 'page'; path: string } | { kind: 'link'; url: string };
+export type FeatureEntry = { kind: 'page'; path: string };
 
 export type FeatureIcon = readonly string[];
 
@@ -20,5 +20,6 @@ export interface HomelabFeature {
   color: string;
   category: FeatureCategory;
   entry: FeatureEntry;
+  adminOnly?: boolean;
   checkHealth?: () => Promise<boolean>;
 }

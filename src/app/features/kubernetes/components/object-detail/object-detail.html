@@ -1,0 +1,293 @@
+@if (current(); as current) {
+  <section class="hl-card object-detail">
+    <div class="hl-row object-detail__head">
+      <div class="object-detail__name">
+        <span class="hl-muted">{{ current.resource.kind }}</span>
+        <h2 class="hl-mono">{{ current.object.metadata.name }}</h2>
+        @if (current.object.metadata.namespace) {
+          <span class="hl-muted">in {{ current.object.metadata.namespace }}</span>
+        }
+      </div>
+      <div class="hl-row">
+        @if (canScale()) {
+          <input
+            class="hl-input object-detail__replicas"
+            type="number"
+            min="0"
+            aria-label="Replicas"
+            [ngModel]="replicas()"
+            (ngModelChange)="replicas.set(+$event)"
+          />
+          <button
+            type="button"
+            class="hl-btn hl-btn--small"
+            [disabled]="store.busy()"
+            (click)="scale()"
+          >
+            Scale
+          </button>
+        }
+        @if (canRestart()) {
+          <button
+            type="button"
+            class="hl-btn hl-btn--small"
+            [disabled]="store.busy()"
+            (click)="restart()"
+          >
+            Restart
+          </button>
+        }
+        @if (isCronJob()) {
+          <button
+            type="button"
+            class="hl-btn hl-btn--small"
+            [disabled]="store.busy()"
+            (click)="store.runNow()"
+          >
+            Run now
+          </button>
+          <button
+            type="button"
+            class="hl-btn hl-btn--small"
+            [disabled]="store.busy()"
+            (click)="store.suspend(!current.object.spec?.['suspend'])"
+          >
+            {{ current.object.spec?.['suspend'] ? 'Resume' : 'Suspend' }}
+          </button>
+        }
+        <button
+          type="button"
+          class="hl-btn hl-btn--small hl-btn--danger"
+          [disabled]="store.busy()"
+          (click)="remove()"
+        >
+          Delete
+        </button>
+        <button type="button" class="hl-btn hl-btn--small" (click)="store.refreshSelected()">
+          Refresh
+        </button>
+        <button type="button" class="hl-btn hl-btn--small" (click)="store.close()">Close</button>
+      </div>
+    </div>
+
+    @if (store.actionError(); as error) {
+      <p class="hl-error">{{ error }}</p>
+    }
+    @if (store.notice(); as notice) {
+      <p class="object-detail__notice">{{ notice }}</p>
+    }
+
+    <nav class="hl-tabs">
+      @for (tab of tabs(); track tab.id) {
+        <button
+          type="button"
+          class="hl-tab"
+          [class.hl-tab--active]="store.detailTab() === tab.id"
+          (click)="store.detailTab.set(tab.id)"
+        >
+          {{ tab.label }}
+        </button>
+      }
+    </nav>
+
+    @switch (store.detailTab()) {
+      @case ('overview') {
+        <table class="hl-table object-detail__facts">
+          <tbody>
+            <tr>
+              <th>Created</th>
+              <td>{{ current.object.metadata.creationTimestamp | date: 'medium' }}</td>
+            </tr>
+            @for (owner of current.object.metadata.ownerReferences ?? []; track owner.name) {
+              <tr>
+                <th>Owned by</th>
+                <td>{{ owner.kind }}/{{ owner.name }}</td>
+              </tr>
+            }
+            @if (labels().length) {
+              <tr>
+                <th>Labels</th>
+                <td>
+                  @for (label of labels(); track label[0]) {
+                    <span class="hl-badge hl-badge--muted object-detail__label"
+                      >{{ label[0] }}={{ label[1] }}</span
+                    >
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        @if (containerStatuses().length) {
+          <h3 class="hl-card__title object-detail__sub">Containers</h3>
+          <div class="hl-table-wrap">
+            <table class="hl-table">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Image</th>
+                  <th>Ready</th>
+                  <th class="hl-num">Restarts</th>
+                  <th>State</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (status of containerStatuses(); track status.name) {
+                  <tr>
+                    <td>{{ status.name }}</td>
+                    <td class="hl-mono">{{ status.image }}</td>
+                    <td>
+                      <span
+                        class="hl-badge"
+                        [class.hl-badge--ok]="status.ready"
+                        [class.hl-badge--bad]="!status.ready"
+                        >{{ status.ready ? 'yes' : 'no' }}</span
+                      >
+                    </td>
+                    <td class="hl-num">{{ status.restartCount }}</td>
+                    <td class="hl-muted">
+                      @if (status.state?.running) {
+                        running since {{ status.state.running.startedAt | date: 'short' }}
+                      }
+                      @if (status.state?.waiting) {
+                        {{ status.state.waiting.reason }} {{ status.state.waiting.message }}
+                      }
+                      @if (status.state?.terminated) {
+                        {{ status.state.terminated.reason }} (exit
+                        {{ status.state.terminated.exitCode }})
+                      }
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (conditions().length) {
+          <h3 class="hl-card__title object-detail__sub">Conditions</h3>
+          <div class="hl-table-wrap">
+            <table class="hl-table">
+              <thead>
+                <tr>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Reason</th>
+                  <th>Message</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (condition of conditions(); track condition.type) {
+                  <tr>
+                    <td>{{ condition.type }}</td>
+                    <td>{{ condition.status }}</td>
+                    <td>{{ condition.reason }}</td>
+                    <td class="hl-muted">{{ condition.message }}</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+
+        @if (dataKeys().length) {
+          <h3 class="hl-card__title object-detail__sub">Data</h3>
+          @for (key of dataKeys(); track key) {
+            <div class="object-detail__data">
+              <div class="hl-row">
+                <strong class="hl-mono">{{ key }}</strong>
+                @if (current.resource.id === 'secrets') {
+                  <button type="button" class="hl-btn hl-btn--small" (click)="toggleReveal(key)">
+                    {{ revealed().has(key) ? 'Hide' : 'Show' }}
+                  </button>
+                }
+              </div>
+              <pre class="hl-pre object-detail__value">{{ value(key) }}</pre>
+            </div>
+          }
+        }
+      }
+      @case ('yaml') {
+        <textarea
+          class="hl-input hl-input--mono object-detail__yaml"
+          spellcheck="false"
+          aria-label="YAML"
+          [ngModel]="yamlText()"
+          (ngModelChange)="yamlText.set($event)"
+        ></textarea>
+        <div class="hl-row">
+          <button
+            type="button"
+            class="hl-btn hl-btn--primary"
+            [disabled]="store.busy()"
+            (click)="save()"
+          >
+            Save
+          </button>
+          <button type="button" class="hl-btn" (click)="yamlText.set(store.yaml(current.object))">
+            Discard changes
+          </button>
+          <span class="hl-muted object-detail__hint"
+            >Releases managed by helmfile are put back as declared on the next apply.</span
+          >
+        </div>
+      }
+      @case ('logs') {
+        @if (containers().length > 1) {
+          <select
+            class="hl-input object-detail__container"
+            aria-label="Container"
+            [ngModel]="container()"
+            (ngModelChange)="container.set($event)"
+          >
+            @for (name of containers(); track name) {
+              <option [value]="name">{{ name }}</option>
+            }
+          </select>
+        }
+        <app-pod-logs
+          [namespace]="current.object.metadata.namespace ?? ''"
+          [pod]="current.object.metadata.name"
+          [container]="container()"
+        />
+      }
+      @case ('shell') {
+        @if (containers().length > 1) {
+          <select
+            class="hl-input object-detail__container"
+            aria-label="Container"
+            [ngModel]="container()"
+            (ngModelChange)="container.set($event)"
+          >
+            @for (name of containers(); track name) {
+              <option [value]="name">{{ name }}</option>
+            }
+          </select>
+        }
+        @for (name of [container()]; track name) {
+          <app-pod-terminal
+            [namespace]="current.object.metadata.namespace ?? ''"
+            [pod]="current.object.metadata.name"
+            [container]="name"
+          />
+        }
+      }
+      @case ('events') {
+        <ul class="object-detail__events">
+          @for (event of store.related(); track event.object.metadata.uid ?? $index) {
+            <li>
+              <span class="hl-badge" [class.hl-badge--warn]="event.tone === 'warn'">{{
+                event.status
+              }}</span>
+              <span class="hl-muted">{{ event.createdMs | date: 'short' }}</span>
+              <span>{{ event.details }}</span>
+            </li>
+          } @empty {
+            <li class="hl-empty">No recent events.</li>
+          }
+        </ul>
+      }
+    }
+  </section>
+}

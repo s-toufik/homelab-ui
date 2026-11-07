@@ -1,4 +1,5 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
+import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 import { newId } from '@shared/utils/uuid';
 import { answerMetadata } from '../domain/answer-metadata';
 import type { ChatMessage } from '../domain/chat-message';
@@ -29,6 +30,14 @@ export class AgentStore {
   readonly canSend = computed(
     () => this.draft().trim().length > 0 && !this.isStreaming() && this.modelName() !== '',
   );
+
+  readonly phase = computed<SwarmPhase>(() => {
+    const last = [...this.messages()].reverse().find((message) => message.role === 'assistant');
+    if (!this.isStreaming()) return last?.error ? 'error' : 'idle';
+    if (last?.content) return 'final';
+    if (last?.status && /execut|running|tool/i.test(last.status)) return 'executor';
+    return 'thinking';
+  });
 
   private abortController: AbortController | null = null;
 

@@ -1,0 +1,206 @@
+<div class="hl-page">
+  <app-page-header title="Kubernetes" eyebrow="k3s">
+    @if (isAdmin()) {
+      <select
+        class="hl-input"
+        aria-label="Namespace"
+        [ngModel]="store.namespace()"
+        (ngModelChange)="setNamespace($event)"
+      >
+        <option value="">All namespaces</option>
+        @for (namespace of store.namespaces(); track namespace) {
+          <option [value]="namespace">{{ namespace }}</option>
+        }
+      </select>
+      <button type="button" class="hl-btn" [disabled]="store.loading()" (click)="store.load()">
+        {{ store.loading() ? 'Loading…' : 'Refresh' }}
+      </button>
+    }
+  </app-page-header>
+
+  @if (!isAdmin()) {
+    <p class="hl-error">
+      The Kubernetes page needs the admin role. An admin gives it with make user-admin
+      ACCOUNT=&lt;you&gt;.
+    </p>
+  } @else {
+    @if (store.error(); as error) {
+      <p class="hl-error" role="alert">{{ error }}</p>
+    }
+
+    <div class="kube-page">
+      <nav class="kube-page__nav" aria-label="Resources">
+        <button
+          type="button"
+          class="kube-page__kind"
+          [class.kube-page__kind--active]="store.view() === 'overview'"
+          (click)="store.show('overview')"
+        >
+          Overview
+        </button>
+        @for (section of groups; track section.group) {
+          <p class="kube-page__group">{{ section.group }}</p>
+          @for (kind of section.kinds; track kind.id) {
+            <button
+              type="button"
+              class="kube-page__kind"
+              [class.kube-page__kind--active]="store.view() === kind.id"
+              (click)="store.show(kind.id)"
+            >
+              {{ kind.label }}
+            </button>
+          }
+        }
+      </nav>
+
+      <div class="kube-page__main">
+        @if (store.selected()) {
+          <app-object-detail />
+        }
+
+        @if (store.view() === 'overview') {
+          <div class="hl-grid">
+            @for (node of store.nodes(); track node.row.name) {
+              <section class="hl-card">
+                <h2 class="hl-card__title">Node {{ node.row.name }}</h2>
+                <div class="kube-page__gauges">
+                  <app-gauge
+                    label="CPU"
+                    unit="percent"
+                    [value]="node.usage ? (node.usage.cpuCores / node.cpuCores) * 100 : null"
+                  />
+                  <app-gauge
+                    label="Memory"
+                    unit="percent"
+                    [value]="node.usage ? (node.usage.memoryBytes / node.memoryBytes) * 100 : null"
+                  />
+                </div>
+                <p class="hl-muted kube-page__node">
+                  <span
+                    class="hl-badge"
+                    [class.hl-badge--ok]="node.row.tone === 'ok'"
+                    [class.hl-badge--bad]="node.row.tone === 'bad'"
+                    >{{ node.row.status }}</span
+                  >
+                  {{ node.row.details }}
+                </p>
+              </section>
+            }
+            <section class="hl-card">
+              <h2 class="hl-card__title">Pods</h2>
+              <div class="hl-stat">
+                <span class="hl-stat__value"
+                  >{{ store.podCount() - store.unhealthyPods().length }} /
+                  {{ store.podCount() }}</span
+                >
+                <span class="hl-stat__label">running and ready, every namespace</span>
+              </div>
+              <ul class="kube-page__short">
+                @for (row of store.unhealthyPods(); track row.namespace + row.name) {
+                  <li>
+                    <button type="button" class="kube-page__link" (click)="openPod(row)">
+                      <span
+                        class="hl-badge"
+                        [class.hl-badge--bad]="row.tone === 'bad'"
+                        [class.hl-badge--warn]="row.tone === 'warn'"
+                        >{{ row.status }}</span
+                      >
+                      {{ row.namespace }}/{{ row.name }}
+                    </button>
+                  </li>
+                }
+              </ul>
+            </section>
+          </div>
+
+          <section class="hl-card">
+            <h2 class="hl-card__title">Warnings in the last hour</h2>
+            <ul class="kube-page__short">
+              @for (row of store.warnings(); track row.object.metadata.uid ?? $index) {
+                <li>
+                  <button type="button" class="kube-page__link" (click)="openEvent(row)">
+                    <span class="hl-muted">{{ row.createdMs | date: 'HH:mm' }}</span>
+                    <span class="hl-badge hl-badge--warn">{{ row.status }}</span>
+                    <span>{{ row.namespace }} · {{ row.details }}</span>
+                  </button>
+                </li>
+              } @empty {
+                <li class="hl-empty">No warnings.</li>
+              }
+            </ul>
+          </section>
+        } @else {
+          <section class="hl-card">
+            <div class="hl-row kube-page__toolbar">
+              <h2 class="hl-card__title kube-page__title">
+                {{ store.resource().label }} · {{ store.shown().length }}
+              </h2>
+              <input
+                class="hl-input hl-input--grow"
+                placeholder="Filter"
+                aria-label="Filter"
+                [ngModel]="store.search()"
+                (ngModelChange)="store.search.set($event)"
+              />
+            </div>
+            <div class="hl-table-wrap">
+              <table class="hl-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    @if (store.resource().namespaced && !store.namespace()) {
+                      <th>Namespace</th>
+                    }
+                    <th>Status</th>
+                    <th>Details</th>
+                    @if (store.resource().id === 'pods') {
+                      <th>Uses</th>
+                    }
+                    <th class="hl-num">Age</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (row of store.shown(); track row.namespace + '/' + row.name + $index) {
+                    <tr
+                      class="hl-clickable"
+                      [class.kube-page__row--active]="
+                        store.selected()?.object?.metadata?.name === row.name
+                      "
+                      (click)="store.open(store.resource(), row)"
+                    >
+                      <td class="hl-mono">{{ row.name }}</td>
+                      @if (store.resource().namespaced && !store.namespace()) {
+                        <td>{{ row.namespace }}</td>
+                      }
+                      <td>
+                        <span
+                          class="hl-badge"
+                          [class.hl-badge--ok]="row.tone === 'ok'"
+                          [class.hl-badge--warn]="row.tone === 'warn'"
+                          [class.hl-badge--bad]="row.tone === 'bad'"
+                          [class.hl-badge--muted]="row.tone === 'muted'"
+                          >{{ row.status }}</span
+                        >
+                      </td>
+                      <td class="kube-page__details">{{ row.details }}</td>
+                      @if (store.resource().id === 'pods') {
+                        <td class="hl-muted kube-page__uses">{{ usage(row) }}</td>
+                      }
+                      <td class="hl-num hl-muted">{{ age(row.createdMs) }}</td>
+                    </tr>
+                  } @empty {
+                    <tr>
+                      <td colspan="6" class="hl-empty">
+                        {{ store.loading() ? 'Loading…' : 'Nothing here.' }}
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          </section>
+        }
+      </div>
+    </div>
+  }
+</div>

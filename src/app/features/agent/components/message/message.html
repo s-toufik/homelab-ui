@@ -4,14 +4,17 @@
   [class.message--assistant]="message().role === 'assistant'"
 >
   <div class="message__bubble">
-    @if (message().streaming && message().status) {
-      <p class="message__status" role="status">{{ message().status }}</p>
+    @if (message().streaming && (message().status || !message().content)) {
+      <p class="message__status" role="status">
+        <app-swarm-avatar [size]="22" [live]="true" [phase]="phase()" />
+        {{ message().status || 'Thinking…' }}
+      </p>
     }
     @if (message().content) {
       <div class="message__content" [innerHTML]="message().content | markdown"></div>
     }
-    @if (message().streaming) {
-      <span class="message__cursor" aria-hidden="true"></span>
+    @if (message().streaming && message().content && !message().status) {
+      <app-swarm-avatar class="message__writing" [size]="18" [live]="true" phase="final" />
     }
     @if (message().error) {
       <p class="message__error">{{ message().error }}</p>

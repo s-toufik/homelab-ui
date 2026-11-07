@@ -1,0 +1,6 @@
+{
+  "key": "kube-api",
+  "port": null,
+  "subpath": null,
+  "api": "/api/kube"
+}

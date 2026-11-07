@@ -11,7 +11,7 @@ function feature(id: string, checkHealth?: () => Promise<boolean>): HomelabFeatu
     icon: [],
     color: '#3b82f6',
     category: 'Observability',
-    entry: { kind: 'link', url: `http://host/${id}` },
+    entry: { kind: 'page', path: `/${id}` },
     checkHealth,
   };
 }

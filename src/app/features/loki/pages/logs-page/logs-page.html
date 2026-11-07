@@ -1,0 +1,135 @@
+<div class="hl-page">
+  <app-page-header title="Logs" eyebrow="Loki">
+    <button
+      type="button"
+      class="hl-btn"
+      [class.hl-btn--primary]="store.live()"
+      [attr.aria-pressed]="store.live()"
+      (click)="store.toggleLive()"
+    >
+      {{ store.live() ? 'Live: on' : 'Live: off' }}
+    </button>
+  </app-page-header>
+
+  <section class="hl-card logs-page__query">
+    <div class="hl-row">
+      <textarea
+        class="hl-input hl-input--mono hl-input--grow"
+        rows="1"
+        aria-label="LogQL"
+        placeholder='LogQL, e.g. {service_name="caddy"} |= "error"'
+        [ngModel]="store.query()"
+        (ngModelChange)="store.query.set($event)"
+        (keydown)="onKeydown($event)"
+      ></textarea>
+      <button
+        type="button"
+        class="hl-btn hl-btn--primary"
+        [disabled]="store.running()"
+        (click)="store.run()"
+      >
+        {{ store.running() ? 'Running…' : 'Run' }}
+      </button>
+    </div>
+
+    <div class="hl-row">
+      <select
+        class="hl-input"
+        aria-label="Label"
+        [ngModel]="label()"
+        (ngModelChange)="pickLabel($event)"
+      >
+        <option value="">Label…</option>
+        @for (name of store.labels(); track name) {
+          <option [value]="name">{{ name }}</option>
+        }
+      </select>
+      <select
+        class="hl-input"
+        aria-label="Value"
+        [disabled]="!label()"
+        [ngModel]="''"
+        (ngModelChange)="$event && store.useSelector(label(), $event)"
+      >
+        <option value="">Value…</option>
+        @for (value of store.labelValues(); track value) {
+          <option [value]="value">{{ value }}</option>
+        }
+      </select>
+      <app-time-range [(range)]="store.range" (refresh)="store.run()" />
+      <select
+        class="hl-input"
+        aria-label="Lines"
+        [ngModel]="store.limit()"
+        (ngModelChange)="store.limit.set(+$event)"
+      >
+        <option [ngValue]="100">100 lines</option>
+        <option [ngValue]="500">500 lines</option>
+        <option [ngValue]="2000">2000 lines</option>
+      </select>
+    </div>
+
+    @if (store.error(); as error) {
+      <p class="hl-error" role="alert">{{ error }}</p>
+    }
+  </section>
+
+  @if (store.metricSeries(); as series) {
+    <section class="hl-card">
+      <app-time-series-chart [series]="series" [height]="300" />
+    </section>
+  } @else {
+    @if (store.volume().length) {
+      <section class="hl-card">
+        <h2 class="hl-card__title">Lines over time</h2>
+        <app-time-series-chart [series]="store.volume()" [height]="140" [area]="true" />
+      </section>
+    }
+
+    <section class="hl-card logs-page__lines">
+      <div class="hl-row logs-page__filters">
+        <span class="hl-muted">{{ store.shown().length }} of {{ store.lines().length }} lines</span>
+        @for (level of levels; track level) {
+          <button
+            type="button"
+            class="hl-badge logs-page__level-filter"
+            [class]="'hl-badge logs-page__level-filter logs-page__level--' + level"
+            [class.logs-page__level-filter--on]="store.levelFilter().has(level)"
+            (click)="store.toggleLevel(level)"
+          >
+            {{ level }}
+          </button>
+        }
+      </div>
+
+      <ol class="logs-page__list">
+        @for (line of store.shown(); track line.id) {
+          <li class="logs-page__line" [class]="'logs-page__line logs-page__line--' + line.level">
+            <button type="button" class="logs-page__line-head" (click)="toggle(line.id)">
+              <time class="logs-page__time">{{ line.timeMs | date: 'MMM d HH:mm:ss.SSS' }}</time>
+              <span class="logs-page__stream">{{ streamName(line.labels) }}</span>
+              <span class="logs-page__text">{{ line.line }}</span>
+            </button>
+            @if (store.expanded() === line.id) {
+              <div class="logs-page__details">
+                @for (pair of labelPairs(line.labels); track pair[0]) {
+                  <button
+                    type="button"
+                    class="logs-page__label"
+                    title="Show only this"
+                    (click)="store.useSelector(pair[0], pair[1])"
+                  >
+                    <span class="hl-muted">{{ pair[0] }}=</span>{{ pair[1] }}
+                  </button>
+                }
+                <pre class="hl-pre logs-page__full">{{ line.line }}</pre>
+              </div>
+            }
+          </li>
+        } @empty {
+          <li class="hl-empty">No log lines in this time range.</li>
+        }
+      </ol>
+    </section>
+  }
+</div>

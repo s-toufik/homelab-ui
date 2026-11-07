@@ -1,0 +1,89 @@
+<div class="chart" [style.height.px]="height()">
+  @if (plot(); as plot) {
+    <svg
+      class="chart__svg"
+      [attr.width]="width()"
+      [attr.height]="height()"
+      (mousemove)="onMove($event)"
+      (mouseleave)="hoverX.set(null)"
+      role="img"
+    >
+      @for (tick of plot.yTicks; track tick.y) {
+        <line
+          class="chart__grid"
+          [attr.x1]="pad.left"
+          [attr.x2]="width() - pad.right"
+          [attr.y1]="tick.y"
+          [attr.y2]="tick.y"
+        />
+        <text class="chart__label" [attr.x]="pad.left - 6" [attr.y]="tick.y + 4" text-anchor="end">
+          {{ tick.label }}
+        </text>
+      }
+      @for (tick of plot.xTicks; track $index) {
+        <text
+          class="chart__label"
+          [attr.x]="tick.x"
+          [attr.y]="height() - 6"
+          [attr.text-anchor]="$first ? 'start' : $last ? 'end' : 'middle'"
+        >
+          {{ tick.label }}
+        </text>
+      }
+      @for (entry of plot.drawn; track entry.name) {
+        @if (area() && entry.area) {
+          <path class="chart__area" [attr.d]="entry.area" [style.fill]="entry.color" />
+        }
+        @if (entry.line) {
+          <path class="chart__line" [attr.d]="entry.line" [style.stroke]="entry.color" />
+        }
+      }
+      @if (tooltip(); as tip) {
+        <line
+          class="chart__cursor"
+          [attr.x1]="tip.x"
+          [attr.x2]="tip.x"
+          [attr.y1]="pad.top"
+          [attr.y2]="height() - pad.bottom"
+        />
+      }
+    </svg>
+
+    @if (tooltip(); as tip) {
+      <div
+        class="chart__tooltip"
+        [style.left.px]="tip.left ? null : tip.x + 12"
+        [style.right.px]="tip.left ? width() - tip.x + 12 : null"
+      >
+        <div class="chart__tooltip-title">{{ tip.title }}</div>
+        @for (row of tip.rows; track row.name) {
+          <div class="chart__tooltip-row">
+            <span class="chart__swatch" [style.background]="row.color"></span>
+            <span class="chart__tooltip-name">{{ row.name }}</span>
+            <span class="chart__tooltip-value">{{ row.label }}</span>
+          </div>
+        }
+      </div>
+    }
+  } @else {
+    <p class="chart__empty">No data in this time range.</p>
+  }
+</div>
+
+@if (legend() && series().length > 1) {
+  <ul class="chart__legend">
+    @for (entry of legendItems(); track entry.name) {
+      <li>
+        <button
+          type="button"
+          class="chart__legend-item"
+          [class.chart__legend-item--off]="hidden().has(entry.name)"
+          (click)="toggle(entry.name)"
+        >
+          <span class="chart__swatch" [style.background]="entry.color"></span>
+          {{ entry.name }}
+        </button>
+      </li>
+    }
+  </ul>
+}

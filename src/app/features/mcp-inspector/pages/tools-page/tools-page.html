@@ -1,0 +1,142 @@
+<div class="hl-page">
+  <app-page-header
+    title="Tools"
+    eyebrow="agent-toolbox (MCP)"
+    [summary]="tools().length + ' tools the agent can use'"
+  >
+    <button type="button" class="hl-btn" (click)="load()">Reconnect</button>
+  </app-page-header>
+
+  @if (error(); as error) {
+    <p class="hl-error" role="alert">{{ error }}</p>
+  }
+
+  <div class="tools-page__body">
+    <section class="hl-card tools-page__list">
+      <input
+        class="hl-input tools-page__filter"
+        placeholder="Filter tools"
+        aria-label="Filter tools"
+        [ngModel]="filter()"
+        (ngModelChange)="filter.set($event)"
+      />
+      <ul>
+        @for (tool of shown(); track tool.name) {
+          <li>
+            <button
+              type="button"
+              class="tools-page__tool"
+              [class.tools-page__tool--active]="selected()?.name === tool.name"
+              (click)="select(tool)"
+            >
+              <strong class="hl-mono">{{ tool.name }}</strong>
+              <span class="hl-muted">{{ tool.description }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="hl-empty">No tools.</li>
+        }
+      </ul>
+    </section>
+
+    <section class="hl-card tools-page__detail">
+      @if (selected(); as tool) {
+        <h2 class="tools-page__title hl-mono">{{ tool.name }}</h2>
+        @if (tool.description) {
+          <p class="tools-page__description">{{ tool.description }}</p>
+        }
+        <form class="tools-page__form" (ngSubmit)="call()">
+          @for (field of fields(); track field.name) {
+            <label class="hl-field">
+              <span
+                >{{ field.label }}
+                @if (field.required) {
+                  <span class="tools-page__required"> *</span>
+                }
+              </span>
+              @switch (field.kind) {
+                @case ('boolean') {
+                  <select class="hl-input" [name]="field.name" [(ngModel)]="values[field.name]">
+                    <option value="">–</option>
+                    <option value="true">true</option>
+                    <option value="false">false</option>
+                  </select>
+                }
+                @case ('choice') {
+                  <select class="hl-input" [name]="field.name" [(ngModel)]="values[field.name]">
+                    <option value="">–</option>
+                    @for (choice of field.choices; track choice) {
+                      <option [value]="choice">{{ choice }}</option>
+                    }
+                  </select>
+                }
+                @case ('json') {
+                  <textarea
+                    class="hl-input hl-input--mono"
+                    rows="4"
+                    [name]="field.name"
+                    [(ngModel)]="values[field.name]"
+                  ></textarea>
+                }
+                @case ('number') {
+                  <input
+                    class="hl-input"
+                    type="number"
+                    [name]="field.name"
+                    [(ngModel)]="values[field.name]"
+                  />
+                }
+                @default {
+                  <textarea
+                    class="hl-input"
+                    rows="2"
+                    [name]="field.name"
+                    [(ngModel)]="values[field.name]"
+                  ></textarea>
+                }
+              }
+              @if (field.description) {
+                <small class="hl-muted">{{ field.description }}</small>
+              }
+            </label>
+          } @empty {
+            <p class="hl-muted">This tool takes no arguments.</p>
+          }
+          <div class="hl-row">
+            <button type="submit" class="hl-btn hl-btn--primary" [disabled]="calling()">
+              {{ calling() ? 'Running…' : 'Run tool' }}
+            </button>
+          </div>
+        </form>
+
+        @if (callError(); as error) {
+          <p class="hl-error">{{ error }}</p>
+        }
+        @if (result(); as result) {
+          <div class="hl-row tools-page__result-head">
+            <span
+              class="hl-badge"
+              [class.hl-badge--ok]="!result.isError"
+              [class.hl-badge--bad]="result.isError"
+            >
+              {{ result.isError ? 'error' : 'ok' }}
+            </span>
+            <span class="hl-muted">{{ result.seconds | number: '1.0-2' }} s</span>
+            <button type="button" class="hl-btn hl-btn--small" (click)="showRaw.set(!showRaw())">
+              {{ showRaw() ? 'Text' : 'Raw' }}
+            </button>
+          </div>
+          @if (showRaw()) {
+            <pre class="hl-pre">{{ json(result.raw) }}</pre>
+          } @else {
+            @for (text of result.texts; track $index) {
+              <pre class="hl-pre tools-page__text">{{ text }}</pre>
+            }
+          }
+        }
+      } @else {
+        <p class="hl-empty">Pick a tool to try it.</p>
+      }
+    </section>
+  </div>
+</div>

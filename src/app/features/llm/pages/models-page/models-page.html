@@ -1,0 +1,142 @@
+<div class="hl-page">
+  <app-page-header title="Models" eyebrow="llama-swap">
+    <p summary class="models-page__summary">
+      {{ store.models().length }} models · {{ store.loaded().length }} loaded
+    </p>
+    <button type="button" class="hl-btn" (click)="store.load()">Refresh</button>
+    @if (isAdmin() && store.loaded().length) {
+      <button
+        type="button"
+        class="hl-btn hl-btn--danger"
+        [disabled]="store.busy()"
+        (click)="store.unload()"
+      >
+        Unload all
+      </button>
+    }
+  </app-page-header>
+
+  @if (store.error(); as error) {
+    <p class="hl-error" role="alert">{{ error }}</p>
+  }
+
+  <section class="hl-card">
+    <h2 class="hl-card__title">Models</h2>
+    <ul class="models-page__list">
+      @for (model of store.models(); track model.id) {
+        <li class="models-page__model">
+          <span
+            class="hl-badge"
+            [class.hl-badge--ok]="model.state === 'ready'"
+            [class.hl-badge--warn]="model.state === 'starting' || model.state === 'stopping'"
+            [class.hl-badge--muted]="model.state === 'stopped'"
+          >
+            {{ model.state === 'stopped' ? 'not loaded' : model.state }}
+          </span>
+          <div class="models-page__name">
+            <strong>{{ model.name }}</strong>
+            @if (model.description) {
+              <span class="hl-muted">{{ model.description }}</span>
+            }
+          </div>
+          @if (store.busy() === model.id) {
+            <span class="hl-muted">Working… (a first load can take minutes)</span>
+          } @else if (model.state === 'stopped') {
+            <button
+              type="button"
+              class="hl-btn hl-btn--small"
+              [disabled]="store.busy()"
+              (click)="store.warmUp(model.id)"
+            >
+              Load
+            </button>
+          } @else if (isAdmin()) {
+            <button
+              type="button"
+              class="hl-btn hl-btn--small"
+              [disabled]="store.busy()"
+              (click)="store.unload(model.id)"
+            >
+              Unload
+            </button>
+          }
+        </li>
+      } @empty {
+        <li class="hl-empty">No models.</li>
+      }
+    </ul>
+  </section>
+
+  <div class="models-page__grid">
+    <section class="hl-card models-page__prompt">
+      <h2 class="hl-card__title">Try a model</h2>
+      <div class="hl-row">
+        <select
+          class="hl-input"
+          aria-label="Model"
+          [ngModel]="store.promptModel()"
+          (ngModelChange)="store.promptModel.set($event)"
+        >
+          @for (model of store.models(); track model.id) {
+            <option [value]="model.id">{{ model.name }}</option>
+          }
+        </select>
+        <button
+          type="button"
+          class="hl-btn hl-btn--primary"
+          [disabled]="store.prompting()"
+          (click)="store.ask()"
+        >
+          {{ store.prompting() ? 'Thinking…' : 'Ask' }}
+        </button>
+      </div>
+      <textarea
+        class="hl-input"
+        rows="4"
+        placeholder="Ask something…"
+        aria-label="Prompt"
+        [ngModel]="store.promptText()"
+        (ngModelChange)="store.promptText.set($event)"
+      ></textarea>
+      @if (store.promptError(); as error) {
+        <p class="hl-error">{{ error }}</p>
+      }
+      @if (store.answer(); as answer) {
+        <div
+          class="message__content models-page__answer"
+          [innerHTML]="answer.text | markdown"
+        ></div>
+        <p class="hl-muted models-page__usage">
+          {{ answer.seconds | number: '1.0-1' }} s · ↑ {{ answer.promptTokens }} · ↓
+          {{ answer.completionTokens }} tokens
+          @if (answer.seconds > 0) {
+            · {{ answer.completionTokens / answer.seconds | number: '1.0-1' }} tokens/s
+          }
+        </p>
+      }
+    </section>
+
+    <section class="hl-card models-page__logs">
+      <div class="hl-row models-page__logs-head">
+        <h2 class="hl-card__title">Logs</h2>
+        @if (store.following()) {
+          <button
+            type="button"
+            class="hl-btn hl-btn--small hl-btn--primary"
+            (click)="store.stopLogs()"
+          >
+            Following · stop
+          </button>
+        } @else {
+          <button type="button" class="hl-btn hl-btn--small" (click)="store.followLogs()">
+            Follow
+          </button>
+          <button type="button" class="hl-btn hl-btn--small" (click)="store.loadLogs()">
+            Reload
+          </button>
+        }
+      </div>
+      <pre #logView class="hl-pre models-page__log">{{ store.logs() }}</pre>
+    </section>
+  </div>
+</div>

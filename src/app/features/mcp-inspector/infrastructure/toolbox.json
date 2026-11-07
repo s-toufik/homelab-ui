@@ -1,0 +1,7 @@
+{
+  "key": "agent-toolbox",
+  "port": 8001,
+  "subpath": null,
+  "healthPath": "/actuator/health",
+  "api": "/api/toolbox"
+}

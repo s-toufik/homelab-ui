@@ -1,0 +1,52 @@
+<aside
+  class="assistant-drawer"
+  [class.assistant-drawer--open]="ui.assistantOpen()"
+  [attr.aria-hidden]="!ui.assistantOpen()"
+  aria-label="Assistant"
+>
+  <div
+    class="assistant-drawer__handle"
+    role="separator"
+    aria-orientation="vertical"
+    aria-label="Resize the assistant (arrow keys, Home to reset)"
+    [attr.aria-valuenow]="ui.assistantWidth()"
+    tabindex="0"
+    title="Drag to resize · double-click to reset"
+    (pointerdown)="startResize($event)"
+    (dblclick)="resetWidth()"
+    (keydown)="resizeWithKeys($event)"
+  ></div>
+
+  <div class="assistant-drawer__header">
+    <app-swarm-avatar
+      [size]="28"
+      [live]="panel.phase() !== 'idle' && panel.phase() !== 'error'"
+      [phase]="panel.phase()"
+    />
+    <h2 class="assistant-drawer__title">Assistant</h2>
+    <button
+      type="button"
+      class="assistant-drawer__close"
+      title="Close (Esc)"
+      aria-label="Close the assistant"
+      (click)="ui.closeAssistant()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+      </svg>
+    </button>
+  </div>
+
+  @if (content(); as component) {
+    <div class="assistant-drawer__body">
+      <ng-container [ngComponentOutlet]="component" />
+    </div>
+  }
+</aside>

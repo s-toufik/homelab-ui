@@ -2,5 +2,6 @@
   "key": "alloy",
   "port": 12345,
   "subpath": null,
-  "healthPath": "/-/ready"
+  "healthPath": "/-/ready",
+  "api": "/api/alloy"
 }

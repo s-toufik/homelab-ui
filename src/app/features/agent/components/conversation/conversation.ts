@@ -12,6 +12,7 @@ const NEAR_BOTTOM_PX = 80;
 })
 export class Conversation {
   readonly messages = input.required<ChatMessage[]>();
+  readonly compact = input(false);
   readonly resend = output<string>();
   private readonly scrollAnchor = viewChild<ElementRef<HTMLElement>>('scrollAnchor');
 

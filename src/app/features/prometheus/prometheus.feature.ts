@@ -8,12 +8,12 @@ export function providePrometheusFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'prometheus',
-      label: 'Prometheus',
-      description: 'Query metrics and check scrape targets.',
+      label: 'Metrics',
+      description: 'Query Prometheus, check scrape targets and alerts.',
       category: 'Observability',
       color: '#f43f5e',
       icon: ['M4 20V10M10 20V4M16 20v-7M22 20H2'],
-      entry: { kind: 'link', url: server.url(PROMETHEUS) },
+      entry: { kind: 'page', path: '/metrics' },
       checkHealth: () => server.isReachable(PROMETHEUS),
     };
   });

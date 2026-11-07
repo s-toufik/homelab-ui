@@ -11,6 +11,7 @@ export class Composer {
   readonly draft = model.required<string>();
   readonly canSend = input.required<boolean>();
   readonly isStreaming = input.required<boolean>();
+  readonly compact = input(false);
   readonly send = output<void>();
   readonly cancel = output<void>();
 

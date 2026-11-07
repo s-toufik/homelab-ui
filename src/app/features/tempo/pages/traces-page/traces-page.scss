@@ -1,0 +1,142 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.traces-page__search {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+
+  .hl-row {
+    align-items: flex-end;
+  }
+}
+
+.traces-page__body {
+  display: grid;
+  gap: 1rem;
+
+  &--split {
+    grid-template-columns: minmax(18rem, 2fr) minmax(0, 3fr);
+  }
+}
+
+.traces-page__list,
+.traces-page__spans {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.traces-page__trace,
+.traces-page__span {
+  display: grid;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.45rem 0.5rem;
+  border: none;
+  border-bottom: 1px solid var(--border);
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.82rem;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &--active {
+    background: var(--accent-soft);
+  }
+}
+
+.traces-page__trace {
+  grid-template-columns: minmax(0, 1fr) auto 6rem 4.5rem;
+}
+
+.traces-page__span {
+  grid-template-columns: minmax(10rem, 2fr) minmax(8rem, 3fr) 4.5rem;
+  font-size: 0.78rem;
+}
+
+.traces-page__trace-name,
+.traces-page__span-name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.traces-page__service {
+  color: var(--accent);
+  margin-right: 0.3rem;
+}
+
+.traces-page__bar,
+.traces-page__timeline {
+  position: relative;
+  height: 0.55rem;
+  border-radius: 999px;
+  background: var(--border);
+}
+
+.traces-page__bar-fill {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  border-radius: 999px;
+  background: var(--chart-1);
+}
+
+.traces-page__timeline {
+  background: transparent;
+  border-left: 1px solid var(--border);
+}
+
+.traces-page__span-bar {
+  position: absolute;
+  inset-block: 0;
+  border-radius: 2px;
+  background: var(--chart-1);
+
+  &--error {
+    background: var(--danger);
+  }
+}
+
+.traces-page__duration {
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+  color: var(--text-muted);
+}
+
+.traces-page__trace-head {
+  justify-content: space-between;
+
+  .hl-card__title {
+    margin: 0;
+  }
+}
+
+.traces-page__span-details {
+  margin-top: 1rem;
+}
+
+.traces-page__error {
+  color: var(--danger);
+}
+
+.traces-page__value {
+  word-break: break-all;
+}
+
+@media (max-width: 1000px) {
+  .traces-page__body--split {
+    grid-template-columns: 1fr;
+  }
+}

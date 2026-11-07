@@ -1,0 +1,233 @@
+<div class="hl-page">
+  <app-page-header title="Metrics" eyebrow="Prometheus">
+    <p summary class="metrics-page__summary">
+      {{ store.targetSummary().up }} of {{ store.targetSummary().total }} targets up
+      @if (store.firing().length) {
+        · <span class="metrics-page__bad">{{ store.firing().length }} alert(s) firing</span>
+      }
+    </p>
+  </app-page-header>
+
+  <nav class="hl-tabs" aria-label="Metrics views">
+    @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        class="hl-tab"
+        [class.hl-tab--active]="store.tab() === tab.id"
+        (click)="store.tab.set(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  @switch (store.tab()) {
+    @case ('query') {
+      <section class="hl-card metrics-page__query">
+        <div class="hl-row">
+          <textarea
+            class="hl-input hl-input--mono hl-input--grow"
+            rows="2"
+            aria-label="PromQL"
+            placeholder="PromQL, e.g. rate(container_cpu_usage_seconds_total[5m])"
+            list="metric-names"
+            [ngModel]="store.query()"
+            (ngModelChange)="store.query.set($event)"
+            (keydown)="onKeydown($event)"
+          ></textarea>
+          <datalist id="metric-names">
+            @for (name of store.metricNames(); track name) {
+              <option [value]="name"></option>
+            }
+          </datalist>
+          <button
+            type="button"
+            class="hl-btn hl-btn--primary"
+            [disabled]="store.running()"
+            (click)="store.run()"
+          >
+            {{ store.running() ? 'Running…' : 'Run' }}
+          </button>
+        </div>
+        <div class="hl-row metrics-page__controls">
+          <app-time-range [(range)]="store.range" (refresh)="store.run()" />
+          <div class="metrics-page__views" role="group" aria-label="View">
+            <button
+              type="button"
+              class="hl-btn hl-btn--small"
+              [class.hl-btn--primary]="store.view() === 'graph'"
+              (click)="store.view.set('graph')"
+            >
+              Graph
+            </button>
+            <button
+              type="button"
+              class="hl-btn hl-btn--small"
+              [class.hl-btn--primary]="store.view() === 'table'"
+              (click)="store.view.set('table')"
+            >
+              Table
+            </button>
+          </div>
+          <span class="hl-muted metrics-page__hint">Enter runs it, Shift+Enter adds a line.</span>
+        </div>
+
+        @if (store.queryError(); as error) {
+          <p class="hl-error" role="alert">{{ error }}</p>
+        } @else if (store.view() === 'graph') {
+          <app-time-series-chart [series]="store.series()" [height]="320" [min]="null" />
+          @if (store.truncated()) {
+            <p class="hl-muted">{{ store.truncated() }} more series not drawn: narrow the query.</p>
+          }
+        } @else {
+          <div class="hl-table-wrap">
+            <table class="hl-table">
+              <thead>
+                <tr>
+                  <th>Series</th>
+                  <th class="hl-num">Value now</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (sample of store.samples(); track $index) {
+                  <tr>
+                    <td class="hl-mono">{{ seriesName(sample.labels) }}</td>
+                    <td class="hl-num hl-mono">{{ format(sample.value) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="2" class="hl-empty">No series.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        }
+      </section>
+    }
+
+    @case ('targets') {
+      <section class="hl-card">
+        <div class="hl-row metrics-page__section-head">
+          <h2 class="hl-card__title">Scrape targets</h2>
+          <button type="button" class="hl-btn hl-btn--small" (click)="store.loadTargets()">
+            Refresh
+          </button>
+        </div>
+        @if (store.targetsError(); as error) {
+          <p class="hl-error" role="alert">{{ error }}</p>
+        }
+        <div class="hl-table-wrap">
+          <table class="hl-table">
+            <thead>
+              <tr>
+                <th>State</th>
+                <th>Job</th>
+                <th>Instance</th>
+                <th>Last scrape</th>
+                <th class="hl-num">Took</th>
+                <th>Error</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (target of store.targets(); track target.url) {
+                <tr
+                  class="hl-clickable"
+                  (click)="store.explore('up{job=&quot;' + target.job + '&quot;}')"
+                >
+                  <td>
+                    <span
+                      class="hl-badge"
+                      [class.hl-badge--ok]="target.health === 'up'"
+                      [class.hl-badge--bad]="target.health === 'down'"
+                      [class.hl-badge--muted]="target.health === 'unknown'"
+                    >
+                      {{ target.health }}
+                    </span>
+                  </td>
+                  <td>{{ target.job }}</td>
+                  <td class="hl-mono">{{ target.instance }}</td>
+                  <td class="hl-muted">{{ target.lastScrape | date: 'HH:mm:ss' }}</td>
+                  <td class="hl-num">{{ target.durationSeconds * 1000 | number: '1.0-1' }} ms</td>
+                  <td class="metrics-page__error-text">{{ target.lastError }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="6" class="hl-empty">No targets.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @case ('alerts') {
+      <section class="hl-card">
+        <div class="hl-row metrics-page__section-head">
+          <h2 class="hl-card__title">Alert rules</h2>
+          <button type="button" class="hl-btn hl-btn--small" (click)="store.loadRules()">
+            Refresh
+          </button>
+        </div>
+        @if (store.rulesError(); as error) {
+          <p class="hl-error" role="alert">{{ error }}</p>
+        }
+        <ul class="metrics-page__rules">
+          @for (rule of store.rules().alerts; track rule.group + rule.name) {
+            <li class="metrics-page__rule">
+              <span
+                class="hl-badge"
+                [class.hl-badge--bad]="rule.state === 'firing'"
+                [class.hl-badge--warn]="rule.state === 'pending'"
+                [class.hl-badge--ok]="rule.state === 'inactive'"
+              >
+                {{ rule.state }}
+              </span>
+              <div class="metrics-page__rule-body">
+                <strong>{{ rule.name }}</strong>
+                <span class="hl-muted">{{ rule.group }}</span>
+                @if (rule.summary) {
+                  <p class="metrics-page__rule-summary">{{ rule.summary }}</p>
+                }
+                @if (rule.activeSince) {
+                  <p class="hl-muted">Active since {{ rule.activeSince | date: 'short' }}</p>
+                }
+                <button
+                  type="button"
+                  class="metrics-page__rule-query hl-mono"
+                  title="Run this query"
+                  (click)="store.explore(rule.query)"
+                >
+                  {{ rule.query }}
+                </button>
+              </div>
+            </li>
+          } @empty {
+            <li class="hl-empty">No alert rules are loaded in Prometheus.</li>
+          }
+        </ul>
+
+        @if (store.rules().recordings.length) {
+          <h2 class="hl-card__title metrics-page__recordings">Recording rules</h2>
+          <ul class="metrics-page__rules">
+            @for (rule of store.rules().recordings; track rule.group + rule.name) {
+              <li class="metrics-page__rule">
+                <div class="metrics-page__rule-body">
+                  <strong class="hl-mono">{{ rule.name }}</strong>
+                  <button
+                    type="button"
+                    class="metrics-page__rule-query hl-mono"
+                    (click)="store.explore(rule.name)"
+                  >
+                    {{ rule.query }}
+                  </button>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+    }
+  }
+</div>

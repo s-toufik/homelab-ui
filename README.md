@@ -10,9 +10,26 @@
 
 </div>
 
-## See everything at a glance
+## Your homelab at a glance
 
-The overview lists every app in your homelab, grouped by what it does — Platform, AI, Automation, Observability, Streaming. Each tile tells you straight away whether the app is **online**, and one click opens it. Looking for something? Start typing in **Find an app** — or just press <kbd>/</kbd>.
+The **control center** is the first page: what needs your attention (firing alerts, a disk filling up, a pod that isn't ready, a backup that didn't run), the server's CPU, memory, disk and temperature with their last 24 hours, the databases and Kafka, the LLM's speed and loaded models, the busiest containers, the last error lines, and every app with its online status. It checks again every 30 seconds; each card opens the page behind it.
+
+## Every tool, inside the homelab
+
+Each tool has its own page here, in your theme, with no new tab to open:
+
+| Page           | What you do there                                                                                                                                                                       |
+| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts (Grafana's three dashboards, rebuilt)                                                                                |
+| **Metrics**    | Run a PromQL query as a chart or a table; see every scrape target and the alert rules                                                                                                   |
+| **Logs**       | Search every container's logs with LogQL, pick a label and a value, filter by level, follow them live                                                                                   |
+| **Traces**     | Find a request by service, operation or duration, and follow it span by span                                                                                                            |
+| **Kafka**      | Topics, their messages, consumer groups and their lag; create or delete a topic and send a message (admins)                                                                             |
+| **Pipeline**   | Alloy's components, their health, what feeds what                                                                                                                                       |
+| **Models**     | Load and unload models, follow the LLM's logs, try a prompt                                                                                                                             |
+| **Tools**      | Every tool the agent can use; fill in its arguments and run it                                                                                                                          |
+| **Account**    | Your name and email, your devices and sessions (sign one out), and changing your password                                                                                               |
+| **Kubernetes** | Admins only: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit an object's YAML, read a pod's logs and open a shell in it |
 
 ## Check every container
 
@@ -20,7 +37,7 @@ The **Status** page lists every container of the homelab, grouped the way the se
 
 Every service also carries what you need to use it:
 
-- **links** to its web interfaces — Grafana's dashboards and Explore, Prometheus queries and targets, Kafka UI, Alloy's pipeline graph, the LLM playground, the agent's API docs, your Keycloak account;
+- **links** to its page here — Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, your Account — and to the agent's API docs;
 - its **connection address**, ready to copy — the MongoDB URI, Kafka's bootstrap server, the OTLP endpoints, the LLM's OpenAI-compatible URL;
 - the **folder** it lives in on the server, for when you need to look at its configuration.
 
@@ -41,6 +58,10 @@ When a request needs real work — reading files, crunching numbers, saving a re
 Under each answer you see how long it took and how many tokens went in and out, like _(21s · ↑ 9.9k · ↓ 642 tokens)_. Hover over the answer for a button that copies it, and an arrow that opens everything the agent reported about it: the model, the tools it used, the steps it took, and any detail the agent adds later.
 
 <img src="docs/screenshots/answer-details.webp" width="532" alt="An answer with its details open: elapsed time, input and output tokens, model, outcome, tools used, iteration and max iteration" />
+
+## The assistant on every page
+
+The assistant button at the top right opens the agent beside any page. It is the same conversation as the Agent page: start a question on the Logs page, finish it on the Agent page. Choose the model or start a new conversation from the panel; **Esc** or the same button closes it. On a wide screen the page makes room for it.
 
 ## Stay in control
 
@@ -65,9 +86,7 @@ Build automations by connecting blocks on a canvas: a **Trigger**, **HTTP reques
 
 ## All your tools, one menu away
 
-The menu shows who is signed in, with **Sign out**, then lists every app and page. Those that open in a new tab — dashboards, metrics, logs, your account — are marked with a small arrow.
-
-Below them, **Infrastructure** shows whether the services your apps rely on — PostgreSQL, MongoDB, Kafka — are **up**.
+The menu shows who is signed in, with **Sign out**, then lists every page. Below them, **Infrastructure** shows whether the services your apps rely on — PostgreSQL, MongoDB, Kafka — are **up**.
 
 <img src="docs/screenshots/menu.webp" alt="The side menu: the signed-in account with Sign out, every app and page with its colour, then PostgreSQL, MongoDB and Kafka marked Up" />
 
@@ -93,11 +112,17 @@ The UI is one static page served by the homelab's gateway. The browser only ever
      /                    the UI itself ◄───────────┤
      /api/agent/…         chat, models  ◄───────────┤──► agent-runtime ──► LLM, agent-toolbox
      /api/tasker/…        workflows     ◄───────────┤──► PostgREST ──► PostgreSQL (your rows only)
-     /api/prometheus/…    Infrastructure◄───────────┤──► Prometheus
+     /api/prometheus/…    Metrics       ◄───────────┤──► Prometheus
+     /api/loki/ tempo/    Logs, Traces  ◄───────────┤──► Loki, Tempo
+     /api/kafka/…         Kafka         ◄───────────┤──► Kafka UI's API ──► Kafka
+     /api/alloy/ llm/     Pipeline, Models ◄────────┤──► Alloy, llama-swap
+     /api/toolbox/mcp     Tools         ◄───────────┤──► agent-toolbox (MCP)
+     /api/account/…       Account       ◄───────────┤──► Keycloak's account API
+     /api/kube/…          Kubernetes    ◄───────────┤──► kube-api ──► Kubernetes API (admins)
      /api/health/<name>   Status page   ◄───────────┘──► each container's health endpoint
-     :6274                MCP Inspector ──────────────► agent-toolbox's tools
-     :3000 :9090 :8080 …  links in a new tab ─────────► Grafana, Prometheus, Kafka UI, Alloy, LLM, …
 ```
+
+Changes (anything but reading) carry the header `X-Homelab-Request: 1`, which the gateway requires so another site can't make them in your name.
 
 Devices on the tailnet can also reach the agent directly: its API on `http://<server>.<tailnet>.ts.net:8000` and its tools (MCP) on `:8001/mcp`.
 
@@ -105,8 +130,8 @@ Devices on the tailnet can also reach the agent directly: its API on `http://<se
 
 On any device on your Tailscale network, open `https://<your-server>.<tailnet>.ts.net/` and sign in. Accounts are created on the server with `make user-add ACCOUNT=<name>` (see homelab-infra's `devops_guide.md`); the old address `http://<your-server>:8002` redirects there.
 
-The left sidebar shows who is signed in, with a **Sign out** link that ends the session everywhere. The **Account** tile opens your Keycloak account page to change your password; passwords expire after 90 days, and the sign-in page then asks for a new one.
+The left sidebar shows who is signed in, with a **Sign out** link that ends the session everywhere. The **Account** page changes your profile and password; passwords expire after 90 days, and the sign-in page then asks for a new one. The Kubernetes page, Kafka changes and unloading a model need the `admin` role (`make user-admin ACCOUNT=<name>` on the server).
 
 ---
 
-**Developers:** project structure, how addresses are built, adding a page, a link or a status, and publishing the image — **[docs/development.md](docs/development.md)**.
+**Developers:** project structure, how addresses are built, adding a page or a status, the shared charts, and publishing the image — **[docs/development.md](docs/development.md)**.

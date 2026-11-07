@@ -1,4 +1,8 @@
-<div class="layout">
+<div
+  class="layout"
+  [class.layout--resizing]="ui.resizing()"
+  [style.--assistant-width]="ui.assistantWidth() + 'px'"
+>
   <button
     type="button"
     class="layout__nav-toggle"
@@ -48,14 +52,35 @@
     </button>
   }
 
+  @if (assistantAvailable() && !ui.assistantOpen()) {
+    <button
+      type="button"
+      class="layout__assistant-toggle"
+      [class.layout__assistant-toggle--beside-settings]="chrome.rightPanel()"
+      [class.layout__assistant-toggle--working]="assistantWorking()"
+      [title]="assistantWorking() ? 'Assistant (working…)' : 'Assistant'"
+      aria-label="Open the assistant"
+      (click)="ui.toggleAssistant()"
+    >
+      <app-swarm-avatar [size]="24" [live]="assistantWorking()" [phase]="assistantPhase()" />
+    </button>
+  }
+
   <app-nav-sidebar />
 
-  <main class="layout__content">
+  <main
+    class="layout__content"
+    [class.layout__content--beside-assistant]="assistantAvailable() && ui.assistantOpen()"
+  >
     <router-outlet />
   </main>
 
   @if (chrome.rightPanel()) {
     <app-page-panel />
+  }
+
+  @if (assistantAvailable()) {
+    <app-assistant-drawer />
   }
 
   <app-settings-modal />
