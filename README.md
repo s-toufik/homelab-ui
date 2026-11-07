@@ -29,6 +29,7 @@ Each tool has its own page here, in your theme, with no new tab to open:
 | **Models**     | Load and unload models, follow the LLM's logs, try a prompt                                                                                                                             |
 | **Tools**      | Every tool the agent can use; fill in its arguments and run it                                                                                                                          |
 | **Account**    | Your name and email, your devices and sessions (sign one out), and changing your password                                                                                               |
+| **Tool UIs**   | Links to each tool's own web interface — Grafana, Prometheus, Kafka UI, Alloy, the LLM playground, MCP Inspector, the agent's API docs, your Keycloak account — with whether it answers |
 | **Kubernetes** | Admins only: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit an object's YAML, read a pod's logs and open a shell in it |
 
 <table>
@@ -113,7 +114,7 @@ Build automations by connecting blocks on a canvas: a **Trigger**, **HTTP reques
 
 ## All your tools, one menu away
 
-The menu shows who is signed in, with **Sign out**, then lists every page; the Kubernetes page is listed only for admins. Below them, **Infrastructure** shows whether the services your apps rely on — PostgreSQL, MongoDB, Kafka — are **up**.
+The menu shows who is signed in, with **Sign out**, then every page grouped by what it does — Platform, AI, Automation, Observability, Streaming; the Kubernetes page is listed only for admins. Below them, **Infrastructure** shows whether the services your apps rely on — PostgreSQL, MongoDB, Kafka — are **up**.
 
 <img src="docs/screenshots/menu.webp" alt="The side menu: the signed-in account with Sign out, every page with its colour, then PostgreSQL, MongoDB and Kafka marked Up" />
 

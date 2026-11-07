@@ -67,22 +67,24 @@
     </div>
   }
 
-  <h2 class="nav-sidebar__section">Apps</h2>
-  <ul class="nav-sidebar__list">
-    @for (feature of features(); track feature.id) {
-      <li>
-        <a
-          class="nav-sidebar__link"
-          [routerLink]="feature.entry.path"
-          routerLinkActive="nav-sidebar__link--active"
-          (click)="ui.collapseNavPeek()"
-        >
-          <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
-          {{ feature.label }}
-        </a>
-      </li>
-    }
-  </ul>
+  @for (section of sections(); track section.category) {
+    <h2 class="nav-sidebar__section">{{ section.category }}</h2>
+    <ul class="nav-sidebar__list">
+      @for (feature of section.features; track feature.id) {
+        <li>
+          <a
+            class="nav-sidebar__link"
+            [routerLink]="feature.entry.path"
+            routerLinkActive="nav-sidebar__link--active"
+            (click)="ui.collapseNavPeek()"
+          >
+            <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
+            {{ feature.label }}
+          </a>
+        </li>
+      }
+    </ul>
+  }
 
   @if (resourceStatus.resources.length) {
     <h2 class="nav-sidebar__section">Infrastructure</h2>

@@ -30,9 +30,15 @@ export class NavSidebar {
   );
   protected readonly host = inject(HomelabServer).host;
   protected readonly session = inject(GatewaySession);
-  protected readonly features = computed(() =>
-    this.allFeatures.filter((feature) => !feature.adminOnly || this.session.isAdmin()),
-  );
+  protected readonly sections = computed(() => {
+    const features = this.allFeatures.filter(
+      (feature) => !feature.adminOnly || this.session.isAdmin(),
+    );
+    return FEATURE_CATEGORIES.map((category) => ({
+      category,
+      features: features.filter((feature) => feature.category === category),
+    })).filter((section) => section.features.length > 0);
+  });
 
   protected initial(username: string): string {
     return username.charAt(0).toUpperCase();

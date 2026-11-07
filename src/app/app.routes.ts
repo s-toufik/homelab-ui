@@ -84,4 +84,11 @@ export const routes: Routes = [
         (m) => m.KubernetesPage,
       ),
   },
+  {
+    path: 'tool-uis',
+    loadComponent: () =>
+      import('./features/tool-links/pages/tool-links-page/tool-links-page').then(
+        (m) => m.ToolLinksPage,
+      ),
+  },
 ];
