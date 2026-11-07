@@ -18,19 +18,19 @@ The **control center** is the first page. At the top, what needs your attention:
 
 Each tool has its own page here, in your theme, with no new tab to open:
 
-| Page           | What you do there                                                                                                                                                                       |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts (Grafana's three dashboards, rebuilt)                                                                                |
-| **Metrics**    | Run a PromQL query as a chart or a table; see every scrape target and the alert rules                                                                                                   |
-| **Logs**       | Search every container's logs with LogQL, pick a label and a value, filter by level, follow them live                                                                                   |
-| **Traces**     | Find a request by service, operation or duration, and follow it span by span                                                                                                            |
-| **Kafka**      | Topics, their messages, consumer groups and their lag; create or delete a topic and send a message (admins)                                                                             |
-| **Pipeline**   | Alloy's components, their health, what feeds what                                                                                                                                       |
-| **Models**     | Load and unload models, follow the LLM's logs, try a prompt                                                                                                                             |
-| **Tools**      | Every tool the agent can use; fill in its arguments and run it                                                                                                                          |
-| **Account**    | Your name and email, your devices and sessions (sign one out), and changing your password                                                                                               |
-| **Tool UIs**   | Links to each tool's own web interface — Grafana, Prometheus, Kafka UI, Alloy, the LLM playground, MCP Inspector, the agent's API docs, your Keycloak account — with whether it answers |
-| **Kubernetes** | Admins only: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit an object's YAML, read a pod's logs and open a shell in it |
+| Page           | What you do there                                                                                                                                                                                          |
+| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts (Grafana's three dashboards, rebuilt)                                                                                                   |
+| **Metrics**    | Run a PromQL query as a chart or a table; see every scrape target and the alert rules                                                                                                                      |
+| **Logs**       | Search every container's logs with LogQL, pick a label and a value, filter by level, follow them live                                                                                                      |
+| **Traces**     | Find a request by service, operation or duration, and follow it span by span                                                                                                                               |
+| **Kafka**      | Topics, their messages, consumer groups and their lag; create or delete a topic and send a message (admins)                                                                                                |
+| **Pipeline**   | Alloy's components, their health, what feeds what                                                                                                                                                          |
+| **Models**     | Load and unload models, follow the LLM's logs, try a prompt                                                                                                                                                |
+| **Tools**      | Every tool the agent can use; fill in its arguments and run it                                                                                                                                             |
+| **Account**    | Your name and email, your devices and sessions (sign one out), and changing your password                                                                                                                  |
+| **Tool UIs**   | Links to each tool's own web interface — Grafana, Prometheus, Kafka UI, Alloy, the LLM playground, MCP Inspector, the agent's API docs, Headlamp (admins), your Keycloak account — with whether it answers |
+| **Kubernetes** | Admins only: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit an object's YAML, read a pod's logs and open a shell in it                    |
 
 <table>
   <tr>

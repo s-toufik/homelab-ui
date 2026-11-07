@@ -32,6 +32,15 @@ export const STACK_SERVICES: readonly StackService[] = [
     links: [{ label: 'Kubernetes', route: '/kubernetes' }],
   },
   {
+    id: 'headlamp',
+    label: 'Headlamp',
+    group: 'Gateway',
+    folder: 'gateway/headlamp',
+    description: 'The Kubernetes dashboard, admins only.',
+    check: health('headlamp'),
+    links: [{ label: 'Open', port: 4466, path: '/' }],
+  },
+  {
     id: 'oauth2-proxy',
     label: 'oauth2-proxy',
     group: 'Gateway',
@@ -206,7 +215,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     check: health('agent-runtime'),
     links: [
       { label: 'Chat', route: '/agent' },
-      { label: 'API docs', port: 8000, path: '/docs', scheme: 'http' },
+      { label: 'API docs', port: 8100, path: '/docs' },
     ],
     connection: 'http://{host}:8000',
   },
