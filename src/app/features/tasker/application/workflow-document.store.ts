@@ -61,12 +61,14 @@ export class WorkflowDocumentStore {
     return this.addBlockWithConfig(defaultConfig(kind));
   }
 
-  addBlockWithConfig(config: BlockConfig): string {
+  addBlockWithConfig(config: BlockConfig, label?: string): string {
     const index = this.blocks().length;
+    const name = label?.trim();
     const block: WorkflowBlock = {
       id: this.newId(),
       x: 40 + (index % 4) * COLUMN_GAP,
       y: 40 + Math.floor(index / 4) * 150,
+      ...(name ? { label: name } : {}),
       config,
     };
     this.blocks.update((blocks) => [...blocks, block]);
@@ -90,6 +92,20 @@ export class WorkflowDocumentStore {
 
   removeSelected(): void {
     this.removeBlocks(this.selectedIds());
+  }
+
+  renameBlock(id: string, label: string): void {
+    const name = label.trim();
+    this.blocks.update((blocks) =>
+      blocks.map((block) => {
+        if (block.id !== id) return block;
+        const { label: _previous, ...rest } = block;
+        const config =
+          block.config.kind === 'group' && name ? { ...block.config, name } : block.config;
+        return name ? { ...rest, label: name, config } : { ...rest, config };
+      }),
+    );
+    this.touch();
   }
 
   updateConfig(id: string, config: BlockConfig): void {

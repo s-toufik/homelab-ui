@@ -65,15 +65,9 @@ export function upstreamOutput(
 }
 
 export function rootSeeds(graph: WorkflowGraph): Map<string, unknown> {
-  const hasIncoming = (id: string) => graph.connections.some((c) => c.toId === id);
+  const fed = new Set(graph.connections.map((connection) => connection.toId));
   return new Map(
-    graph.blocks
-      .filter(
-        (block) =>
-          block.config.kind === 'trigger' ||
-          (block.config.kind === 'group' && !hasIncoming(block.id)),
-      )
-      .map((block) => [block.id, null]),
+    graph.blocks.filter((block) => !fed.has(block.id)).map((block) => [block.id, null]),
   );
 }
 

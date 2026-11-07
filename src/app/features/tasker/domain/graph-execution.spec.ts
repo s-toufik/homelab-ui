@@ -34,6 +34,21 @@ describe('graph execution', () => {
     expect(outputs.get('label')).toBe('answer 42');
   });
 
+  it('runs from every block nothing feeds into, with or without a trigger', async () => {
+    const graph: WorkflowGraph = {
+      blocks: [
+        code('alone', 'return "ran";'),
+        { id: 't', x: 0, y: 0, config: { kind: 'trigger' } },
+        code('next', 'return input === null ? "after trigger" : "fed";'),
+      ],
+      connections: [{ id: 'c1', fromId: 't', toId: 'next' }],
+    };
+
+    expect([...rootSeeds(graph).keys()]).toEqual(['alone', 't']);
+    const { outputs } = await executeGraph(graph, rootSeeds(graph), { execute: run });
+    expect([outputs.get('alone'), outputs.get('next')]).toEqual(['ran', 'after trigger']);
+  });
+
   it('stops a branch when a block fails', async () => {
     const graph: WorkflowGraph = {
       blocks: [code('boom', 'throw new Error("nope");'), code('after', 'return 1;')],

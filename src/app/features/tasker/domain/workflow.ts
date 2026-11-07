@@ -1,4 +1,4 @@
-import { isBlockKind, type BlockKind } from './block-kind';
+import { blockKindMeta, isBlockKind, type BlockKind } from './block-kind';
 
 export interface HttpHeader {
   readonly key: string;
@@ -52,7 +52,14 @@ export interface WorkflowBlock {
   readonly id: string;
   readonly x: number;
   readonly y: number;
+  readonly label?: string;
   readonly config: BlockConfig;
+}
+
+export function blockTitle(block: Pick<WorkflowBlock, 'label' | 'config'>): string {
+  const label = block.label?.trim();
+  if (label) return label;
+  return block.config.kind === 'group' ? block.config.name : blockKindMeta(block.config.kind).label;
 }
 
 export interface WorkflowConnection {

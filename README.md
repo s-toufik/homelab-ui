@@ -103,9 +103,10 @@ At the bottom, **Fixed by the server** shows the steps that always use the same 
 
 ## Automate with Tasker
 
-Build automations by connecting blocks on a canvas: a **Trigger**, **HTTP requests**, **Code**, **Transforms** and an **Output**. Run the flow and follow each block's result.
+Build automations by connecting blocks on a canvas: a **Trigger**, **HTTP requests**, **Code**, **Transforms** and an **Output**. **Run** starts from every block nothing feeds into — a Trigger, or a block on its own — and you follow each block's result.
 
 - **Several canvases side by side** — open tabs, split the workspace horizontally or vertically, and resize the panes freely.
+- **Name your blocks** so the canvas reads like the flow; a block saved as a favorite takes the favorite's name, and comes back with it when you add the favorite.
 - **Group blocks** into one reusable block, and open it to edit what is inside.
 - **Saved to your account** — workflows and favourite blocks are stored in the homelab's PostgreSQL; the right panel lists your workflows, with **New canvas** to start another. Nobody else sees them.
 - **Inspect any block** — select it to edit its settings and see what it returned on the last run.

@@ -3,14 +3,14 @@ import { FormsModule } from '@angular/forms';
 import { BlockFavoritesStore } from '../../application/block-favorites.store';
 import { WorkspaceStore } from '../../application/workspace.store';
 import { blockKindMeta } from '../../domain/block-kind';
-import type {
-  BlockConfig,
-  CodeConfig,
-  FieldMapping,
-  GroupConfig,
-  HttpConfig,
-  HttpHeader,
-  TransformConfig,
+import {
+  blockTitle,
+  type BlockConfig,
+  type CodeConfig,
+  type FieldMapping,
+  type HttpConfig,
+  type HttpHeader,
+  type TransformConfig,
 } from '../../domain/workflow';
 
 @Component({
@@ -25,6 +25,10 @@ export class BlockInspector {
   protected readonly document = this.workspace.activeDocument;
   protected readonly block = computed(() => this.document()?.selectedBlock() ?? null);
   protected readonly selectionCount = computed(() => this.document()?.selectedBlocks().length ?? 0);
+  protected readonly title = computed(() => {
+    const block = this.block();
+    return block ? blockTitle(block) : '';
+  });
   protected readonly meta = computed(() => {
     const block = this.block();
     return block ? blockKindMeta(block.config.kind) : null;
@@ -51,10 +55,6 @@ export class BlockInspector {
 
   protected patchTransform(patch: Partial<TransformConfig>): void {
     this.patch('transform', patch);
-  }
-
-  protected patchGroup(patch: Partial<GroupConfig>): void {
-    this.patch('group', patch);
   }
 
   addHeader(): void {
@@ -98,9 +98,13 @@ export class BlockInspector {
     if (this.document()?.groupSelected(name)) this.groupName.set('Group');
   }
 
-  startSaveFavorite(): void {
+  rename(label: string): void {
     const block = this.block();
-    this.savingName.set(block?.config.kind === 'group' ? block.config.name : '');
+    if (block) this.document()?.renameBlock(block.id, label);
+  }
+
+  startSaveFavorite(): void {
+    this.savingName.set(this.title());
   }
 
   cancelSaveFavorite(): void {
@@ -111,7 +115,9 @@ export class BlockInspector {
     const block = this.block();
     const name = this.savingName()?.trim();
     if (!block || !name) return;
-    if (await this.favorites.add(name, block.config)) this.savingName.set(null);
+    if (!(await this.favorites.add(name, block.config))) return;
+    this.document()?.renameBlock(block.id, name);
+    this.savingName.set(null);
   }
 
   runSelected(): void {

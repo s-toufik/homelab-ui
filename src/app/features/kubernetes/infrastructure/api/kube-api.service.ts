@@ -180,7 +180,7 @@ export class KubeApiService {
         `/api/v1/namespaces/${encodeURIComponent(namespace)}/pods/${encodeURIComponent(pod)}/log?${params}`,
       ),
       {
-        accept: 'text/plain',
+        accept: '*/*',
       },
     );
   }
@@ -202,7 +202,7 @@ export class KubeApiService {
       this.url(
         `/api/v1/namespaces/${encodeURIComponent(namespace)}/pods/${encodeURIComponent(pod)}/log?${params}`,
       ),
-      { accept: 'text/plain', signal, timeoutMs: 24 * 3600_000 },
+      { accept: '*/*', signal, timeoutMs: 24 * 3600_000 },
     );
     const reader = response.body?.getReader();
     if (!reader) return;

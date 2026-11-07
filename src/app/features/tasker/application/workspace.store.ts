@@ -103,8 +103,8 @@ export class WorkspaceStore {
     (this.activeDocument() ?? this.newCanvas()).addBlock(kind);
   }
 
-  addBlockWithConfig(config: BlockConfig): void {
-    (this.activeDocument() ?? this.newCanvas()).addBlockWithConfig(config);
+  addBlockWithConfig(config: BlockConfig, label?: string): void {
+    (this.activeDocument() ?? this.newCanvas()).addBlockWithConfig(config, label);
   }
 
   moveTab(docId: string, groupId: string, edge: DropEdge): void {
