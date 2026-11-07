@@ -23,7 +23,8 @@
 
 .composer--compact {
   width: auto;
-  margin: 0 1rem 1rem;
+  max-width: none;
+  margin: 0 max(1rem, calc((100% - 56rem) / 2)) 1rem;
 }
 
 .composer__line {

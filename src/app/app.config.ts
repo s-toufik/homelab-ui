@@ -20,6 +20,7 @@ import { provideMcpInspectorFeature } from '@features/mcp-inspector/mcp-inspecto
 import { providePrometheusFeature } from '@features/prometheus/prometheus.feature';
 import { provideStatusFeature } from '@features/status/status.feature';
 import { provideTaskerFeature } from '@features/tasker/tasker.feature';
+import { provideToolLinksFeature } from '@features/tool-links/tool-links.feature';
 import { provideTempoFeature } from '@features/tempo/tempo.feature';
 import { routes } from './app.routes';
 
@@ -35,6 +36,7 @@ export const appConfig: ApplicationConfig = {
     provideStatusFeature(),
     provideAccountFeature(),
     provideKubernetesFeature(),
+    provideToolLinksFeature(),
     provideAgentFeature(),
     provideLlmFeature(),
     provideMcpInspectorFeature(),

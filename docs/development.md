@@ -13,7 +13,7 @@ src/app/
 │
 ├── shell/                       -- app chrome; knows the feature contract, never a feature
 │   ├── layout/                  -- left nav + <router-outlet> + right panel + assistant drawer
-│   ├── nav-sidebar/             -- left sidebar: every page (admin-only ones for admins), signed-in account
+│   ├── nav-sidebar/             -- left sidebar: every page by category (admin-only ones for admins), signed-in account
 │   ├── page-panel/              -- generic right sidebar host
 │   ├── assistant-drawer/        -- the assistant beside any page; its content comes from ASSISTANT_PANEL
 │   ├── feature-icon/            -- draws the icon a feature hands over
@@ -45,6 +45,7 @@ src/app/
 │   ├── mcp-inspector/           -- /tools: agent-toolbox over MCP (infrastructure/api/mcp-client.service.ts)
 │   ├── account/                 -- /account: Keycloak's account API
 │   ├── kubernetes/              -- /kubernetes (admins): resources, actions, YAML, logs, exec shell (xterm)
+│   ├── tool-links/              -- /tool-uis: links to each tool's own web interface, with a reachability dot
 │   └── infrastructure/          -- the menu's Infrastructure section (PostgreSQL, MongoDB, Kafka), from Prometheus
 │
 └── shared/

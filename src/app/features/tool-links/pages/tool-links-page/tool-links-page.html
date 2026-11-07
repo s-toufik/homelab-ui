@@ -1,0 +1,57 @@
+<div class="hl-page">
+  <app-page-header
+    title="Tool UIs"
+    summary="Each tool's own web interface, in a new tab. The pages in the menu cover the same tools inside the homelab."
+  >
+    <button type="button" class="hl-btn" (click)="check()">Check again</button>
+  </app-page-header>
+
+  @for (section of groups; track section.group) {
+    <section class="tool-links__group" [attr.aria-label]="section.group">
+      <h2 class="tool-links__title">{{ section.group }}</h2>
+      <div class="hl-grid">
+        @for (tool of section.tools; track tool.id) {
+          @let state = status()[tool.id];
+          <article class="hl-card tool-links__card">
+            <div class="tool-links__head">
+              <span
+                class="tool-links__dot"
+                [class.tool-links__dot--up]="state === 'up'"
+                [class.tool-links__dot--down]="state === 'down'"
+                [attr.title]="
+                  state === 'up' ? 'Online' : state === 'down' ? 'Unreachable' : 'Checking'
+                "
+              ></span>
+              <h3 class="tool-links__name">{{ tool.label }}</h3>
+              <code class="tool-links__address">{{ address(tool) }}</code>
+            </div>
+            <p class="tool-links__description">{{ tool.description }}</p>
+            <div class="hl-row">
+              @for (link of tool.links; track link.label) {
+                <a class="hl-btn hl-btn--small" [href]="href(link)" target="_blank" rel="noopener">
+                  {{ link.label }}
+                  <svg
+                    viewBox="0 0 24 24"
+                    width="12"
+                    height="12"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    aria-label="opens in a new tab"
+                    role="img"
+                  >
+                    <path
+                      d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                    />
+                  </svg>
+                </a>
+              }
+            </div>
+          </article>
+        }
+      </div>
+    </section>
+  }
+</div>

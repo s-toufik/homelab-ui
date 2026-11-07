@@ -36,6 +36,10 @@
 .cc__attention {
   border-color: color-mix(in srgb, var(--warning) 45%, var(--border));
 
+  > strong {
+    margin-right: 0.4rem;
+  }
+
   &--ok {
     border-color: color-mix(in srgb, var(--success) 45%, var(--border));
   }

@@ -16,7 +16,8 @@
 
 .conversation--compact {
   width: 100%;
-  padding: 0.5rem 1rem 1rem;
+  max-width: none;
+  padding: 0.5rem max(1rem, calc((100% - 56rem) / 2)) 1rem;
 }
 
 .conversation__empty {
