@@ -79,10 +79,19 @@ export const TOOL_UIS: readonly ToolUi[] = [
   {
     id: 'agent-runtime',
     label: 'Agent API',
-    description: "agent-runtime's interactive API docs, on the tailnet.",
+    description: "agent-runtime's interactive API docs, over HTTPS.",
     group: 'AI',
     healthKey: 'agent-runtime',
-    links: [{ label: 'API docs', port: 8000, path: '/docs', scheme: 'http' }],
+    links: [{ label: 'API docs', port: 8100, path: '/docs' }],
+  },
+  {
+    id: 'headlamp',
+    label: 'Headlamp',
+    description:
+      'The Kubernetes dashboard: resources, Helm releases, a map of the cluster (admins).',
+    group: 'Platform',
+    healthKey: 'headlamp',
+    links: [{ label: 'Open', port: 4466, path: '/' }],
   },
   {
     id: 'keycloak',
