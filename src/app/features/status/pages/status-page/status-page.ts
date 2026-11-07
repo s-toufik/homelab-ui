@@ -1,4 +1,5 @@
 import { DatePipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
 import { copyText } from '@shared/utils/clipboard';
@@ -21,7 +22,7 @@ const STATE_LABEL: Record<ServiceState, string> = {
 
 @Component({
   selector: 'app-status-page',
-  imports: [DatePipe],
+  imports: [DatePipe, RouterLink],
   templateUrl: './status-page.html',
   styleUrl: './status-page.scss',
 })
@@ -47,7 +48,12 @@ export class StatusPage implements OnInit, OnDestroy {
     return this.store.states()[service.id] ?? 'checking';
   }
 
+  protected route(link: ServiceLink): string | null {
+    return 'route' in link ? link.route : null;
+  }
+
   protected href(link: ServiceLink): string {
+    if ('route' in link) return link.route;
     if (link.scheme === 'http') return `http://${this.host}:${link.port}${link.path}`;
     return this.server.url({ port: link.port, subpath: null }, link.path);
   }

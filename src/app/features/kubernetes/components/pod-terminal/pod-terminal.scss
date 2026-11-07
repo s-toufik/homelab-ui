@@ -1,0 +1,20 @@
+@use '@xterm/xterm/css/xterm';
+
+app-pod-terminal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.pod-terminal__state {
+  margin: 0;
+  font-size: 0.8rem;
+}
+
+.pod-terminal__screen {
+  height: 26rem;
+  padding: 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--code-surface);
+}

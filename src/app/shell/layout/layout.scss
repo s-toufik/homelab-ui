@@ -18,10 +18,27 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  transition: padding-right 0.22s ease;
+}
+
+@media (min-width: 1100px) {
+  .layout__content--beside-assistant {
+    padding-right: min(var(--assistant-width), 92vw);
+  }
+}
+
+.layout--resizing {
+  cursor: col-resize;
+  user-select: none;
+
+  .layout__content {
+    transition: none;
+  }
 }
 
 .layout__nav-toggle,
-.layout__panel-toggle {
+.layout__panel-toggle,
+.layout__assistant-toggle {
   display: flex;
   position: absolute;
   top: 1rem;
@@ -48,4 +65,17 @@
 
 .layout__panel-toggle {
   right: 1rem;
+}
+
+.layout__assistant-toggle {
+  right: 1rem;
+
+  &--beside-settings {
+    right: 3.75rem;
+  }
+
+  &--working {
+    border-color: var(--accent-border);
+    background: var(--accent-soft);
+  }
 }

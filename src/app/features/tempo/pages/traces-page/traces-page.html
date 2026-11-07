@@ -1,0 +1,182 @@
+<div class="hl-page">
+  <app-page-header title="Traces" eyebrow="Tempo" />
+
+  <section class="hl-card traces-page__search">
+    <div class="hl-row">
+      <label class="hl-field">
+        Service
+        <select
+          class="hl-input"
+          [ngModel]="store.service()"
+          (ngModelChange)="store.service.set($event)"
+        >
+          <option value="">Any</option>
+          @for (service of store.services(); track service) {
+            <option [value]="service">{{ service }}</option>
+          }
+        </select>
+      </label>
+      <label class="hl-field">
+        Operation contains
+        <input
+          class="hl-input"
+          [ngModel]="store.name()"
+          (ngModelChange)="store.name.set($event)"
+          (keydown.enter)="store.search()"
+        />
+      </label>
+      <label class="hl-field">
+        Longer than (ms)
+        <input
+          class="hl-input"
+          type="number"
+          min="0"
+          [ngModel]="store.minDurationMs()"
+          (ngModelChange)="store.minDurationMs.set($event)"
+          (keydown.enter)="store.search()"
+        />
+      </label>
+      <label class="hl-field hl-input--grow">
+        Or TraceQL
+        <input
+          class="hl-input hl-input--mono"
+          placeholder="{ status = error }"
+          [ngModel]="store.traceql()"
+          (ngModelChange)="store.traceql.set($event)"
+          (keydown.enter)="store.search()"
+        />
+      </label>
+    </div>
+    <div class="hl-row">
+      <app-time-range [(range)]="store.range" (refresh)="store.search()" />
+      <button
+        type="button"
+        class="hl-btn hl-btn--primary"
+        [disabled]="store.searching()"
+        (click)="store.search()"
+      >
+        {{ store.searching() ? 'Searching…' : 'Search' }}
+      </button>
+    </div>
+    @if (store.error(); as error) {
+      <p class="hl-error" role="alert">{{ error }}</p>
+    }
+  </section>
+
+  <div class="traces-page__body" [class.traces-page__body--split]="store.selectedId()">
+    <section class="hl-card traces-page__results">
+      <h2 class="hl-card__title">{{ store.results().length }} traces</h2>
+      <ul class="traces-page__list">
+        @for (trace of store.results(); track trace.traceId) {
+          <li>
+            <button
+              type="button"
+              class="traces-page__trace"
+              [class.traces-page__trace--active]="store.selectedId() === trace.traceId"
+              (click)="store.open(trace.traceId)"
+            >
+              <span class="traces-page__trace-name">
+                <strong>{{ trace.service }}</strong> {{ trace.name }}
+              </span>
+              <span class="hl-muted">{{ trace.startMs | date: 'MMM d HH:mm:ss' }}</span>
+              <span class="traces-page__bar">
+                <span
+                  class="traces-page__bar-fill"
+                  [style.width.%]="(trace.durationMs / store.slowest()) * 100"
+                ></span>
+              </span>
+              <span class="traces-page__duration">{{ duration(trace.durationMs) }}</span>
+            </button>
+          </li>
+        } @empty {
+          <li class="hl-empty">No traces match.</li>
+        }
+      </ul>
+    </section>
+
+    @if (store.selectedId(); as traceId) {
+      <section class="hl-card traces-page__trace-view">
+        <div class="hl-row traces-page__trace-head">
+          <h2 class="hl-card__title">
+            Trace <span class="hl-mono">{{ traceId }}</span> · {{ store.view().rows.length }} spans
+            ·
+            {{ duration(store.view().durationMs) }}
+          </h2>
+          <button type="button" class="hl-btn hl-btn--small" (click)="store.close()">Close</button>
+        </div>
+        @if (store.traceError(); as error) {
+          <p class="hl-error" role="alert">{{ error }}</p>
+        } @else if (store.loadingTrace()) {
+          <p class="hl-empty">Loading…</p>
+        } @else {
+          <ol class="traces-page__spans">
+            @for (row of store.view().rows; track row.span.spanId) {
+              <li>
+                <button
+                  type="button"
+                  class="traces-page__span"
+                  [class.traces-page__span--active]="
+                    store.selectedSpan()?.spanId === row.span.spanId
+                  "
+                  (click)="store.selectedSpan.set(row.span)"
+                >
+                  <span class="traces-page__span-name" [style.padding-left.rem]="row.depth * 0.9">
+                    <span class="traces-page__service">{{ row.span.service }}</span>
+                    {{ row.span.name }}
+                  </span>
+                  <span class="traces-page__timeline">
+                    <span
+                      class="traces-page__span-bar"
+                      [class.traces-page__span-bar--error]="row.span.error"
+                      [style.left.%]="row.offsetPercent"
+                      [style.width.%]="row.widthPercent"
+                    ></span>
+                  </span>
+                  <span class="traces-page__duration">{{ duration(row.span.durationMs) }}</span>
+                </button>
+              </li>
+            }
+          </ol>
+
+          @if (store.selectedSpan(); as span) {
+            <div class="traces-page__span-details">
+              <h3 class="hl-card__title">{{ span.name }}</h3>
+              <table class="hl-table">
+                <tbody>
+                  <tr>
+                    <th>Service</th>
+                    <td>{{ span.service }}</td>
+                  </tr>
+                  <tr>
+                    <th>Kind</th>
+                    <td>{{ span.kind || '–' }}</td>
+                  </tr>
+                  <tr>
+                    <th>Started</th>
+                    <td>{{ span.startMs | date: 'HH:mm:ss.SSS' }}</td>
+                  </tr>
+                  <tr>
+                    <th>Duration</th>
+                    <td>{{ span.durationMs | number: '1.0-3' }} ms</td>
+                  </tr>
+                  @if (span.error) {
+                    <tr>
+                      <th>Status</th>
+                      <td class="traces-page__error">error {{ span.statusMessage }}</td>
+                    </tr>
+                  }
+                  @for (attribute of span.attributes; track attribute[0]) {
+                    <tr>
+                      <th class="hl-mono">{{ attribute[0] }}</th>
+                      <td class="hl-mono traces-page__value">{{ attribute[1] }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        }
+      </section>
+    }
+  </div>
+</div>

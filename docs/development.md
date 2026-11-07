@@ -1,6 +1,6 @@
 # Developing homelab-ui
 
-The dashboard UI for the homelab: a left sidebar for navigating between pages, a right sidebar for whatever the current page's settings are, and one page or link per homelab component.
+The dashboard UI for the homelab: a left sidebar for navigating between pages, a right sidebar for whatever the current page's settings are, an assistant drawer on every page but the Agent's, and one page per homelab component, each calling its tool's API through the gateway.
 
 Built with Angular 21 (standalone components, signals, zoneless) using a feature-first, layered structure: each page under `features/` owns its `domain` (types), `application` (state/orchestration), `infrastructure` (API clients), and `components`/`pages` (UI), and never reaches into another feature. Cross-cutting app chrome — the two sidebars, routing between pages — lives in `shell/`; what several features use lives in `shared/`.
 
@@ -12,52 +12,59 @@ src/app/
 ├── app.config.ts                -- the only place that lists the features (provideXxxFeature())
 │
 ├── shell/                       -- app chrome; knows the feature contract, never a feature
-│   ├── layout/                  -- left nav + <router-outlet> + right panel
-│   ├── nav-sidebar/             -- left sidebar: Homelab (overview) + every app and page, signed-in account
+│   ├── layout/                  -- left nav + <router-outlet> + right panel + assistant drawer
+│   ├── nav-sidebar/             -- left sidebar: every page (admin-only ones for admins), signed-in account
 │   ├── page-panel/              -- generic right sidebar host
+│   ├── assistant-drawer/        -- the assistant beside any page; its content comes from ASSISTANT_PANEL
 │   ├── feature-icon/            -- draws the icon a feature hands over
 │   ├── application/
 │   │   ├── homelab-features.ts  -- HOMELAB_FEATURES + provideHomelabFeature()
+│   │   ├── assistant-panel.ts   -- ASSISTANT_PANEL + provideAssistantPanel(): what the drawer loads, where it hides
 │   │   ├── feature-status.store.ts  -- runs each feature's health check
 │   │   ├── homelab-resources.ts -- HOMELAB_RESOURCES + provideHomelabResource()
 │   │   ├── resource-status.store.ts -- runs each resource's status check
-│   │   ├── layout.store.ts      -- open/closed state of both sidebars
+│   │   ├── layout.store.ts      -- open/closed state of both sidebars and the assistant
 │   │   └── page-chrome.store.ts -- whatever the current page registered for the right panel
 │   ├── directives/              -- [appPagePanelContent], how a page fills the right panel
 │   └── domain/
-│       ├── homelab-feature.ts   -- HomelabFeature (an app or page the shell lists), FEATURE_CATEGORIES
+│       ├── homelab-feature.ts   -- HomelabFeature (a page the shell lists; adminOnly), FEATURE_CATEGORIES
 │       └── homelab-resource.ts  -- HomelabResource: has a status, nothing to open
 │
-├── features/                    -- one folder per backend, even a plain link
-│   ├── home/                    -- the overview: every feature by category, with health dots
+├── features/                    -- one folder per backend
+│   ├── control-center/          -- / : alerts, server, data, LLM, Kubernetes, busiest containers, errors, apps
 │   ├── status/                  -- /status: every homelab-infra container, its state, links, connection
-│   │   ├── domain/stack-services.ts  -- the catalog: one entry per container, grouped like homelab-infra
-│   │   ├── infrastructure/      -- /api/health/<key> or a Prometheus metric, per entry
-│   │   ├── application/         -- StackStatusStore: states, summary, refresh
-│   │   └── pages/status-page/
-│   ├── agent/                   -- chat page (reference example for a page)
-│   │   ├── domain/ application/ components/ pages/
-│   │   │                        -- domain/answer-metadata.ts: what the agent reports about an answer
-│   │   └── infrastructure/
-│   │       ├── agent.json       -- port, subpath and api path of agent-runtime
-│   │       ├── api/             -- SSE client, model list (/v1/models), readiness check
-│   │       └── storage/         -- the user's model and auto-approve choices (localStorage)
+│   ├── agent/                   -- /agent chat (reference example for a page) + components/assistant (the drawer)
 │   ├── tasker/                  -- block canvas, split panes, groups; workflows and favorites via PostgREST
-│   ├── infrastructure/          -- the menu's Infrastructure section (PostgreSQL, MongoDB, Kafka), from Prometheus
-│   ├── account/                 -- link to the Keycloak account page
-│   └── grafana/ prometheus/ …   -- one folder per homelab-infra web UI, opened as a link
-│       ├── <name>.feature.ts    -- registration
-│       └── infrastructure/<name>.json  -- port + subpath + health path
+│   ├── grafana/                 -- /dashboards/:id: Grafana's dashboards as panel lists (domain/dashboards.ts)
+│   ├── prometheus/              -- /metrics: PromQL, targets, rules
+│   ├── loki/                    -- /logs: LogQL, labels, live
+│   ├── tempo/                   -- /traces: search and waterfall
+│   ├── kafka-ui/                -- /kafka: Kafka UI's REST API (topics, messages, groups)
+│   ├── alloy/                   -- /pipeline: Alloy's components
+│   ├── llm/                     -- /models: llama-swap (models, load/unload, logs, prompt)
+│   ├── mcp-inspector/           -- /tools: agent-toolbox over MCP (infrastructure/api/mcp-client.service.ts)
+│   ├── account/                 -- /account: Keycloak's account API
+│   ├── kubernetes/              -- /kubernetes (admins): resources, actions, YAML, logs, exec shell (xterm)
+│   └── infrastructure/          -- the menu's Infrastructure section (PostgreSQL, MongoDB, Kafka), from Prometheus
 │
 └── shared/
+    ├── domain/log-line.ts       -- a log line and its level, from Loki
     ├── infrastructure/
     │   ├── homelab-server.json  -- the server for `npm start` ("http://<your-server>")
     │   ├── homelab-server.ts    -- builds every backend address; API_ROUTING, isReachable()
-    │   ├── gateway-session.ts   -- the signed-in account, sign-out, session watch
-    │   ├── prometheus.json + prometheus-query.service.ts  -- instant PromQL queries (/api/prometheus)
+    │   ├── gateway-session.ts   -- the signed-in account, isAdmin() (realm role admin), sign-out, session watch
+    │   ├── gateway-api.ts       -- fetch for /api/<tool>: X-Homelab-Request, timeouts, 401 → sign in, error text
+    │   ├── prometheus-query.service.ts  -- value(), vector(), range(); seriesName()
+    │   ├── loki-query.service.ts        -- labels, values, query_range (lines or series)
     │   └── connection-settings* -- a host saved in Settings → Connectors
+    ├── ui/
+    │   ├── charts/              -- time-series chart, sparkline, gauge; chart-format.ts (units, ticks, colours)
+    │   ├── time-range/          -- 15 min … 7 d picker and timeWindow()
+    │   └── page-header/         -- eyebrow, title, summary, actions
     ├── pipes/ utils/
 ```
+
+Global classes for tool pages live in `src/styles.scss` under `.hl-*`: `hl-page`, `hl-card`, `hl-grid`, `hl-row`, `hl-btn` (`--primary`, `--danger`, `--small`), `hl-input`, `hl-field`, `hl-tabs`/`hl-tab`, `hl-table`, `hl-badge` (`--ok`, `--warn`, `--bad`, `--muted`), `hl-pre`, `hl-error`, `hl-empty`, `hl-stat`. Chart colours are `--chart-1` … `--chart-8` (`--chart-1` is the palette's accent).
 
 ## Backend addresses
 
@@ -73,11 +80,11 @@ Every address is built from `shared/infrastructure/homelab-server.json` and the 
 
 **Behind the gateway.** In production the UI is served by homelab-infra's gateway (Caddy + Keycloak + oauth2-proxy), so the browser only ever talks to one HTTPS origin:
 
-| JSON field                | Production build (`API_ROUTING = 'gateway'`)                                 | `npm start` (`'direct'`)        |
-| ------------------------- | ---------------------------------------------------------------------------- | ------------------------------- |
-| `api` (e.g. `/api/agent`) | API calls go to `/api/agent/…` on the same origin, signed-in cookie included | `http://<your-server>:<port>/…` |
-| `healthPath`              | Status dots call `/api/health/<key>` and trust its status code               | `no-cors` probe of the port     |
-| `port` / `subpath`        | Links that open a tool in a new tab, on `https://<page host>:<port>`         | `http://<your-server>:<port>`   |
+| JSON field                | Production build (`API_ROUTING = 'gateway'`)                                   | `npm start` (`'direct'`)        |
+| ------------------------- | ------------------------------------------------------------------------------ | ------------------------------- |
+| `api` (e.g. `/api/agent`) | API calls go to `/api/agent/…` on the same origin, signed-in cookie included   | `http://<your-server>:<port>/…` |
+| `healthPath`              | Status dots call `/api/health/<key>` and trust its status code                 | `no-cors` probe of the port     |
+| `port` / `subpath`        | Links to a tool's own address (Keycloak's password page, the agent's API docs) | `http://<your-server>:<port>`   |
 
 In production the server address is the page's own host (`HOMELAB_SERVER_URL` follows `location`), unless a host is saved in Settings → Connectors; `homelab-server.json` is only used by `npm start`.
 
@@ -85,8 +92,8 @@ In production the server address is the page's own host (`HOMELAB_SERVER_URL` fo
 
 What the UI calls must exist on the gateway (homelab-infra's `gateway/caddy/Caddyfile`):
 
-- a new API: an `api` path in its JSON **and** a route under `/api/`;
-- a new link to a tool: a site for its port (see `gateway/caddy/README.md`);
+- a new API: an `api` path in its JSON **and** a route under `/api/`, limited to the paths the page calls;
+- a page that changes things: send them with `GatewayApi` (it adds `X-Homelab-Request: 1`) and give the route `import no_cross_site_writes`; admin-only changes also `import admin_only <matcher>`;
 - a new health check: `import health_route <key> <service>:<port> <path>` under `/api/*`.
 
 Tasker's HTTP blocks run in the browser: from the HTTPS page they can only call `https://` addresses.
@@ -107,7 +114,7 @@ To try the UI against a backend running on your own machine, set `homelab-server
 | Local image                                                                                                                       | `make docker_build`               | `docker build -f devops/docker/Dockerfile -t homelab-ui:local .`                                                             |
 | Publish a test image (releases: git tag, see below)                                                                               | `make docker_publish [TAG=1.4.0]` | `docker buildx build --platform linux/amd64,linux/arm64 -f devops/docker/Dockerfile -t toufik142/homelab-ui:latest --push .` |
 
-`npm start` calls the backends directly on their ports, without the gateway, from a machine on the tailnet: the Agent page works against the server's agent-runtime (`http://<your-server>:8000`). PostgREST and the `/api/health` routes exist only behind the gateway, so Tasker's saved workflows and the Status page need the deployed UI (`https://<server>.<tailnet>.ts.net/`).
+`npm start` calls the backends directly on their ports, without the gateway, from a machine on the tailnet: the Agent page and the assistant work against the server's agent-runtime (`http://<your-server>:8000`). The tool pages, PostgREST and the `/api/health` routes exist only behind the gateway, so they need the deployed UI (`https://<server>.<tailnet>.ts.net/`) or a dev image deployed with `make apply R=homelab-ui --set image.tag=dev-<sha>` in homelab-infra.
 
 ## Releasing
 
@@ -178,7 +185,7 @@ src/app/features/metrics/
 └── pages/metrics-page/
 ```
 
-Skip any of `domain`/`application`/`infrastructure` the page doesn't need yet — `home` has none of them. Add a layer only when it actually has something to hold; an empty folder documents nothing.
+Skip any of `domain`/`application`/`infrastructure` the page doesn't need yet — `alloy` has no `application`. Add a layer only when it actually has something to hold; an empty folder documents nothing.
 
 ### 2. Build the page component
 
@@ -195,7 +202,7 @@ import { Component } from '@angular/core';
 export class MetricsPage {}
 ```
 
-Give the page's `:host` this shape so it fills the space the shell gives it (see `agent-page.scss` or `home-page.scss` for the exact rule):
+Give the page's `:host` this shape so it fills the space the shell gives it (see `agent-page.scss`); a tool page wraps its content in `<div class="hl-page">` and starts with `<app-page-header>`:
 
 ```scss
 :host {
@@ -223,7 +230,7 @@ Lazy (`loadComponent`) keeps each page its own bundle chunk — a new page never
 
 ### 4. Register the feature
 
-The left nav and the home dashboard list registered features. Add a registration next to the page:
+The left nav and the control center list registered features. Add a registration next to the page:
 
 ```ts
 // features/metrics/metrics.feature.ts
@@ -239,7 +246,7 @@ export function provideMetricsFeature(): Provider {
 }
 ```
 
-and list it in `app.config.ts` (`provideMetricsFeature()`). If the page talks to a backend, give it `infrastructure/metrics.json` and a `checkHealth` (see `features/agent`).
+and list it in `app.config.ts` (`provideMetricsFeature()`). If the page talks to a backend, give it `infrastructure/metrics.json` (with `api`), an API service on `GatewayApi`, and a `checkHealth` (see `features/kafka-ui`). `adminOnly: true` hides it from accounts without the `admin` role.
 
 ### 5. Give it a right-sidebar panel (optional)
 
@@ -264,22 +271,19 @@ import { PagePanelContentDirective } from '@shell/directives/page-panel-content.
 export class MetricsPage {}
 ```
 
-That's the entire contract: register the template, and the shell shows/hides the right sidebar and its mobile toggle automatically. Skip this step and the page simply has no right sidebar — that's how `home` and `status` work.
+That's the entire contract: register the template, and the shell shows/hides the right sidebar and its mobile toggle automatically. Skip this step and the page simply has no right sidebar — that's how `status` and the tool pages work.
 
 ### 6. Verify
 
-`make run`, open `http://localhost:4200`: the new page appears in the left nav and as a tile on the overview, `/metrics` routes to it, and (if step 5 was done) its settings show in the right sidebar.
+`make run`, open `http://localhost:4200`: the new page appears in the left nav and in the control center's apps, `/metrics` routes to it, the assistant button shows at the top right, and (if step 5 was done) its settings show in the right sidebar.
 
-## Adding a link to a homelab service
+## The assistant drawer
 
-For a web UI the stack serves (a dashboard, an admin console…), no page or route is needed:
+The agent feature registers the drawer's content with `provideAssistantPanel({ load, hiddenOn: ['/agent'] })` in `agent.feature.ts`; the shell loads it lazily the first time the drawer opens. The drawer shows `features/agent/components/assistant`, which uses the same root `AgentStore` as the Agent page, so both show one conversation. To hide the drawer on another page, add its path to `hiddenOn`.
 
-1. `features/<name>/infrastructure/<name>.json` — its `port`, `subpath` (or `null`) and a cheap `healthPath`.
-2. `features/<name>/<name>.feature.ts` — copy `features/grafana/grafana.feature.ts`: label, description, colour, icon, category, `entry: { kind: 'link', url: server.url(ADDRESS) }` and `checkHealth: () => server.isReachable(ADDRESS)`.
-3. List `provide<Name>Feature()` in `app.config.ts`.
-4. In homelab-infra, the matching `import health_route <name> …` line in the `Caddyfile`.
+## Charts
 
-It appears on the overview, with its status dot, and in the menu. A new category is one more entry in `FEATURE_CATEGORIES` (`shell/domain/homelab-feature.ts`).
+`app-time-series-chart` takes `series` (`{ name, points: [ms, value][] }[]`), a `unit` (`number`, `percent`, `ratio`, `bytes`, `bytesPerSecond`, `seconds`, `perSecond`, `celsius`), `height`, `area`, `min` and `max`; it draws the axes, a tooltip, a legend that hides a series on click, and breaks lines where data is missing. `app-sparkline` and `app-gauge` cover the small ones. A Prometheus range is `PrometheusQueryService.range(expr, start, end, step)` with `timeWindow(rangeId)` from `ui/time-range`.
 
 ## Adding a container to the Status page
 
@@ -287,7 +291,7 @@ Every container homelab-infra runs has an entry in `STACK_SERVICES` (`features/s
 
 - `group` and `folder` — where it lives in homelab-infra (`observability/logs/loki`);
 - `check` — `{ kind: 'health', key }` for a container with an HTTP health endpoint (the gateway's `/api/health/<key>` route), or `{ kind: 'metric', query }` for one with only a Prometheus metric (`pg_up`, `kafka_brokers`, …);
-- `links` — its web interfaces (`port` on the gateway, or `null` for this page's own host);
+- `links` — `{ label, route }` for one of this UI's pages, or `{ label, port, path }` for a tool's own address;
 - `connection` (optional) — the address apps use, `{host}` replaced by the server's name.
 
 A new group is one more entry in `SERVICE_GROUPS` (`features/status/domain/stack-service.ts`).

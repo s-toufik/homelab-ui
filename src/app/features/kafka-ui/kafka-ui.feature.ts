@@ -8,12 +8,12 @@ export function provideKafkaUiFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'kafka-ui',
-      label: 'Kafka UI',
-      description: 'Topics, consumer groups and messages.',
+      label: 'Kafka',
+      description: 'Topics, messages and consumer groups.',
       category: 'Streaming',
       color: '#f59e0b',
       icon: ['M3 7h13M3 12h18M3 17h10', 'm14 4 3 3-3 3'],
-      entry: { kind: 'link', url: server.url(KAFKA_UI) },
+      entry: { kind: 'page', path: '/kafka' },
       checkHealth: () => server.isReachable(KAFKA_UI),
     };
   });

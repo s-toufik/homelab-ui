@@ -1,0 +1,7 @@
+{
+  "key": "kube-api",
+  "port": null,
+  "subpath": null,
+  "healthPath": null,
+  "api": "/api/kube"
+}

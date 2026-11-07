@@ -1,0 +1,326 @@
+<div class="hl-page">
+  <header class="cc__header">
+    <div>
+      <p class="cc__eyebrow">Control center</p>
+      <h1 class="cc__title">{{ greeting }}</h1>
+      <p class="cc__summary">
+        @if (featureStatus.summary(); as summary) {
+          {{ summary.online }} of {{ summary.total }} apps online ·
+        }
+        {{ store.alerts().length }} alert(s) firing
+        @if (store.updatedAt(); as at) {
+          · updated {{ at | date: 'HH:mm:ss' }}, every 30 s
+        }
+      </p>
+    </div>
+    <button type="button" class="hl-btn" (click)="store.refresh()">Refresh</button>
+  </header>
+
+  @if (store.prometheusDown()) {
+    <p class="hl-error">
+      Prometheus doesn't answer: the numbers below are missing until it's back.
+    </p>
+  }
+
+  <section class="hl-card cc__attention" [class.cc__attention--ok]="store.allGood()">
+    @if (store.allGood()) {
+      <strong>All good.</strong>
+      <span class="hl-muted">No alert firing and nothing near its limit.</span>
+    } @else if (!store.warnings().length && !store.alerts().length) {
+      <span class="hl-muted">
+        {{ store.updatedAt() ? 'Waiting for Prometheus to say whether all is well.' : 'Checking…' }}
+      </span>
+    } @else {
+      <h2 class="hl-card__title">Needs attention</h2>
+      <ul class="cc__list">
+        @for (alert of store.alerts(); track $index) {
+          <li>
+            <span class="hl-badge hl-badge--bad">{{ alert.labels['severity'] || 'alert' }}</span>
+            <a routerLink="/metrics">{{ alert.labels['alertname'] }}</a>
+            <span class="hl-muted"
+              >{{ alert.labels['namespace'] || '' }}
+              {{ alert.labels['pod'] || alert.labels['job'] || '' }}</span
+            >
+          </li>
+        }
+        @for (warning of store.warnings(); track warning) {
+          <li><span class="hl-badge hl-badge--warn">check</span> {{ warning }}</li>
+        }
+      </ul>
+    }
+  </section>
+
+  <div class="cc__grid">
+    <section class="hl-card cc__server">
+      <div class="cc__card-head">
+        <h2 class="hl-card__title">Server</h2>
+        <a class="cc__more" routerLink="/dashboards/homelab-overview">Dashboards →</a>
+      </div>
+      <div class="cc__gauges">
+        <div class="cc__gauge">
+          <app-gauge label="CPU" [value]="store.gauges().cpu ?? null" />
+          <app-sparkline [points]="store.history().cpu ?? []" [max]="100" />
+        </div>
+        <div class="cc__gauge">
+          <app-gauge label="Memory" [value]="store.gauges().memory ?? null" />
+          <app-sparkline
+            [points]="store.history().memory ?? []"
+            [max]="100"
+            color="var(--chart-4)"
+          />
+        </div>
+        <div class="cc__gauge">
+          <app-gauge label="Disk" [value]="store.gauges().disk ?? null" />
+          <app-sparkline [points]="store.history().disk ?? []" [max]="100" color="var(--chart-3)" />
+        </div>
+        <div class="cc__gauge">
+          <app-gauge
+            label="CPU temperature"
+            unit="celsius"
+            [value]="store.gauges().temperature ?? null"
+            [warnAt]="0.8"
+            [dangerAt]="0.9"
+          />
+          <app-sparkline
+            [points]="store.history().temperature ?? []"
+            [min]="null"
+            color="var(--chart-5)"
+          />
+        </div>
+      </div>
+      <div class="cc__facts">
+        <span>↓ {{ format(store.stats().received, 'bytesPerSecond') }}</span>
+        <span>↑ {{ format(store.stats().sent, 'bytesPerSecond') }}</span>
+        <span>{{ format(store.stats().diskFree, 'bytes') }} free</span>
+        <span>up {{ uptime(store.stats().uptime) }}</span>
+        <span
+          >{{ (store.stats().targets ?? 0) - (store.stats().targetsDown ?? 0) }}/{{
+            store.stats().targets ?? 0
+          }}
+          targets up</span
+        >
+      </div>
+    </section>
+
+    <section class="hl-card">
+      <div class="cc__card-head">
+        <h2 class="hl-card__title">Data</h2>
+        <a class="cc__more" routerLink="/kafka">Kafka →</a>
+      </div>
+      <ul class="cc__rows">
+        <li>
+          <span class="hl-badge" [class]="'hl-badge hl-badge--' + up(store.stats().postgresUp)">{{
+            up(store.stats().postgresUp) === 'ok'
+              ? 'up'
+              : up(store.stats().postgresUp) === 'bad'
+                ? 'down'
+                : '–'
+          }}</span>
+          PostgreSQL <span class="hl-muted">{{ format(store.stats().postgresSize, 'bytes') }}</span>
+        </li>
+        <li>
+          <span class="hl-badge" [class]="'hl-badge hl-badge--' + up(store.stats().mongoUp)">{{
+            up(store.stats().mongoUp) === 'ok'
+              ? 'up'
+              : up(store.stats().mongoUp) === 'bad'
+                ? 'down'
+                : '–'
+          }}</span>
+          MongoDB
+        </li>
+        <li>
+          <span class="hl-badge" [class]="'hl-badge hl-badge--' + up(store.stats().kafkaBrokers)">{{
+            up(store.stats().kafkaBrokers) === 'ok'
+              ? 'up'
+              : up(store.stats().kafkaBrokers) === 'bad'
+                ? 'down'
+                : '–'
+          }}</span>
+          Kafka
+          <span class="hl-muted"
+            >{{ format(store.stats().kafkaIn, 'perSecond') }} in · lag
+            {{ store.stats().kafkaLag ?? 0 | number }}</span
+          >
+        </li>
+        @for (backup of store.kube()?.backups ?? []; track backup.name) {
+          <li>
+            <span
+              class="hl-badge"
+              [class.hl-badge--ok]="backup.lastSuccessMs"
+              [class.hl-badge--bad]="!backup.lastSuccessMs"
+              >backup</span
+            >
+            {{ backup.name.replace('backups-', '') }}
+            <span class="hl-muted">{{
+              backup.lastSuccessMs ? (backup.lastSuccessMs | date: 'MMM d HH:mm') : 'never'
+            }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="hl-card">
+      <div class="cc__card-head">
+        <h2 class="hl-card__title">LLM</h2>
+        <a class="cc__more" routerLink="/models">Models →</a>
+      </div>
+      <div class="cc__stats">
+        <div class="hl-stat">
+          <span class="hl-stat__value">{{
+            store.stats().tokensPerSecond ?? null | number: '1.0-1'
+          }}</span>
+          <span class="hl-stat__label">tokens/s (5 min)</span>
+        </div>
+        <div class="hl-stat">
+          <span class="hl-stat__value">{{ store.stats().llmRequests ?? 0 }}</span>
+          <span class="hl-stat__label">requests running</span>
+        </div>
+      </div>
+      <p class="cc__models">
+        @for (model of store.loadedModels(); track model) {
+          <span class="hl-badge hl-badge--ok">{{ model }}</span>
+        } @empty {
+          <span class="hl-muted">No model loaded.</span>
+        }
+      </p>
+    </section>
+
+    @if (store.kube(); as kube) {
+      <section class="hl-card">
+        <div class="cc__card-head">
+          <h2 class="hl-card__title">Kubernetes</h2>
+          <a class="cc__more" routerLink="/kubernetes">Kubernetes →</a>
+        </div>
+        <div class="cc__stats">
+          <div class="hl-stat">
+            <span class="hl-stat__value"
+              >{{ kube.pods - kube.notReady.length }}/{{ kube.pods }}</span
+            >
+            <span class="hl-stat__label">pods ready</span>
+          </div>
+          <div class="hl-stat">
+            <span class="hl-stat__value">{{ kube.restartsLastHour }}</span>
+            <span class="hl-stat__label">restarts, last hour</span>
+          </div>
+          <div class="hl-stat">
+            <span class="hl-stat__value">{{ kube.warningsLastHour }}</span>
+            <span class="hl-stat__label">warnings, last hour</span>
+          </div>
+        </div>
+        <ul class="cc__list">
+          @for (pod of kube.notReady; track pod.namespace + pod.name) {
+            <li>
+              <span class="hl-badge hl-badge--warn">{{ pod.reason }}</span>
+              <span class="hl-mono">{{ pod.namespace }}/{{ pod.name }}</span>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <section class="hl-card">
+      <div class="cc__card-head">
+        <h2 class="hl-card__title">Busiest containers</h2>
+        <a class="cc__more" routerLink="/dashboards/homelab-overview">More →</a>
+      </div>
+      <p class="hl-muted cc__sub">Memory</p>
+      <ul class="cc__bars">
+        @for (sample of store.topMemory(); track sample.labels['container']) {
+          <li>
+            <span>{{ sample.labels['container'] }}</span>
+            <span class="cc__bar"
+              ><span
+                class="cc__bar-fill"
+                [style.width.%]="(sample.value / maxMemory()) * 100"
+              ></span
+            ></span>
+            <span class="cc__bar-value">{{ bytes(sample.value) }}</span>
+          </li>
+        }
+      </ul>
+      <p class="hl-muted cc__sub">CPU (cores)</p>
+      <ul class="cc__bars">
+        @for (sample of store.topCpu(); track sample.labels['container']) {
+          <li>
+            <span>{{ sample.labels['container'] }}</span>
+            <span class="cc__bar"
+              ><span
+                class="cc__bar-fill cc__bar-fill--cpu"
+                [style.width.%]="(sample.value / maxCpu()) * 100"
+              ></span
+            ></span>
+            <span class="cc__bar-value">{{ sample.value | number: '1.0-2' }}</span>
+          </li>
+        }
+      </ul>
+    </section>
+
+    <section class="hl-card cc__errors">
+      <div class="cc__card-head">
+        <h2 class="hl-card__title">Recent errors (1 h)</h2>
+        <a class="cc__more" routerLink="/logs">Logs →</a>
+      </div>
+      <ol class="cc__log">
+        @for (line of store.errors(); track line.id) {
+          <li>
+            <time class="hl-muted">{{ line.timeMs | date: 'HH:mm:ss' }}</time>
+            <span class="cc__stream">{{ streamName(line.labels) }}</span>
+            <span class="cc__line">{{ line.line }}</span>
+          </li>
+        } @empty {
+          <li class="hl-muted">No error lines in the last hour.</li>
+        }
+      </ol>
+    </section>
+  </div>
+
+  <section class="hl-card">
+    <h2 class="hl-card__title">Apps and services</h2>
+    <div class="cc__apps">
+      @for (app of apps(); track app.id) {
+        @let status = featureStatus.statuses()[app.id];
+        <a
+          class="cc__app"
+          [routerLink]="app.entry.kind === 'page' ? app.entry.path : null"
+          [style.--app-color]="app.color"
+        >
+          <span class="cc__app-icon"><app-feature-icon [paths]="app.icon" [size]="18" /></span>
+          <span class="cc__app-text">
+            <strong>{{ app.label }}</strong>
+            <span class="hl-muted">{{ app.description }}</span>
+          </span>
+          @if (app.checkHealth) {
+            <span
+              class="cc__dot"
+              [class.cc__dot--ok]="status === 'online'"
+              [class.cc__dot--bad]="status === 'offline'"
+              [attr.title]="status ?? 'checking'"
+            ></span>
+          }
+        </a>
+      }
+      @for (resource of resources.resources; track resource.id) {
+        @let status = resources.statuses()[resource.id];
+        <div class="cc__app" [style.--app-color]="resource.color">
+          <span class="cc__app-text">
+            <strong>{{ resource.label }}</strong>
+            <span class="hl-muted">{{
+              status === 'up'
+                ? 'Up'
+                : status === 'down'
+                  ? 'Down'
+                  : status === 'checking'
+                    ? 'Checking'
+                    : 'No data'
+            }}</span>
+          </span>
+          <span
+            class="cc__dot"
+            [class.cc__dot--ok]="status === 'up'"
+            [class.cc__dot--bad]="status === 'down'"
+          ></span>
+        </div>
+      }
+    </div>
+  </section>
+</div>

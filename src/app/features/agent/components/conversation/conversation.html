@@ -1,4 +1,4 @@
-<main class="conversation" (scroll)="onScroll($event)">
+<main class="conversation" [class.conversation--compact]="compact()" (scroll)="onScroll($event)">
   @if (messages().length === 0) {
     <p class="conversation__empty">Ask anything to start the conversation.</p>
   }

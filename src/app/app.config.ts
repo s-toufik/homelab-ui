@@ -13,11 +13,14 @@ import { provideAlloyFeature } from '@features/alloy/alloy.feature';
 import { provideGrafanaFeature } from '@features/grafana/grafana.feature';
 import { provideInfrastructureResources } from '@features/infrastructure/infrastructure.feature';
 import { provideKafkaUiFeature } from '@features/kafka-ui/kafka-ui.feature';
+import { provideKubernetesFeature } from '@features/kubernetes/kubernetes.feature';
 import { provideLlmFeature } from '@features/llm/llm.feature';
+import { provideLokiFeature } from '@features/loki/loki.feature';
 import { provideMcpInspectorFeature } from '@features/mcp-inspector/mcp-inspector.feature';
 import { providePrometheusFeature } from '@features/prometheus/prometheus.feature';
 import { provideStatusFeature } from '@features/status/status.feature';
 import { provideTaskerFeature } from '@features/tasker/tasker.feature';
+import { provideTempoFeature } from '@features/tempo/tempo.feature';
 import { routes } from './app.routes';
 
 export const appConfig: ApplicationConfig = {
@@ -31,11 +34,14 @@ export const appConfig: ApplicationConfig = {
     provideRouter(routes),
     provideStatusFeature(),
     provideAccountFeature(),
+    provideKubernetesFeature(),
     provideAgentFeature(),
     provideLlmFeature(),
     provideMcpInspectorFeature(),
     provideGrafanaFeature(),
     providePrometheusFeature(),
+    provideLokiFeature(),
+    provideTempoFeature(),
     provideAlloyFeature(),
     provideKafkaUiFeature(),
     provideTaskerFeature(),

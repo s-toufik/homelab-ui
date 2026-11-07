@@ -158,15 +158,6 @@
   margin: 0 0 0.35rem;
   color: var(--text-muted);
   font-size: 0.85rem;
-
-  &::before {
-    content: '';
-    width: 0.45rem;
-    height: 0.45rem;
-    border-radius: 50%;
-    background: var(--accent);
-    animation: pulse 1.2s ease-in-out infinite;
-  }
 }
 
 @media (max-width: 640px) {
@@ -179,12 +170,6 @@
   }
 }
 
-@keyframes pulse {
-  50% {
-    opacity: 0.3;
-  }
-}
-
 .message__error {
   margin: 0.5rem 0 0;
   color: var(--danger);
@@ -193,18 +178,7 @@
   overflow-wrap: anywhere;
 }
 
-.message__cursor {
-  display: inline-block;
-  width: 0.6em;
-  height: 1.1em;
-  margin-inline-start: 0.1em;
-  vertical-align: text-bottom;
-  background: var(--accent);
-  animation: blink 1s step-start infinite;
-}
-
-@keyframes blink {
-  50% {
-    opacity: 0;
-  }
+.message__writing {
+  display: block;
+  margin-top: 0.35rem;
 }

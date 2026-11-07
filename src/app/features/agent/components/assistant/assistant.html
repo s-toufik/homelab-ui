@@ -1,0 +1,70 @@
+<div class="assistant__toolbar">
+  <select
+    class="assistant__model"
+    aria-label="Model"
+    [ngModel]="store.modelName()"
+    (ngModelChange)="store.modelName.set($event)"
+    [disabled]="store.modelNames().length === 0"
+  >
+    @for (name of store.modelNames(); track name) {
+      <option [value]="name">{{ name }}</option>
+    } @empty {
+      <option value="">{{ store.modelsError() ? 'No models' : 'Loading models…' }}</option>
+    }
+  </select>
+
+  <button
+    type="button"
+    class="assistant__action"
+    title="New conversation"
+    aria-label="New conversation"
+    (click)="store.newSession()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+    >
+      <path d="M12 5v14M5 12h14" stroke-linecap="round" />
+    </svg>
+  </button>
+
+  <a
+    class="assistant__action"
+    routerLink="/agent"
+    title="Open the Agent page"
+    aria-label="Open the Agent page"
+    (click)="ui.closeAssistant()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="16"
+      height="16"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+    >
+      <path d="M14 4h6v6M20 4l-8 8M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5" />
+    </svg>
+  </a>
+</div>
+
+<app-conversation [messages]="store.messages()" [compact]="true" (resend)="store.resend($event)" />
+
+@if (store.requestError()) {
+  <p class="assistant__banner" role="alert">{{ store.requestError() }}</p>
+}
+
+<app-composer
+  [(draft)]="store.draft"
+  [canSend]="store.canSend()"
+  [isStreaming]="store.isStreaming()"
+  [compact]="true"
+  (send)="store.send()"
+  (cancel)="store.cancel()"
+/>

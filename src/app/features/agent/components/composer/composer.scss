@@ -21,6 +21,11 @@
   }
 }
 
+.composer--compact {
+  width: auto;
+  margin: 0 1rem 1rem;
+}
+
 .composer__line {
   flex: 1 1 auto;
   display: flex;
@@ -89,7 +94,7 @@
 }
 
 @media (max-width: 640px) {
-  .composer {
+  .composer:not(.composer--compact) {
     width: 94%;
   }
 }

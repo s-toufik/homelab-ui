@@ -1,0 +1,77 @@
+<section class="hl-card dashboard-panel">
+  <h3 class="hl-card__title">{{ panel().title }}</h3>
+
+  @if (error(); as error) {
+    <p class="hl-error">{{ error }}</p>
+  } @else {
+    @switch (panel().kind) {
+      @case ('gauge') {
+        <div class="dashboard-panel__gauges">
+          @for (reading of readings(); track reading.name) {
+            <app-gauge
+              [value]="reading.value"
+              [max]="panel().max ?? 100"
+              [unit]="panel().unit ?? 'percent'"
+            />
+          } @empty {
+            <p class="hl-empty">{{ loading() ? '…' : 'No data' }}</p>
+          }
+        </div>
+      }
+      @case ('stat') {
+        <div class="dashboard-panel__stats">
+          @for (reading of readings(); track reading.name) {
+            <div class="hl-stat">
+              <span class="hl-stat__value">{{ format(reading.value, panel().unit) }}</span>
+              @if (readings().length > 1) {
+                <span class="hl-stat__label">{{ reading.name }}</span>
+              }
+            </div>
+          } @empty {
+            <p class="hl-empty">{{ loading() ? '…' : 'No data' }}</p>
+          }
+        </div>
+      }
+      @case ('bars') {
+        <ul class="dashboard-panel__bars">
+          @for (reading of readings(); track reading.name) {
+            <li>
+              <span class="dashboard-panel__bar-name">{{ reading.name }}</span>
+              <span class="dashboard-panel__bar">
+                <span
+                  class="dashboard-panel__bar-fill"
+                  [style.width.%]="barPercent(reading)"
+                ></span>
+              </span>
+              <span class="dashboard-panel__bar-value">{{
+                format(reading.value, panel().unit)
+              }}</span>
+            </li>
+          } @empty {
+            <li class="hl-empty">{{ loading() ? '…' : 'No data' }}</li>
+          }
+        </ul>
+      }
+      @case ('timeseries') {
+        <app-time-series-chart
+          [series]="series()"
+          [unit]="panel().unit ?? 'number'"
+          [height]="200"
+        />
+      }
+      @case ('logs') {
+        <ol class="dashboard-panel__logs">
+          @for (line of lines(); track line.id) {
+            <li>
+              <time class="hl-muted">{{ line.timeMs | date: 'MMM d HH:mm:ss' }}</time>
+              <span class="dashboard-panel__stream">{{ streamName(line.labels) }}</span>
+              <span class="dashboard-panel__line">{{ line.line }}</span>
+            </li>
+          } @empty {
+            <li class="hl-empty">{{ loading() ? '…' : 'No matching lines.' }}</li>
+          }
+        </ol>
+      }
+    }
+  }
+</section>

@@ -1,0 +1,108 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.kafka-page__summary {
+  margin: 0.5rem 0 0;
+  color: var(--text-muted);
+}
+
+.kafka-page__create {
+  align-items: flex-end;
+}
+
+.kafka-page__full {
+  flex: 1 1 100%;
+}
+
+.kafka-page__body {
+  display: grid;
+  gap: 1rem;
+
+  &--split {
+    grid-template-columns: minmax(18rem, 2fr) minmax(0, 3fr);
+  }
+}
+
+.kafka-page__toolbar {
+  margin-bottom: 0.6rem;
+}
+
+.kafka-page__title {
+  margin: 0;
+}
+
+.kafka-page__spacer {
+  flex: 1 1 auto;
+}
+
+.kafka-page__check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.kafka-page__row--active {
+  background: var(--accent-soft);
+}
+
+.kafka-page__send {
+  margin-bottom: 0.75rem;
+}
+
+.kafka-page__partition {
+  width: 6.5rem;
+}
+
+.kafka-page__messages {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    border-bottom: 1px solid var(--border);
+  }
+}
+
+.kafka-page__message {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.4rem 0.3rem;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.8rem;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.kafka-page__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.kafka-page__lag {
+  color: var(--warning);
+  font-weight: 600;
+}
+
+@media (max-width: 1000px) {
+  .kafka-page__body--split {
+    grid-template-columns: 1fr;
+  }
+}

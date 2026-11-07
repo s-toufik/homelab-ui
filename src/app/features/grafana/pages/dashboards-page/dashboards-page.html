@@ -1,0 +1,36 @@
+<div class="hl-page">
+  <app-page-header
+    [title]="dashboard().title"
+    eyebrow="Dashboards"
+    [summary]="dashboard().description"
+  >
+    <app-time-range [(range)]="range" (refresh)="refresh()" />
+  </app-page-header>
+
+  <nav class="hl-tabs" aria-label="Dashboards">
+    @for (item of dashboards; track item.id) {
+      <a
+        class="hl-tab"
+        [class.hl-tab--active]="item.id === dashboard().id"
+        [routerLink]="['/dashboards', item.id]"
+      >
+        {{ item.title }}
+      </a>
+    }
+  </nav>
+
+  @for (section of dashboard().sections; track $index) {
+    @if (section.title) {
+      <h2 class="dashboards-page__section">{{ section.title }}</h2>
+    }
+    <div class="dashboards-page__grid">
+      @for (panel of section.panels; track panel.title + $index) {
+        <app-dashboard-panel
+          [class]="'dashboards-page__panel--' + panel.width"
+          [panel]="panel"
+          [window]="window()"
+        />
+      }
+    </div>
+  }
+</div>

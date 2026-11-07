@@ -20,7 +20,16 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'gateway/keycloak',
     description: 'Accounts, passwords and the sign-in pages.',
     check: health('keycloak'),
-    links: [{ label: 'Your account', port: 8443, path: '/realms/homelab/account' }],
+    links: [{ label: 'Your account', route: '/account' }],
+  },
+  {
+    id: 'kube-api',
+    label: 'kube-api',
+    group: 'Gateway',
+    folder: 'gateway/kube-api',
+    description: 'The Kubernetes API for the Kubernetes page, admins only.',
+    check: health('kube-api'),
+    links: [{ label: 'Kubernetes', route: '/kubernetes' }],
   },
   {
     id: 'oauth2-proxy',
@@ -76,7 +85,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'message-broker/kafka-ui',
     description: 'Browse topics, messages and consumer groups.',
     check: health('kafka-ui'),
-    links: [{ label: 'Open', port: 8080, path: '/' }],
+    links: [{ label: 'Kafka', route: '/kafka' }],
   },
   {
     id: 'prometheus',
@@ -85,10 +94,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'observability/prometheus',
     description: 'Metrics storage and queries.',
     check: health('prometheus'),
-    links: [
-      { label: 'Query', port: 9090, path: '/query' },
-      { label: 'Targets', port: 9090, path: '/targets' },
-    ],
+    links: [{ label: 'Metrics', route: '/metrics' }],
   },
   {
     id: 'kafka-exporter',
@@ -115,7 +121,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'observability/loki',
     description: 'Log storage, browsed in Grafana.',
     check: health('loki'),
-    links: [{ label: 'API', port: 3100, path: '/ready' }],
+    links: [{ label: 'Logs', route: '/logs' }],
   },
   {
     id: 'tempo',
@@ -124,7 +130,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'observability/tempo',
     description: 'Trace storage, browsed in Grafana.',
     check: health('tempo'),
-    links: [{ label: 'API', port: 3200, path: '/ready' }],
+    links: [{ label: 'Traces', route: '/traces' }],
   },
   {
     id: 'otel-collector',
@@ -143,10 +149,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'observability/alloy',
     description: 'Collects host metrics and container logs.',
     check: health('alloy'),
-    links: [
-      { label: 'Components', port: 12345, path: '/' },
-      { label: 'Graph', port: 12345, path: '/graph' },
-    ],
+    links: [{ label: 'Pipeline', route: '/pipeline' }],
   },
   {
     id: 'grafana',
@@ -155,10 +158,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'observability/grafana',
     description: 'Dashboards for metrics, logs and traces.',
     check: health('grafana'),
-    links: [
-      { label: 'Dashboards', port: 3000, path: '/dashboards' },
-      { label: 'Explore', port: 3000, path: '/explore' },
-    ],
+    links: [{ label: 'Dashboards', route: '/dashboards' }],
   },
   {
     id: 'llm',
@@ -167,10 +167,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'llm/llm',
     description: 'Local models behind an OpenAI-compatible API.',
     check: health('llm'),
-    links: [
-      { label: 'Playground', port: 8090, path: '/ui' },
-      { label: 'Loaded models', port: 8090, path: '/running' },
-    ],
+    links: [{ label: 'Models', route: '/models' }],
     connection: 'https://{host}:8090/v1 (Authorization: Bearer <LLM_GATEWAY_API_KEY>)',
   },
   {
@@ -189,7 +186,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'llm/mcp-inspector',
     description: "Lists and tries agent-toolbox's tools in the browser, signed in.",
     check: health('mcp-inspector'),
-    links: [{ label: 'Open', port: 6274, path: '/' }],
+    links: [{ label: 'Tools', route: '/tools' }],
   },
   {
     id: 'homelab-ui',
@@ -198,7 +195,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'apps/homelab-ui',
     description: 'This interface.',
     check: health('homelab-ui'),
-    links: [{ label: 'Home', port: null, path: '/' }],
+    links: [{ label: 'Control center', route: '/' }],
   },
   {
     id: 'agent-runtime',
@@ -208,7 +205,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     description: 'The homelab agent (tailnet only).',
     check: health('agent-runtime'),
     links: [
-      { label: 'Chat', port: null, path: '/agent' },
+      { label: 'Chat', route: '/agent' },
       { label: 'API docs', port: 8000, path: '/docs', scheme: 'http' },
     ],
     connection: 'http://{host}:8000',
@@ -220,7 +217,7 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'apps/agent-toolbox',
     description: "The agent's tools (files, Python), kept away from the databases (tailnet only).",
     check: health('agent-toolbox'),
-    links: [{ label: 'MCP Inspector', port: 6274, path: '/' }],
+    links: [{ label: 'Tools', route: '/tools' }],
     connection: 'http://{host}:8001/mcp',
   },
 ];

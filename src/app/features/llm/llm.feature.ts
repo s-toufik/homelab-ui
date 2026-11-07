@@ -9,14 +9,14 @@ export function provideLlmFeature(): Provider {
     return {
       id: 'llm',
       label: 'Models',
-      description: 'llama-swap: loaded models, logs and a playground.',
+      description: 'Load and unload models, follow their logs, try a prompt.',
       category: 'AI',
       color: '#8b5cf6',
       icon: [
         'M8 6h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2Z',
         'M9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4',
       ],
-      entry: { kind: 'link', url: server.url(LLM) },
+      entry: { kind: 'page', path: '/models' },
       checkHealth: () => server.isReachable(LLM),
     };
   });

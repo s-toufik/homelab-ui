@@ -1,0 +1,124 @@
+<div class="hl-page">
+  <app-page-header title="Account" eyebrow="Keycloak" [summary]="profile()?.username ?? ''">
+    <a class="hl-btn" [href]="session.signOutUrl">Sign out</a>
+  </app-page-header>
+
+  @if (error(); as error) {
+    <p class="hl-error" role="alert">{{ error }}</p>
+  }
+
+  <div class="hl-grid">
+    <section class="hl-card">
+      <h2 class="hl-card__title">Profile</h2>
+      @if (profile(); as profile) {
+        <form class="account-page__form" (ngSubmit)="save()">
+          <label class="hl-field">
+            Username
+            <input class="hl-input" [value]="profile.username" disabled />
+          </label>
+          <label class="hl-field">
+            First name
+            <input
+              class="hl-input"
+              name="firstName"
+              [ngModel]="profile.firstName"
+              (ngModelChange)="update('firstName', $event)"
+            />
+          </label>
+          <label class="hl-field">
+            Last name
+            <input
+              class="hl-input"
+              name="lastName"
+              [ngModel]="profile.lastName"
+              (ngModelChange)="update('lastName', $event)"
+            />
+          </label>
+          <label class="hl-field">
+            Email
+            <input
+              class="hl-input"
+              name="email"
+              type="email"
+              [ngModel]="profile.email"
+              (ngModelChange)="update('email', $event)"
+            />
+          </label>
+          <div class="hl-row">
+            <button type="submit" class="hl-btn hl-btn--primary" [disabled]="saving()">
+              {{ saving() ? 'Saving…' : 'Save' }}
+            </button>
+            @if (saved()) {
+              <span class="account-page__ok">Saved.</span>
+            }
+          </div>
+        </form>
+      } @else {
+        <p class="hl-empty">Loading…</p>
+      }
+    </section>
+
+    <section class="hl-card">
+      <h2 class="hl-card__title">Signing in</h2>
+      <ul class="account-page__list">
+        @for (credential of credentials(); track $index) {
+          <li>
+            <strong>{{ credential.label }}</strong>
+            @if (credential.createdMs) {
+              <span class="hl-muted">set {{ credential.createdMs | date: 'mediumDate' }}</span>
+            }
+          </li>
+        }
+      </ul>
+      <p class="hl-muted account-page__note">
+        Passwords expire after 90 days. Changing it opens Keycloak's page, then you sign in again.
+      </p>
+      <a class="hl-btn" [href]="changePasswordUrl" target="_blank" rel="noopener"
+        >Change password</a
+      >
+    </section>
+  </div>
+
+  <section class="hl-card">
+    <div class="hl-row account-page__head">
+      <h2 class="hl-card__title">Devices and sessions</h2>
+      <button type="button" class="hl-btn hl-btn--small" (click)="endOthers()">
+        Sign out other sessions
+      </button>
+    </div>
+    <ul class="account-page__list">
+      @for (device of devices(); track device.id) {
+        <li class="account-page__device">
+          <div>
+            <strong>{{ device.label }}</strong>
+            @if (device.current) {
+              <span class="hl-badge hl-badge--ok">this device</span>
+            }
+            <span class="hl-muted"> · last active {{ device.lastAccess | date: 'short' }}</span>
+          </div>
+          @for (signedIn of device.sessions; track signedIn.id) {
+            <div class="account-page__session">
+              <span class="hl-mono">{{ signedIn.ipAddress }}</span>
+              <span class="hl-muted"
+                >started {{ signedIn.started | date: 'short' }}, ends
+                {{ signedIn.expires | date: 'short' }}</span
+              >
+              <span class="hl-muted">{{ signedIn.clients.join(', ') }}</span>
+              @if (!signedIn.current) {
+                <button
+                  type="button"
+                  class="hl-btn hl-btn--small hl-btn--danger"
+                  (click)="end(signedIn.id)"
+                >
+                  Sign out
+                </button>
+              }
+            </div>
+          }
+        </li>
+      } @empty {
+        <li class="hl-empty">No sessions.</li>
+      }
+    </ul>
+  </section>
+</div>

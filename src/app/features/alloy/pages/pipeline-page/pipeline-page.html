@@ -1,0 +1,92 @@
+<div class="hl-page">
+  <app-page-header title="Pipeline" eyebrow="Alloy">
+    <p summary class="pipeline-page__summary">
+      {{ components().length }} components
+      @if (unhealthy()) {
+        · <span class="pipeline-page__bad">{{ unhealthy() }} not healthy</span>
+      }
+    </p>
+    <button type="button" class="hl-btn" (click)="load()">Refresh</button>
+  </app-page-header>
+
+  @if (error(); as error) {
+    <p class="hl-error" role="alert">{{ error }}</p>
+  }
+
+  <div class="pipeline-page__body" [class.pipeline-page__body--split]="selected()">
+    <div class="hl-grid">
+      @for (group of groups(); track group.kind) {
+        <section class="hl-card">
+          <h2 class="hl-card__title">{{ group.kind }}</h2>
+          <ul class="pipeline-page__list">
+            @for (component of group.components; track component.id) {
+              <li>
+                <button
+                  type="button"
+                  class="pipeline-page__component"
+                  [class.pipeline-page__component--active]="selected()?.id === component.id"
+                  (click)="open(component)"
+                >
+                  <span
+                    class="hl-badge"
+                    [class.hl-badge--ok]="component.health === 'healthy'"
+                    [class.hl-badge--bad]="
+                      component.health === 'unhealthy' || component.health === 'exited'
+                    "
+                    [class.hl-badge--muted]="component.health === 'unknown'"
+                    >{{ component.health }}</span
+                  >
+                  <span class="hl-mono">{{ component.id }}</span>
+                </button>
+                @if (component.message && component.health !== 'healthy') {
+                  <p class="pipeline-page__message">{{ component.message }}</p>
+                }
+              </li>
+            }
+          </ul>
+        </section>
+      }
+    </div>
+
+    @if (selected(); as component) {
+      <section class="hl-card pipeline-page__details">
+        <div class="hl-row pipeline-page__head">
+          <h2 class="hl-card__title hl-mono">{{ component.id }}</h2>
+          <button type="button" class="hl-btn hl-btn--small" (click)="selected.set(null)">
+            Close
+          </button>
+        </div>
+        @if (component.referencesTo.length) {
+          <p class="hl-muted">Sends to</p>
+          <div class="hl-row">
+            @for (id of component.referencesTo; track id) {
+              <button
+                type="button"
+                class="hl-btn hl-btn--small hl-mono"
+                (click)="find(id) && open(find(id)!)"
+              >
+                {{ id }}
+              </button>
+            }
+          </div>
+        }
+        @if (component.referencedBy.length) {
+          <p class="hl-muted">Receives from</p>
+          <div class="hl-row">
+            @for (id of component.referencedBy; track id) {
+              <button
+                type="button"
+                class="hl-btn hl-btn--small hl-mono"
+                (click)="find(id) && open(find(id)!)"
+              >
+                {{ id }}
+              </button>
+            }
+          </div>
+        }
+        <p class="hl-muted">Arguments, exports and debug information</p>
+        <pre class="hl-pre">{{ details() }}</pre>
+      </section>
+    }
+  </div>
+</div>

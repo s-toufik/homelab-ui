@@ -14,7 +14,7 @@
     routerLink="/"
     routerLinkActive="nav-sidebar__brand--active"
     [routerLinkActiveOptions]="{ exact: true }"
-    aria-label="Homelab overview"
+    aria-label="Control center"
     (click)="ui.collapseNavPeek()"
   >
     <span class="nav-sidebar__logo" aria-hidden="true">
@@ -69,47 +69,17 @@
 
   <h2 class="nav-sidebar__section">Apps</h2>
   <ul class="nav-sidebar__list">
-    @for (feature of features; track feature.id) {
+    @for (feature of features(); track feature.id) {
       <li>
-        @if (feature.entry.kind === 'page') {
-          <a
-            class="nav-sidebar__link"
-            [routerLink]="feature.entry.path"
-            routerLinkActive="nav-sidebar__link--active"
-            (click)="ui.collapseNavPeek()"
-          >
-            <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
-            {{ feature.label }}
-          </a>
-        } @else {
-          <a
-            class="nav-sidebar__link"
-            [href]="feature.entry.url"
-            target="_blank"
-            rel="noopener"
-            (click)="ui.collapseNavPeek()"
-          >
-            <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
-            {{ feature.label }}
-            <svg
-              class="nav-sidebar__external"
-              viewBox="0 0 24 24"
-              width="13"
-              height="13"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              aria-label="Opens in a new tab"
-              role="img"
-            >
-              <path
-                d="M14 4h6v6M20 4l-9 9M18 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h5"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-              />
-            </svg>
-          </a>
-        }
+        <a
+          class="nav-sidebar__link"
+          [routerLink]="feature.entry.path"
+          routerLinkActive="nav-sidebar__link--active"
+          (click)="ui.collapseNavPeek()"
+        >
+          <span class="nav-sidebar__swatch" [style.background]="feature.color"></span>
+          {{ feature.label }}
+        </a>
       </li>
     }
   </ul>

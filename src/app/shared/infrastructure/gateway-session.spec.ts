@@ -40,6 +40,25 @@ describe('GatewaySession', () => {
     expect(current.user()).toEqual({ username: 'toufik', email: 'toufik@example.com' });
   });
 
+  it('is admin only with the realm role admin', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ preferredUsername: 'toufik', groups: ['role:admin'] })),
+      )
+      .mockResolvedValueOnce(
+        new Response(JSON.stringify({ preferredUsername: 'guest', groups: ['role:user'] })),
+      );
+    vi.stubGlobal('fetch', fetch);
+    const current = session('gateway');
+
+    await current.load();
+    const admin = current.isAdmin();
+    await current.load();
+
+    expect([admin, current.isAdmin()]).toEqual([true, false]);
+  });
+
   it('sends the browser to sign in when the session has ended', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 401 })));
     const current = session('gateway');

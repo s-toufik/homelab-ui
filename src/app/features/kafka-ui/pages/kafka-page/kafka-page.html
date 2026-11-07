@@ -1,0 +1,309 @@
+<div class="hl-page">
+  <app-page-header title="Kafka" eyebrow="Message broker">
+    <p summary class="kafka-page__summary">
+      @if (store.cluster(); as cluster) {
+        {{ cluster.online ? 'Online' : 'Offline' }} · {{ cluster.brokers }} broker(s) ·
+        {{ store.topics().length }} topics · {{ store.groups().length }} consumer groups · lag
+        {{ store.totalLag() | number }}
+      } @else {
+        {{ store.loading() ? 'Loading…' : '' }}
+      }
+    </p>
+    <button type="button" class="hl-btn" [disabled]="store.loading()" (click)="store.load()">
+      Refresh
+    </button>
+    @if (isAdmin()) {
+      <button type="button" class="hl-btn hl-btn--primary" (click)="creating.set(!creating())">
+        New topic
+      </button>
+    }
+  </app-page-header>
+
+  @if (store.error(); as error) {
+    <p class="hl-error" role="alert">{{ error }}</p>
+  }
+
+  @if (creating()) {
+    <form class="hl-card hl-row kafka-page__create" (ngSubmit)="create()">
+      <label class="hl-field hl-input--grow">
+        Name
+        <input class="hl-input" name="name" required [(ngModel)]="newTopic.name" />
+      </label>
+      <label class="hl-field">
+        Partitions
+        <input
+          class="hl-input"
+          name="partitions"
+          type="number"
+          min="1"
+          [(ngModel)]="newTopic.partitions"
+        />
+      </label>
+      <label class="hl-field">
+        Replication
+        <input
+          class="hl-input"
+          name="replication"
+          type="number"
+          min="1"
+          [(ngModel)]="newTopic.replicationFactor"
+        />
+      </label>
+      <button type="submit" class="hl-btn hl-btn--primary" [disabled]="store.busy()">Create</button>
+      <button type="button" class="hl-btn" (click)="creating.set(false)">Cancel</button>
+      @if (store.actionError(); as error) {
+        <p class="hl-error kafka-page__full">{{ error }}</p>
+      }
+    </form>
+  }
+
+  <nav class="hl-tabs" aria-label="Kafka views">
+    @for (tab of tabs; track tab.id) {
+      <button
+        type="button"
+        class="hl-tab"
+        [class.hl-tab--active]="store.tab() === tab.id"
+        (click)="store.tab.set(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    }
+  </nav>
+
+  @switch (store.tab()) {
+    @case ('topics') {
+      <div class="kafka-page__body" [class.kafka-page__body--split]="store.selected()">
+        <section class="hl-card">
+          <div class="hl-row kafka-page__toolbar">
+            <input
+              class="hl-input hl-input--grow"
+              placeholder="Filter topics"
+              aria-label="Filter topics"
+              [ngModel]="store.filter()"
+              (ngModelChange)="store.filter.set($event)"
+            />
+            <label class="kafka-page__check">
+              <input
+                type="checkbox"
+                [ngModel]="store.showInternal()"
+                (ngModelChange)="store.showInternal.set($event); store.load()"
+              />
+              Internal topics
+            </label>
+          </div>
+          <div class="hl-table-wrap">
+            <table class="hl-table">
+              <thead>
+                <tr>
+                  <th>Topic</th>
+                  <th class="hl-num">Partitions</th>
+                  <th class="hl-num">Messages</th>
+                  <th class="hl-num">Size</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (topic of store.shownTopics(); track topic.name) {
+                  <tr
+                    class="hl-clickable"
+                    [class.kafka-page__row--active]="store.selected()?.name === topic.name"
+                    (click)="store.open(topic)"
+                  >
+                    <td>
+                      {{ topic.name }}
+                      @if (topic.underReplicated) {
+                        <span class="hl-badge hl-badge--warn"
+                          >{{ topic.underReplicated }} under-replicated</span
+                        >
+                      }
+                    </td>
+                    <td class="hl-num">{{ topic.partitions }}</td>
+                    <td class="hl-num">{{ topic.messages | number }}</td>
+                    <td class="hl-num">{{ bytes(topic.sizeBytes) }}</td>
+                  </tr>
+                } @empty {
+                  <tr>
+                    <td colspan="4" class="hl-empty">No topics.</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        @if (store.selected(); as topic) {
+          <section class="hl-card kafka-page__topic">
+            <div class="hl-row kafka-page__toolbar">
+              <h2 class="hl-card__title kafka-page__title">{{ topic.name }}</h2>
+              <span class="hl-muted"
+                >{{ topic.partitions }} partitions · replication {{ topic.replicationFactor }} ·
+                {{ topic.cleanupPolicy }}</span
+              >
+              <span class="kafka-page__spacer"></span>
+              <button type="button" class="hl-btn hl-btn--small" (click)="store.loadMessages(true)">
+                Newest
+              </button>
+              <button
+                type="button"
+                class="hl-btn hl-btn--small"
+                (click)="store.loadMessages(false)"
+              >
+                Oldest
+              </button>
+              @if (isAdmin()) {
+                <button
+                  type="button"
+                  class="hl-btn hl-btn--small hl-btn--danger"
+                  [disabled]="store.busy()"
+                  (click)="remove()"
+                >
+                  Delete
+                </button>
+              }
+              <button type="button" class="hl-btn hl-btn--small" (click)="store.close()">
+                Close
+              </button>
+            </div>
+
+            @if (store.actionError(); as error) {
+              <p class="hl-error">{{ error }}</p>
+            }
+
+            @if (isAdmin()) {
+              <form class="hl-row kafka-page__send" (ngSubmit)="send()">
+                <input
+                  class="hl-input"
+                  name="key"
+                  placeholder="Key (optional)"
+                  [(ngModel)]="newMessage.key"
+                />
+                <input
+                  class="hl-input hl-input--mono hl-input--grow"
+                  name="value"
+                  placeholder="Value"
+                  required
+                  [(ngModel)]="newMessage.value"
+                />
+                <input
+                  class="hl-input kafka-page__partition"
+                  name="partition"
+                  type="number"
+                  min="0"
+                  placeholder="Partition"
+                  [(ngModel)]="newMessage.partition"
+                />
+                <button type="submit" class="hl-btn hl-btn--primary" [disabled]="store.busy()">
+                  Send
+                </button>
+              </form>
+            }
+
+            @if (store.messagesError(); as error) {
+              <p class="hl-error">{{ error }}</p>
+            } @else if (store.messagesLoading()) {
+              <p class="hl-empty">Reading messages…</p>
+            } @else {
+              <ol class="kafka-page__messages">
+                @for (message of store.messages(); track message.partition + ':' + message.offset) {
+                  @let id = message.partition + ':' + message.offset;
+                  <li>
+                    <button type="button" class="kafka-page__message" (click)="toggle(id)">
+                      <span class="hl-muted">{{ message.timestamp | date: 'MMM d HH:mm:ss' }}</span>
+                      <span class="hl-mono hl-muted"
+                        >p{{ message.partition }} #{{ message.offset }}</span
+                      >
+                      @if (message.key) {
+                        <span class="hl-badge">{{ message.key }}</span>
+                      }
+                      <span class="kafka-page__value hl-mono">{{ message.value }}</span>
+                    </button>
+                    @if (expanded() === id) {
+                      <pre class="hl-pre">{{ pretty(message.value) }}</pre>
+                    }
+                  </li>
+                } @empty {
+                  <li class="hl-empty">No messages.</li>
+                }
+              </ol>
+            }
+          </section>
+        }
+      </div>
+    }
+
+    @case ('groups') {
+      <section class="hl-card">
+        <div class="hl-table-wrap">
+          <table class="hl-table">
+            <thead>
+              <tr>
+                <th>Group</th>
+                <th>State</th>
+                <th class="hl-num">Members</th>
+                <th class="hl-num">Topics</th>
+                <th class="hl-num">Lag</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (group of store.groups(); track group.id) {
+                <tr>
+                  <td>{{ group.id }}</td>
+                  <td>
+                    <span
+                      class="hl-badge"
+                      [class.hl-badge--ok]="group.state === 'STABLE'"
+                      [class.hl-badge--warn]="group.state !== 'STABLE' && group.state !== 'EMPTY'"
+                      >{{ group.state }}</span
+                    >
+                  </td>
+                  <td class="hl-num">{{ group.members }}</td>
+                  <td class="hl-num">{{ group.topics }}</td>
+                  <td class="hl-num" [class.kafka-page__lag]="group.lag > 0">
+                    {{ group.lag | number }}
+                  </td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="5" class="hl-empty">No consumer groups.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+
+    @case ('brokers') {
+      <section class="hl-card">
+        <div class="hl-table-wrap">
+          <table class="hl-table">
+            <thead>
+              <tr>
+                <th>Broker</th>
+                <th>Address</th>
+                <th class="hl-num">Data</th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (broker of store.brokers(); track broker.id) {
+                <tr>
+                  <td>{{ broker.id }}</td>
+                  <td class="hl-mono">{{ broker.host }}:{{ broker.port }}</td>
+                  <td class="hl-num">{{ bytes(broker.sizeBytes) }}</td>
+                </tr>
+              } @empty {
+                <tr>
+                  <td colspan="3" class="hl-empty">No brokers.</td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+        @if (store.cluster(); as cluster) {
+          <p class="hl-muted">
+            Kafka {{ cluster.version }} · {{ cluster.onlinePartitions }} partitions online
+          </p>
+        }
+      </section>
+    }
+  }
+</div>

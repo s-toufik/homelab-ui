@@ -8,7 +8,7 @@ export function provideAlloyFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'alloy',
-      label: 'Alloy',
+      label: 'Pipeline',
       description: 'Collection pipelines for host metrics and container logs.',
       category: 'Observability',
       color: '#14b8a6',
@@ -18,7 +18,7 @@ export function provideAlloyFeature(): Provider {
         'M17 12a2 2 0 1 0 4 0a2 2 0 1 0-4 0',
         'M7 6h3a3 3 0 0 1 3 3a3 3 0 0 0 3 3h1M7 18h3a3 3 0 0 0 3-3a3 3 0 0 1 3-3',
       ],
-      entry: { kind: 'link', url: server.url(ALLOY) },
+      entry: { kind: 'page', path: '/pipeline' },
       checkHealth: () => server.isReachable(ALLOY),
     };
   });

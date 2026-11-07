@@ -1,0 +1,7 @@
+{
+  "key": "loki",
+  "port": 3100,
+  "subpath": null,
+  "healthPath": "/ready",
+  "api": "/api/loki"
+}

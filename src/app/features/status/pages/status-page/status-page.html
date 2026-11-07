@@ -52,14 +52,18 @@
                 @if (service.links.length || connection(service)) {
                   <div class="status-page__access">
                     @for (link of service.links; track link.label) {
-                      <a
-                        class="status-page__link"
-                        [href]="href(link)"
-                        target="_blank"
-                        rel="noopener"
-                      >
-                        {{ link.label }}
-                      </a>
+                      @if (route(link); as path) {
+                        <a class="status-page__link" [routerLink]="path">{{ link.label }}</a>
+                      } @else {
+                        <a
+                          class="status-page__link"
+                          [href]="href(link)"
+                          target="_blank"
+                          rel="noopener"
+                        >
+                          {{ link.label }}
+                        </a>
+                      }
                     }
                     @if (connection(service); as text) {
                       <button

@@ -1,0 +1,127 @@
+:host {
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart {
+  position: relative;
+  width: 100%;
+}
+
+.chart__svg {
+  display: block;
+  overflow: visible;
+}
+
+.chart__grid {
+  stroke: var(--border);
+  stroke-width: 1;
+}
+
+.chart__label {
+  fill: var(--text-muted);
+  font-size: 0.68rem;
+  font-family: var(--font-sans);
+}
+
+.chart__line {
+  fill: none;
+  stroke-width: 1.6;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.chart__area {
+  opacity: 0.14;
+  stroke: none;
+}
+
+.chart__cursor {
+  stroke: var(--text-muted);
+  stroke-dasharray: 3 3;
+}
+
+.chart__tooltip {
+  position: absolute;
+  top: 0.5rem;
+  z-index: 2;
+  min-width: 10rem;
+  max-width: 22rem;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-float);
+  font-size: 0.75rem;
+  pointer-events: none;
+}
+
+.chart__tooltip-title {
+  margin-bottom: 0.3rem;
+  color: var(--text-muted);
+}
+
+.chart__tooltip-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.chart__tooltip-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chart__tooltip-value {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.chart__swatch {
+  flex: 0 0 auto;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: 2px;
+}
+
+.chart__empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+.chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.75rem;
+  margin: 0.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  max-height: 6rem;
+  overflow-y: auto;
+}
+
+.chart__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.75rem;
+  cursor: pointer;
+
+  &--off {
+    opacity: 0.4;
+  }
+}

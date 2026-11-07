@@ -1,0 +1,7 @@
+{
+  "key": "tempo",
+  "port": 3200,
+  "subpath": null,
+  "healthPath": "/ready",
+  "api": "/api/tempo"
+}

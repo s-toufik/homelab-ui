@@ -1,4 +1,4 @@
-import { Component, effect, inject } from '@angular/core';
+import { Component, computed, effect, inject } from '@angular/core';
 import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
 import { RouterLink, RouterLinkActive } from '@angular/router';
@@ -25,11 +25,14 @@ export class NavSidebar {
     unknown: 'No data',
   } as const;
 
-  protected readonly features = [...(inject(HOMELAB_FEATURES, { optional: true }) ?? [])].sort(
+  private readonly allFeatures = [...(inject(HOMELAB_FEATURES, { optional: true }) ?? [])].sort(
     (a, b) => FEATURE_CATEGORIES.indexOf(a.category) - FEATURE_CATEGORIES.indexOf(b.category),
   );
   protected readonly host = inject(HomelabServer).host;
   protected readonly session = inject(GatewaySession);
+  protected readonly features = computed(() =>
+    this.allFeatures.filter((feature) => !feature.adminOnly || this.session.isAdmin()),
+  );
 
   protected initial(username: string): string {
     return username.charAt(0).toUpperCase();

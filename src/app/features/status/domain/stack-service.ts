@@ -13,13 +13,15 @@ export type ServiceCheck =
   | { readonly kind: 'health'; readonly key: string }
   | { readonly kind: 'metric'; readonly query: string };
 
-export interface ServiceLink {
-  readonly label: string;
-  readonly port: number | null;
-  readonly path: string;
-  /** 'http' for a port published directly on the tailnet, not served by the HTTPS gateway */
-  readonly scheme?: 'http';
-}
+export type ServiceLink =
+  | { readonly label: string; readonly route: string }
+  | {
+      readonly label: string;
+      readonly port: number | null;
+      readonly path: string;
+      /** 'http' for a port published directly on the tailnet, not served by the HTTPS gateway */
+      readonly scheme?: 'http';
+    };
 
 export interface StackService {
   readonly id: string;

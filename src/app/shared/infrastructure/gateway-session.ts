@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
 import { API_ROUTING } from './homelab-server';
 
 export interface SignedInUser {
@@ -10,9 +10,11 @@ interface UserInfoResponse {
   readonly user?: string;
   readonly email?: string;
   readonly preferredUsername?: string;
+  readonly groups?: readonly string[];
 }
 
 const USERINFO_PATH = '/oauth2/userinfo';
+const ADMIN_GROUP = 'role:admin';
 const TIMEOUT_MS = 4000;
 const CHECK_INTERVAL_MS = 60_000;
 
@@ -21,6 +23,8 @@ export class GatewaySession {
   private readonly destroyRef = inject(DestroyRef);
   readonly enabled = inject(API_ROUTING) === 'gateway';
   readonly user = signal<SignedInUser | null>(null);
+  readonly groups = signal<readonly string[]>([]);
+  readonly isAdmin = computed(() => !this.enabled || this.groups().includes(ADMIN_GROUP));
   readonly signOutUrl = '/oauth2/sign_out?rd=%2F';
 
   async load(): Promise<void> {
@@ -41,6 +45,7 @@ export class GatewaySession {
     const body = (await response.json().catch(() => ({}))) as UserInfoResponse;
     const username = body.preferredUsername || body.user;
     if (username) this.user.set({ username, email: body.email ?? null });
+    this.groups.set(body.groups ?? []);
   }
 
   watch(): void {
