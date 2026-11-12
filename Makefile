@@ -45,7 +45,7 @@ docker_build:
 # Publishes the image homelab-infra runs, for both x86-64 servers and ARM machines.
 # Needs `docker login` and a buildx builder (Docker Desktop has one). TAG=1.2.0 for a release.
 IMAGE ?= toufik142/homelab-ui
-TAG ?= latest
+TAG ?= manual
 docker_publish:
 	docker buildx build --platform linux/amd64,linux/arm64 \
 	  -f devops/docker/Dockerfile -t $(IMAGE):$(TAG) --push .

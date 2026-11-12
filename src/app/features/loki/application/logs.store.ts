@@ -2,10 +2,11 @@ import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core'
 import { seriesName } from '@shared/infrastructure/prometheus-query.service';
 import type { ChartSeries } from '@shared/ui/charts/time-series-chart';
 import { type TimeRangeId, timeWindow } from '@shared/ui/time-range/time-range';
-import type { LogLevel, LogLine } from '@shared/domain/log-line';
+import { type LogLevel, type LogLine, normalizeLevel } from '@shared/domain/log-line';
 import { LokiQueryService } from '@shared/infrastructure/loki-query.service';
 
 const LIVE_INTERVAL_MS = 5000;
+const LEVEL_ORDER: LogLevel[] = ['error', 'warn', 'info', 'debug', 'unknown'];
 const LEVEL_COLORS: Record<string, string> = {
   error: 'var(--danger)',
   warn: 'var(--warning)',
@@ -81,12 +82,7 @@ export class LogsStore {
         { stepSec },
       );
       if (result.kind !== 'series') return;
-      this.volume.set(
-        result.series.map((entry) => {
-          const level = entry.labels['detected_level'] ?? 'unknown';
-          return { name: level, points: entry.points, color: LEVEL_COLORS[level] };
-        }),
-      );
+      this.volume.set(volumeByLevel(result.series));
     } catch {
       this.volume.set([]);
     }
@@ -140,4 +136,24 @@ export class LogsStore {
     if (this.timer) clearInterval(this.timer);
     this.timer = null;
   }
+}
+
+export function volumeByLevel(
+  series: readonly {
+    labels: Record<string, string>;
+    points: readonly (readonly [number, number])[];
+  }[],
+): ChartSeries[] {
+  const byLevel = new Map<LogLevel, Map<number, number>>();
+  for (const entry of series) {
+    const level = normalizeLevel(entry.labels['detected_level'] ?? 'unknown');
+    const points = byLevel.get(level) ?? new Map<number, number>();
+    for (const [time, value] of entry.points) points.set(time, (points.get(time) ?? 0) + value);
+    byLevel.set(level, points);
+  }
+  return LEVEL_ORDER.filter((level) => byLevel.has(level)).map((level) => ({
+    name: level,
+    points: [...byLevel.get(level)!.entries()].sort(([a], [b]) => a - b),
+    color: LEVEL_COLORS[level],
+  }));
 }

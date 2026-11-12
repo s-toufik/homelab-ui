@@ -122,6 +122,15 @@
                     <span class="hl-muted">{{ pair[0] }}=</span>{{ pair[1] }}
                   </button>
                 }
+                @if (traceIdOf(line.labels); as traceId) {
+                  <a
+                    class="logs-page__trace"
+                    routerLink="/traces"
+                    [queryParams]="{ trace: traceId }"
+                  >
+                    Open its trace →
+                  </a>
+                }
                 <pre class="hl-pre logs-page__full">{{ line.line }}</pre>
               </div>
             }

@@ -103,19 +103,19 @@ To try the UI against a backend running on your own machine, set `homelab-server
 
 ## Development
 
-| To…                                                                                                                               | make                              | Raw command                                                                                                                  |
-| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| Install dependencies                                                                                                              | `make install`                    | `npm install`                                                                                                                |
-| Dev server at `http://localhost:4200` (direct to the ports in `homelab-server.json`, no sign-in; the Status page shows _Unknown_) | `make run`                        | `npx ng serve`                                                                                                               |
-| Tests (vitest)                                                                                                                    | `make test`                       | `npx ng test --watch=false`                                                                                                  |
-| Format check / fix                                                                                                                | `make lint` / `make fix`          | `npx prettier --check .` / `npx prettier --write .`                                                                          |
-| Type check                                                                                                                        | `make typecheck`                  | `npx tsc -p tsconfig.app.json --noEmit`                                                                                      |
-| All checks                                                                                                                        | `make check`                      | lint + typecheck + test                                                                                                      |
-| Production build to `dist/homelab-ui`                                                                                             | `make build`                      | `rm -rf dist && npx ng build`                                                                                                |
-| Local image                                                                                                                       | `make docker_build`               | `docker build -f devops/docker/Dockerfile -t homelab-ui:local .`                                                             |
-| Publish a test image (releases: git tag, see below)                                                                               | `make docker_publish [TAG=1.4.0]` | `docker buildx build --platform linux/amd64,linux/arm64 -f devops/docker/Dockerfile -t toufik142/homelab-ui:latest --push .` |
+| To…                                                                                                                               | make                               | Raw command                                                                                                                  |
+| --------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Install dependencies                                                                                                              | `make install`                     | `npm install`                                                                                                                |
+| Dev server at `http://localhost:4200` (direct to the ports in `homelab-server.json`, no sign-in; the Status page shows _Unknown_) | `make run`                         | `npx ng serve`                                                                                                               |
+| Tests (vitest)                                                                                                                    | `make test`                        | `npx ng test --watch=false`                                                                                                  |
+| Format check / fix                                                                                                                | `make lint` / `make fix`           | `npx prettier --check .` / `npx prettier --write .`                                                                          |
+| Type check                                                                                                                        | `make typecheck`                   | `npx tsc -p tsconfig.app.json --noEmit`                                                                                      |
+| All checks                                                                                                                        | `make check`                       | lint + typecheck + test                                                                                                      |
+| Production build to `dist/homelab-ui`                                                                                             | `make build`                       | `rm -rf dist && npx ng build`                                                                                                |
+| Local image                                                                                                                       | `make docker_build`                | `docker build -f devops/docker/Dockerfile -t homelab-ui:local .`                                                             |
+| Publish a test image (releases: git tag, see below)                                                                               | `make docker_publish [TAG=manual]` | `docker buildx build --platform linux/amd64,linux/arm64 -f devops/docker/Dockerfile -t toufik142/homelab-ui:manual --push .` |
 
-`npm start` calls the backends directly on their ports, without the gateway, from a machine on the tailnet: the Agent page and the assistant work against the server's agent-runtime (`http://<your-server>:8000`). The tool pages, PostgREST and the `/api/health` routes exist only behind the gateway, so they need the deployed UI (`https://<server>.<tailnet>.ts.net/`) or a dev image deployed with `make apply R=homelab-ui --set image.tag=dev-<sha>` in homelab-infra.
+`npm start` calls the backends directly on their ports, without the gateway, from a machine on the tailnet: the Agent page and the assistant work against the server's agent-runtime (`http://<your-server>:8000`). The tool pages, PostgREST and the `/api/health` routes exist only behind the gateway, so they need the deployed UI (`https://<server>.<tailnet>.ts.net/`) or a pre-release image deployed with `helmfile -l name=homelab-ui apply --set image.tag=X.Y.Z-rc.N` in homelab-infra.
 
 ## Releasing
 
@@ -127,13 +127,15 @@ The server runs homelab-ui as a Helm release: the chart `oci://ghcr.io/s-toufik/
    git tag v1.4.0
    git push origin v1.4.0
    ```
-3. GitHub Actions: PUBLISH (image `1.4.0`) and CHART (chart `1.4.0`) are green.
+3. GitHub Actions: RELEASE TARGET says `release`, PUBLISH (image `1.4.0`) and CHART (chart `1.4.0`) are green.
 4. In homelab-infra: `apps.homelabUi: 1.4.0` in `environments/versions.yaml`; on the server `make apply R=homelab-ui` (homelab-infra's DevOps guide, Release an app).
 5. Open `https://<server>/status` and reload.
 
+Only a tag on `main` makes a release. A tag only on `develop` is a pre-release, `vX.Y.Z-rc.N`: it publishes the image `X.Y.Z-rc.N` and moves `dev` to it, with no chart, so the server never runs it. A tag on `main` also moves `latest`. Pushes to `develop` and `main` publish nothing. RELEASE TARGET, the same job as in the other repositories with this pipeline, refuses a tag on neither branch, a pre-release on `main` and a final version only on `develop`.
+
 Ports, probes, resources and env variables are in `devops/helm/values.yml`; the next release carries a change there to the server.
 
-`make docker_publish` still pushes `latest` (or `TAG=…`) from a Mac for both `linux/amd64` and `linux/arm64`: built with plain `docker build` on a Mac, an image would be arm64 only and fail on an x86-64 server with `exec format error`. The Dockerfile builds the static files once on the builder's own platform (`--platform=$BUILDPLATFORM`), then copies them into an nginx image for each target.
+`make docker_publish` pushes `manual` (or `TAG=…`; never `latest` or `dev`, which CI moves to the last release and pre-release) from a Mac for both `linux/amd64` and `linux/arm64`: built with plain `docker build` on a Mac, an image would be arm64 only and fail on an x86-64 server with `exec format error`. The Dockerfile builds the static files once on the builder's own platform (`--platform=$BUILDPLATFORM`), then copies them into an nginx image for each target.
 
 ## Pre-commit hooks
 

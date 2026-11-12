@@ -13,10 +13,10 @@ const LEVEL_LABELS = ['level', 'detected_level', 'severity', 'severity_text', 'l
 export function detectLevel(labels: Record<string, string>, line: string): LogLevel {
   for (const key of LEVEL_LABELS) {
     const value = labels[key];
-    if (value) return normalize(value);
+    if (value) return normalizeLevel(value);
   }
   const match = /\b(level|lvl|severity)["'=:\s]+["']?(\w+)/i.exec(line);
-  if (match) return normalize(match[2]);
+  if (match) return normalizeLevel(match[2]);
   if (/\b(ERROR|FATAL|PANIC|CRITICAL|Traceback)\b/.test(line)) return 'error';
   if (/\bWARN(ING)?\b/.test(line)) return 'warn';
   if (/\bINFO\b/.test(line)) return 'info';
@@ -24,13 +24,23 @@ export function detectLevel(labels: Record<string, string>, line: string): LogLe
   return 'unknown';
 }
 
-function normalize(value: string): LogLevel {
+export function normalizeLevel(value: string): LogLevel {
   const lower = value.toLowerCase();
   if (/^(err|error|fatal|panic|crit|critical|alert|emerg)/.test(lower)) return 'error';
   if (/^warn/.test(lower)) return 'warn';
   if (/^(info|notice)/.test(lower)) return 'info';
   if (/^(debug|trace)/.test(lower)) return 'debug';
   return 'unknown';
+}
+
+const TRACE_ID_LABELS = ['trace_id', 'traceid', 'traceID', 'trace.id'];
+
+export function traceIdOf(labels: Record<string, string>): string | null {
+  for (const key of TRACE_ID_LABELS) {
+    const value = labels[key];
+    if (value && /^[0-9a-f]{16,32}$/i.test(value) && !/^0+$/.test(value)) return value;
+  }
+  return null;
 }
 
 export function streamName(labels: Record<string, string>): string {

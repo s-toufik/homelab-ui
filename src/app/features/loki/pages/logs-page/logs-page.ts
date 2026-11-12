@@ -1,15 +1,16 @@
 import { DatePipe } from '@angular/common';
 import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { RouterLink } from '@angular/router';
 import { TimeSeriesChart } from '@shared/ui/charts/time-series-chart';
 import { PageHeader } from '@shared/ui/page-header/page-header';
 import { TimeRange } from '@shared/ui/time-range/time-range';
 import { LogsStore } from '../../application/logs.store';
-import { type LogLevel, streamName } from '@shared/domain/log-line';
+import { type LogLevel, streamName, traceIdOf } from '@shared/domain/log-line';
 
 @Component({
   selector: 'app-logs-page',
-  imports: [FormsModule, DatePipe, PageHeader, TimeRange, TimeSeriesChart],
+  imports: [FormsModule, DatePipe, PageHeader, RouterLink, TimeRange, TimeSeriesChart],
   templateUrl: './logs-page.html',
   styleUrl: './logs-page.scss',
 })
@@ -18,6 +19,7 @@ export class LogsPage {
   protected readonly label = signal('');
   protected readonly levels: LogLevel[] = ['error', 'warn', 'info', 'debug', 'unknown'];
   protected readonly streamName = streamName;
+  protected readonly traceIdOf = traceIdOf;
 
   constructor() {
     void this.store.loadLabels();
