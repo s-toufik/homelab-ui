@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { HOMELAB_SERVER_URL } from '@shared/infrastructure/homelab-server';
+import { API_ROUTING, HOMELAB_SERVER_URL } from '@shared/infrastructure/homelab-server';
 import { AgentModelsService } from './agent-models.service';
 
 describe('AgentModelsService', () => {
@@ -32,6 +32,23 @@ describe('AgentModelsService', () => {
       models: [{ name: 'qwen3-8b', contextTokens: 16384, maxOutputTokens: 4096, thinking: false }],
       pinnedSteps: { act: 'big-model' },
     });
+  });
+
+  it('asks the chosen agent for its models', async () => {
+    const fetch = vi
+      .fn()
+      .mockResolvedValue(new Response(JSON.stringify({ models: [], pinned_steps: {} })));
+    vi.stubGlobal('fetch', fetch);
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: HOMELAB_SERVER_URL, useValue: 'https://homelab' },
+        { provide: API_ROUTING, useValue: 'gateway' },
+      ],
+    });
+
+    await TestBed.inject(AgentModelsService).list('chat');
+
+    expect(fetch.mock.calls[0][0]).toBe('/api/agents/chat/v1/models');
   });
 
   it('fails when the agent does not answer 2xx', async () => {

@@ -15,21 +15,41 @@ function storageWith(entries: Record<string, string> = {}): {
 
 describe('AgentPreferencesStorage', () => {
   it('starts from the defaults when nothing is saved', () => {
-    expect(storageWith().service.read()).toEqual({ modelName: '', autoApprove: false });
+    expect(storageWith().service.read()).toEqual({
+      agentName: 'orchestration',
+      modelName: '',
+      autoApprove: false,
+    });
   });
 
   it('reads back what it wrote', () => {
     const { service } = storageWith();
 
-    service.write({ modelName: 'big-model', autoApprove: true });
+    service.write({ agentName: 'observation', modelName: 'big-model', autoApprove: true });
 
-    expect(service.read()).toEqual({ modelName: 'big-model', autoApprove: true });
+    expect(service.read()).toEqual({
+      agentName: 'observation',
+      modelName: 'big-model',
+      autoApprove: true,
+    });
+  });
+
+  it('falls back to the orchestrator when no agent was saved', () => {
+    const { service } = storageWith({
+      'homelab-ui.agent.preferences': JSON.stringify({ modelName: 'm', autoApprove: true }),
+    });
+
+    expect(service.read().agentName).toBe('orchestration');
   });
 
   it('ignores a corrupted entry', () => {
     const { service } = storageWith({ 'homelab-ui.agent.preferences': '{not json' });
 
-    expect(service.read()).toEqual({ modelName: '', autoApprove: false });
+    expect(service.read()).toEqual({
+      agentName: 'orchestration',
+      modelName: '',
+      autoApprove: false,
+    });
   });
 
   it('works without any storage at all', () => {
@@ -38,8 +58,12 @@ describe('AgentPreferencesStorage', () => {
     });
     const service = TestBed.inject(AgentPreferencesStorage);
 
-    service.write({ modelName: 'x', autoApprove: true });
+    service.write({ agentName: 'chat', modelName: 'x', autoApprove: true });
 
-    expect(service.read()).toEqual({ modelName: '', autoApprove: false });
+    expect(service.read()).toEqual({
+      agentName: 'orchestration',
+      modelName: '',
+      autoApprove: false,
+    });
   });
 });

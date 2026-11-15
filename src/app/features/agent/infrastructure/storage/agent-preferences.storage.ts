@@ -21,6 +21,10 @@ export class AgentPreferencesStorage {
     try {
       const saved = JSON.parse(this.storage?.getItem(STORAGE_KEY) ?? 'null');
       return {
+        agentName:
+          typeof saved?.agentName === 'string' && saved.agentName
+            ? saved.agentName
+            : DEFAULT_PREFERENCES.agentName,
         modelName:
           typeof saved?.modelName === 'string' ? saved.modelName : DEFAULT_PREFERENCES.modelName,
         autoApprove: saved?.autoApprove === true,

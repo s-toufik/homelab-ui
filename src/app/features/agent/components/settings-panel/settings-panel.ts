@@ -1,6 +1,7 @@
 import { Component, computed, input, model, output, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { copyText } from '@shared/utils/clipboard';
+import type { AgentProfile } from '../../domain/agent-directory';
 
 const STEP_LABELS: Readonly<Record<string, string>> = {
   understand: 'Understand',
@@ -17,6 +18,11 @@ const STEP_LABELS: Readonly<Record<string, string>> = {
   styleUrl: './settings-panel.scss',
 })
 export class SettingsPanel {
+  readonly agents = input.required<readonly AgentProfile[]>();
+  readonly agentsError = input<string | null>(null);
+  readonly agentName = input.required<string>();
+  readonly agentChange = output<string>();
+  readonly agent = computed(() => this.agents().find((agent) => agent.name === this.agentName()));
   readonly models = input.required<readonly string[]>();
   readonly pinnedSteps = input.required<Readonly<Record<string, string>>>();
   readonly modelsError = input<string | null>(null);

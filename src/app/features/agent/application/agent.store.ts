@@ -3,9 +3,11 @@ import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 import { newId } from '@shared/utils/uuid';
 import { answerMetadata } from '../domain/answer-metadata';
 import type { ChatMessage } from '../domain/chat-message';
+import type { AgentProfile } from '../domain/agent-directory';
 import { NO_MODELS, type ModelListing } from '../domain/model-catalog';
 import type { StreamEvent } from '../domain/stream-event';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
+import { AgentDirectoryService } from '../infrastructure/api/agent-directory.service';
 import { AgentModelsService } from '../infrastructure/api/agent-models.service';
 import { AgentPreferencesStorage } from '../infrastructure/storage/agent-preferences.storage';
 
@@ -13,9 +15,14 @@ import { AgentPreferencesStorage } from '../infrastructure/storage/agent-prefere
 export class AgentStore {
   private readonly api = inject(AgentApiService);
   private readonly modelCatalog = inject(AgentModelsService);
+  private readonly directory = inject(AgentDirectoryService);
   private readonly preferences = inject(AgentPreferencesStorage);
   private readonly saved = this.preferences.read();
 
+  readonly agents = signal<AgentProfile[]>([]);
+  readonly agentsError = signal<string | null>(null);
+  readonly agentName = signal(this.saved.agentName);
+  readonly agent = computed(() => this.agents().find((agent) => agent.name === this.agentName()));
   readonly modelListing = signal<ModelListing>(NO_MODELS);
   readonly modelsError = signal<string | null>(null);
   readonly modelNames = computed(() => this.modelListing().models.map((model) => model.name));
@@ -43,13 +50,38 @@ export class AgentStore {
 
   constructor() {
     effect(() => {
-      this.preferences.write({ modelName: this.modelName(), autoApprove: this.autoApprove() });
+      this.preferences.write({
+        agentName: this.agentName(),
+        modelName: this.modelName(),
+        autoApprove: this.autoApprove(),
+      });
     });
+  }
+
+  async loadAgents(): Promise<void> {
+    try {
+      const agents = await this.directory.list();
+      this.agents.set(agents);
+      this.agentsError.set(null);
+      if (!agents.some((agent) => agent.name === this.agentName())) {
+        this.agentName.set(agents[0]?.name ?? this.agentName());
+      }
+    } catch {
+      this.agentsError.set("Couldn't load the agents from the orchestrator.");
+    }
+    await this.loadModels();
+  }
+
+  async chooseAgent(name: string): Promise<void> {
+    if (name === this.agentName()) return;
+    this.agentName.set(name);
+    this.newSession();
+    await this.loadModels();
   }
 
   async loadModels(): Promise<void> {
     try {
-      const listing = await this.modelCatalog.list();
+      const listing = await this.modelCatalog.list(this.agentName());
       this.modelListing.set(listing);
       this.modelsError.set(null);
       const names = listing.models.map((model) => model.name);
@@ -57,7 +89,8 @@ export class AgentStore {
         this.modelName.set(names[0] ?? '');
       }
     } catch {
-      this.modelsError.set("Couldn't load the models from the agent.");
+      this.modelListing.set(NO_MODELS);
+      this.modelsError.set(`Couldn't load the models from the ${this.agentName()} agent.`);
     }
   }
 
@@ -105,6 +138,7 @@ export class AgentStore {
 
     try {
       const events = this.api.stream(
+        this.agentName(),
         {
           message: text,
           model_name: this.modelName(),
