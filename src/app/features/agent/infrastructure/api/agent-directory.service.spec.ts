@@ -13,14 +13,14 @@ describe('AgentDirectoryService', () => {
     return TestBed.inject(AgentDirectoryService);
   }
 
-  it('asks the orchestrator which agents answer', async () => {
+  it('asks the supervisor which agents answer', async () => {
     const fetch = vi.fn().mockResolvedValue(
       new Response(
         JSON.stringify({
           agents: [
             {
-              name: 'chat',
-              description: 'the conversation agent',
+              name: 'observation',
+              description: 'the observation agent',
               skills: [{ id: 'answer', name: 'Answer', description: 'Explains.', tags: ['x'] }],
             },
           ],
@@ -34,14 +34,14 @@ describe('AgentDirectoryService', () => {
     expect(fetch.mock.calls[0][0]).toBe('http://server:8000/v1/agents');
     expect(agents).toEqual([
       {
-        name: 'chat',
-        description: 'the conversation agent',
+        name: 'observation',
+        description: 'the observation agent',
         skills: [{ id: 'answer', name: 'Answer', description: 'Explains.' }],
       },
     ]);
   });
 
-  it('fails when the orchestrator does not answer 2xx', async () => {
+  it('fails when the supervisor does not answer 2xx', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 502 })));
 
     await expect(service().list()).rejects.toThrow('502');
@@ -49,7 +49,7 @@ describe('AgentDirectoryService', () => {
 });
 
 describe('agentAddress', () => {
-  it('reaches the orchestrator at the agent route and the others at their own', () => {
+  it('reaches the supervisor at the agent route and the others at their own', () => {
     TestBed.configureTestingModule({
       providers: [
         { provide: HOMELAB_SERVER_URL, useValue: 'https://homelab' },
@@ -57,7 +57,7 @@ describe('agentAddress', () => {
       ],
     });
 
-    expect(agentAddress('orchestration').api).toBe('/api/agent');
+    expect(agentAddress('supervisor').api).toBe('/api/agent');
     expect(agentAddress('observation').api).toBe('/api/agents/observation');
   });
 });

@@ -46,9 +46,9 @@ describe('AgentModelsService', () => {
       ],
     });
 
-    await TestBed.inject(AgentModelsService).list('chat');
+    await TestBed.inject(AgentModelsService).list('observation');
 
-    expect(fetch.mock.calls[0][0]).toBe('/api/agents/chat/v1/models');
+    expect(fetch.mock.calls[0][0]).toBe('/api/agents/observation/v1/models');
   });
 
   it('fails when the agent does not answer 2xx', async () => {

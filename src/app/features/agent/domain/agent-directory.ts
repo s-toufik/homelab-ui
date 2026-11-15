@@ -10,4 +10,4 @@ export interface AgentProfile {
   skills: AgentSkill[];
 }
 
-export const ORCHESTRATOR = 'orchestration';
+export const SUPERVISOR = 'supervisor';

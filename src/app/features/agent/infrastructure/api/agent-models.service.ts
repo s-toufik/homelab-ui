@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
 import type { ModelListing } from '../../domain/model-catalog';
-import { ORCHESTRATOR } from '../../domain/agent-directory';
+import { SUPERVISOR } from '../../domain/agent-directory';
 import { agentAddress } from './agent-address';
 
 const TIMEOUT_MS = 4000;
@@ -15,7 +15,7 @@ interface ModelListResponse {
 export class AgentModelsService {
   private readonly server = inject(HomelabServer);
 
-  async list(agent: string = ORCHESTRATOR): Promise<ModelListing> {
+  async list(agent: string = SUPERVISOR): Promise<ModelListing> {
     const response = await fetch(this.server.api(agentAddress(agent), '/v1/models'), {
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });

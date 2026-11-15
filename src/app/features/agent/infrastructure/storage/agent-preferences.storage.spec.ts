@@ -16,7 +16,7 @@ function storageWith(entries: Record<string, string> = {}): {
 describe('AgentPreferencesStorage', () => {
   it('starts from the defaults when nothing is saved', () => {
     expect(storageWith().service.read()).toEqual({
-      agentName: 'orchestration',
+      agentName: 'supervisor',
       modelName: '',
       autoApprove: false,
     });
@@ -34,19 +34,19 @@ describe('AgentPreferencesStorage', () => {
     });
   });
 
-  it('falls back to the orchestrator when no agent was saved', () => {
+  it('falls back to the supervisor when no agent was saved', () => {
     const { service } = storageWith({
       'homelab-ui.agent.preferences': JSON.stringify({ modelName: 'm', autoApprove: true }),
     });
 
-    expect(service.read().agentName).toBe('orchestration');
+    expect(service.read().agentName).toBe('supervisor');
   });
 
   it('ignores a corrupted entry', () => {
     const { service } = storageWith({ 'homelab-ui.agent.preferences': '{not json' });
 
     expect(service.read()).toEqual({
-      agentName: 'orchestration',
+      agentName: 'supervisor',
       modelName: '',
       autoApprove: false,
     });
@@ -58,10 +58,10 @@ describe('AgentPreferencesStorage', () => {
     });
     const service = TestBed.inject(AgentPreferencesStorage);
 
-    service.write({ agentName: 'chat', modelName: 'x', autoApprove: true });
+    service.write({ agentName: 'observation', modelName: 'x', autoApprove: true });
 
     expect(service.read()).toEqual({
-      agentName: 'orchestration',
+      agentName: 'supervisor',
       modelName: '',
       autoApprove: false,
     });
