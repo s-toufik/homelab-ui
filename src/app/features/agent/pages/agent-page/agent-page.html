@@ -1,5 +1,9 @@
 <ng-template appPagePanelContent>
   <app-settings-panel
+    [agents]="store.agents()"
+    [agentsError]="store.agentsError()"
+    [agentName]="store.agentName()"
+    (agentChange)="store.chooseAgent($event)"
     [models]="store.modelNames()"
     [pinnedSteps]="store.pinnedSteps()"
     [modelsError]="store.modelsError()"

@@ -20,11 +20,12 @@ export class CodeBlockRunner {
   }
 
   private async askAgent(message: string): Promise<string> {
-    const { modelName, autoApprove } = this.preferences.read();
+    const { agentName, modelName, autoApprove } = this.preferences.read();
     const controller = new AbortController();
     let content = '';
 
     const events = this.api.stream(
+      agentName,
       {
         message,
         model_name: modelName,

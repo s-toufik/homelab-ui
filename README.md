@@ -93,13 +93,16 @@ Drag the panel's left edge to make it wider or narrower (double-click it to rese
 
 ## Stay in control
 
-The settings panel lets you choose the **model** that answers, start a **new conversation**, or pick up an old one by pasting its id. The list of models comes from the agent itself: when a new model is added there, it shows up here.
+The settings panel lets you choose the **agent** you talk to, the **model** that answers, start a **new conversation**, or pick up an old one by pasting its id.
 
-Trust the agent with a task? Turn on **Auto-approve plans** and it carries out its plans without waiting for your yes. Your model and auto-approve choices are **remembered** on that device.
+- **The agents** come from the orchestrator, which knows them all: the orchestration agent (the default, which splits a request between the others), chat, observation, analysis, coding, security, kitchen and travel. Under the list, a line says what the chosen agent does. Choosing another agent starts a new conversation with it.
+- **The models** come from the chosen agent itself: when a new model is added there, it shows up here.
+
+Trust the agent with a task? Turn on **Auto-approve plans** and it carries out its plans without waiting for your yes. Your agent, model and auto-approve choices are **remembered** on that device. Code blocks in Tasker ask the agent you chose here.
 
 At the bottom, **Fixed by the server** shows the steps that always use the same model whatever you pick — for example understanding your request or writing a plan.
 
-<img src="docs/screenshots/settings.webp" alt="The settings panel: model, auto-approve, conversation id, new conversation, and the steps fixed by the server with their model" />
+<img src="docs/screenshots/settings.webp" alt="The settings panel: the agent (analysis, with what it does), model, auto-approve, conversation id, new conversation, and the steps fixed by the server with their model" />
 
 ## Automate with Tasker
 
@@ -139,7 +142,8 @@ The UI is one static page served by the homelab's gateway. The browser only ever
  Browser ── https://<server>.<tailnet>.ts.net ──► Caddy ── signed in? ──► oauth2-proxy ◄──► Keycloak
                                                     │
      /                    the UI itself ◄───────────┤
-     /api/agent/…         chat, models  ◄───────────┤──► agent-runtime ──► LLM, agent-toolbox
+     /api/agent/…         agents list   ◄───────────┤──► agent-orchestration ─ A2A ─► the other agents
+     /api/agents/<n>/…    chat, models  ◄───────────┤──► agent-<n> ──► LLM, agent-toolbox (its scope)
      /api/tasker/…        workflows     ◄───────────┤──► PostgREST ──► PostgreSQL (your rows only)
      /api/prometheus/…    Metrics       ◄───────────┤──► Prometheus
      /api/loki/ tempo/    Logs, Traces  ◄───────────┤──► Loki, Tempo
@@ -153,7 +157,7 @@ The UI is one static page served by the homelab's gateway. The browser only ever
 
 Changes (anything but reading) carry the header `X-Homelab-Request: 1`, which the gateway requires so another site can't make them in your name.
 
-Devices on the tailnet can also reach the agent directly: its API on `http://<server>.<tailnet>.ts.net:8000` and its tools (MCP) on `:8001/mcp`.
+Devices on the tailnet can also reach the orchestrator directly: its API on `http://<server>.<tailnet>.ts.net:8000` and its tools (MCP) on `:8001/mcp`.
 
 ## Open it
 

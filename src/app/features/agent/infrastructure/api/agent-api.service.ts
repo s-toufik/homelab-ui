@@ -2,14 +2,18 @@ import { Injectable, inject } from '@angular/core';
 import type { AgentRequestBody } from '../../domain/agent-request';
 import type { StreamEvent, StreamEventType } from '../../domain/stream-event';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
-import AGENT from '../agent.json';
+import { agentAddress } from './agent-address';
 
 @Injectable({ providedIn: 'root' })
 export class AgentApiService {
   private readonly server = inject(HomelabServer);
 
-  async *stream(body: AgentRequestBody, signal: AbortSignal): AsyncGenerator<StreamEvent> {
-    const response = await fetch(this.server.api(AGENT, '/v1/stream'), {
+  async *stream(
+    agent: string,
+    body: AgentRequestBody,
+    signal: AbortSignal,
+  ): AsyncGenerator<StreamEvent> {
+    const response = await fetch(this.server.api(agentAddress(agent), '/v1/api2a'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body),

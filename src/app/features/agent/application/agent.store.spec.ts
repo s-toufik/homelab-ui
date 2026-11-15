@@ -6,15 +6,18 @@ import { AgentModelsService } from '../infrastructure/api/agent-models.service';
 import { PREFERENCES_STORAGE } from '../infrastructure/storage/agent-preferences.storage';
 import { memoryStorage } from '../infrastructure/storage/memory-storage';
 import type { ModelListing } from '../domain/model-catalog';
+import { AgentDirectoryService } from '../infrastructure/api/agent-directory.service';
 import { AgentStore } from './agent.store';
 
 function storeStreaming(
   events: StreamEvent[],
   seen: (store: AgentStore) => void = () => {},
   bodies: AgentRequestBody[] = [],
+  agents: string[] = [],
 ) {
   const api = {
-    async *stream(body: AgentRequestBody): AsyncGenerator<StreamEvent> {
+    async *stream(agent: string, body: AgentRequestBody): AsyncGenerator<StreamEvent> {
+      agents.push(agent);
       bodies.push(body);
       for (const event of events) {
         yield event;
@@ -191,9 +194,94 @@ describe('AgentStore', () => {
       TestBed.tick();
 
       expect(JSON.parse(storage.getItem('homelab-ui.agent.preferences')!)).toEqual({
+        agentName: 'orchestration',
         modelName: 'big-model',
         autoApprove: true,
       });
+    });
+  });
+
+  describe('agents', () => {
+    const agents = [
+      { name: 'orchestration', description: 'the orchestrator', skills: [] },
+      { name: 'chat', description: 'the conversation agent', skills: [] },
+    ];
+    const listing: ModelListing = {
+      models: [{ name: 'm', contextTokens: 1, maxOutputTokens: 1, thinking: false }],
+      pinnedSteps: {},
+    };
+
+    function storeWith(list: () => Promise<typeof agents>, modelsOf: string[] = []): AgentStore {
+      TestBed.configureTestingModule({
+        providers: [
+          { provide: AgentDirectoryService, useValue: { list } },
+          {
+            provide: AgentModelsService,
+            useValue: {
+              list: async (agent: string) => {
+                modelsOf.push(agent);
+                return listing;
+              },
+            },
+          },
+        ],
+      });
+      return TestBed.inject(AgentStore);
+    }
+
+    it('lists the agents and loads the models of the chosen one', async () => {
+      const modelsOf: string[] = [];
+      const store = storeWith(async () => agents, modelsOf);
+
+      await store.loadAgents();
+
+      expect(store.agents().map((agent) => agent.name)).toEqual(['orchestration', 'chat']);
+      expect(store.agent()?.description).toBe('the orchestrator');
+      expect(modelsOf).toEqual(['orchestration']);
+    });
+
+    it('starts a new conversation with the agent it switches to', async () => {
+      const modelsOf: string[] = [];
+      const store = storeWith(async () => agents, modelsOf);
+      await store.loadAgents();
+      const before = store.sessionId();
+
+      await store.chooseAgent('chat');
+
+      expect(store.agentName()).toBe('chat');
+      expect(store.sessionId()).not.toBe(before);
+      expect(modelsOf).toEqual(['orchestration', 'chat']);
+    });
+
+    it('falls back to the first agent when the saved one is gone', async () => {
+      storage.setItem('homelab-ui.agent.preferences', JSON.stringify({ agentName: 'kitchen' }));
+      const store = storeWith(async () => agents);
+
+      await store.loadAgents();
+
+      expect(store.agentName()).toBe('orchestration');
+    });
+
+    it('still loads the models when the orchestrator cannot list the agents', async () => {
+      const modelsOf: string[] = [];
+      const store = storeWith(() => Promise.reject(new Error('down')), modelsOf);
+
+      await store.loadAgents();
+
+      expect(store.agentsError()).toContain("Couldn't load the agents");
+      expect(modelsOf).toEqual(['orchestration']);
+    });
+
+    it('sends each message to the chosen agent', async () => {
+      const sentTo: string[] = [];
+      const store = storeStreaming([event('complete')], () => {}, [], sentTo);
+      store.agentName.set('chat');
+      store.modelName.set('m');
+      store.draft.set('hi');
+
+      await store.send();
+
+      expect(sentTo).toEqual(['chat']);
     });
   });
 });

@@ -1,4 +1,40 @@
 <section class="settings-panel__group">
+  <label class="settings-panel__row settings-panel__row--select" for="agent">
+    <span>Agent</span>
+    <span class="settings-panel__value">
+      <select
+        id="agent"
+        [ngModel]="agentName()"
+        (ngModelChange)="agentChange.emit($event)"
+        [disabled]="agents().length === 0"
+        aria-describedby="agent-hint"
+      >
+        @for (candidate of agents(); track candidate.name) {
+          <option [value]="candidate.name">{{ candidate.name }}</option>
+        } @empty {
+          <option [value]="agentName()">{{ agentName() }}</option>
+        }
+      </select>
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.8"
+      >
+        <path d="m9 6 6 6-6 6" stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+    </span>
+  </label>
+</section>
+@if (agentsError(); as error) {
+  <p id="agent-hint" class="settings-panel__hint settings-panel__hint--error">{{ error }}</p>
+} @else if (agent(); as current) {
+  <p id="agent-hint" class="settings-panel__hint">{{ current.description }}</p>
+}
+
+<section class="settings-panel__group">
   <label class="settings-panel__row settings-panel__row--select" for="model">
     <span>Model</span>
     <span class="settings-panel__value">
