@@ -194,7 +194,7 @@ describe('AgentStore', () => {
       TestBed.tick();
 
       expect(JSON.parse(storage.getItem('homelab-ui.agent.preferences')!)).toEqual({
-        agentName: 'orchestration',
+        agentName: 'supervisor',
         modelName: 'big-model',
         autoApprove: true,
       });
@@ -203,8 +203,8 @@ describe('AgentStore', () => {
 
   describe('agents', () => {
     const agents = [
-      { name: 'orchestration', description: 'the orchestrator', skills: [] },
-      { name: 'chat', description: 'the conversation agent', skills: [] },
+      { name: 'supervisor', description: 'the supervisor', skills: [] },
+      { name: 'observation', description: 'the observation agent', skills: [] },
     ];
     const listing: ModelListing = {
       models: [{ name: 'm', contextTokens: 1, maxOutputTokens: 1, thinking: false }],
@@ -235,9 +235,9 @@ describe('AgentStore', () => {
 
       await store.loadAgents();
 
-      expect(store.agents().map((agent) => agent.name)).toEqual(['orchestration', 'chat']);
-      expect(store.agent()?.description).toBe('the orchestrator');
-      expect(modelsOf).toEqual(['orchestration']);
+      expect(store.agents().map((agent) => agent.name)).toEqual(['supervisor', 'observation']);
+      expect(store.agent()?.description).toBe('the supervisor');
+      expect(modelsOf).toEqual(['supervisor']);
     });
 
     it('starts a new conversation with the agent it switches to', async () => {
@@ -246,11 +246,11 @@ describe('AgentStore', () => {
       await store.loadAgents();
       const before = store.sessionId();
 
-      await store.chooseAgent('chat');
+      await store.chooseAgent('observation');
 
-      expect(store.agentName()).toBe('chat');
+      expect(store.agentName()).toBe('observation');
       expect(store.sessionId()).not.toBe(before);
-      expect(modelsOf).toEqual(['orchestration', 'chat']);
+      expect(modelsOf).toEqual(['supervisor', 'observation']);
     });
 
     it('falls back to the first agent when the saved one is gone', async () => {
@@ -259,29 +259,29 @@ describe('AgentStore', () => {
 
       await store.loadAgents();
 
-      expect(store.agentName()).toBe('orchestration');
+      expect(store.agentName()).toBe('supervisor');
     });
 
-    it('still loads the models when the orchestrator cannot list the agents', async () => {
+    it('still loads the models when the supervisor cannot list the agents', async () => {
       const modelsOf: string[] = [];
       const store = storeWith(() => Promise.reject(new Error('down')), modelsOf);
 
       await store.loadAgents();
 
       expect(store.agentsError()).toContain("Couldn't load the agents");
-      expect(modelsOf).toEqual(['orchestration']);
+      expect(modelsOf).toEqual(['supervisor']);
     });
 
     it('sends each message to the chosen agent', async () => {
       const sentTo: string[] = [];
       const store = storeStreaming([event('complete')], () => {}, [], sentTo);
-      store.agentName.set('chat');
+      store.agentName.set('observation');
       store.modelName.set('m');
       store.draft.set('hi');
 
       await store.send();
 
-      expect(sentTo).toEqual(['chat']);
+      expect(sentTo).toEqual(['observation']);
     });
   });
 });

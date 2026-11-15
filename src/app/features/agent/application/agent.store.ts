@@ -67,7 +67,7 @@ export class AgentStore {
         this.agentName.set(agents[0]?.name ?? this.agentName());
       }
     } catch {
-      this.agentsError.set("Couldn't load the agents from the orchestrator.");
+      this.agentsError.set("Couldn't load the agents from the supervisor.");
     }
     await this.loadModels();
   }

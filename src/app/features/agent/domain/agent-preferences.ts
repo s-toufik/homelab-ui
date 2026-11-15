@@ -1,4 +1,4 @@
-import { ORCHESTRATOR } from './agent-directory';
+import { SUPERVISOR } from './agent-directory';
 
 export interface AgentPreferences {
   agentName: string;
@@ -7,7 +7,7 @@ export interface AgentPreferences {
 }
 
 export const DEFAULT_PREFERENCES: AgentPreferences = {
-  agentName: ORCHESTRATOR,
+  agentName: SUPERVISOR,
   modelName: '',
   autoApprove: false,
 };
