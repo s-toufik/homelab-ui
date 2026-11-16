@@ -25,6 +25,7 @@ export class NewPersonPage {
   protected readonly saving = signal(false);
   protected readonly failure = signal<string | null>(null);
   protected readonly password = signal('');
+  protected readonly pagesError = signal<string | null>(null);
   protected readonly copied = signal(false);
 
   protected readonly usernameTaken = computed(() =>
@@ -77,17 +78,17 @@ export class NewPersonPage {
     this.saving.set(true);
     this.failure.set(null);
     try {
-      this.password.set(
-        await this.store.create(
-          {
-            username: this.username().trim(),
-            firstName: this.firstName().trim(),
-            lastName: this.lastName().trim(),
-            email: this.email().trim(),
-          },
-          [...this.chosen()],
-        ),
+      const created = await this.store.create(
+        {
+          username: this.username().trim(),
+          firstName: this.firstName().trim(),
+          lastName: this.lastName().trim(),
+          email: this.email().trim(),
+        },
+        [...this.chosen()],
       );
+      this.password.set(created.password);
+      this.pagesError.set(created.pagesError);
       this.step.set(3);
     } catch (error) {
       this.failure.set(peopleError(error, 'create the account'));

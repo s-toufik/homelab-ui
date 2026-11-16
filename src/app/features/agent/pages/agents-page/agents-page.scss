@@ -5,114 +5,242 @@
   min-height: 0;
 }
 
-.agents {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr));
-  gap: 1rem;
-}
-
-.agents__card {
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
+.map {
+  position: relative;
+  width: 100%;
+  height: clamp(40rem, 80vh, 58rem);
   border: var(--card-border);
   border-radius: var(--radius-card);
+  background:
+    radial-gradient(
+      circle at 50% 50%,
+      color-mix(in srgb, var(--hue-indigo) 10%, transparent),
+      transparent 60%
+    ),
+    var(--surface-sunken);
+  overflow: hidden;
+}
+
+.map__links {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.map__link {
+  fill: none;
+  stroke: var(--border);
+  stroke-width: 2;
+  stroke-dasharray: 2 6;
+  vector-effect: non-scaling-stroke;
+}
+
+.map__flow {
+  fill: none;
+  stroke: var(--h);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 10 14;
+  vector-effect: non-scaling-stroke;
+  filter: drop-shadow(0 0 4px var(--h));
+  animation: flow 0.9s linear infinite;
+}
+
+.map__flow--back {
+  stroke-width: 2;
+  stroke-dasharray: 3 21;
+  opacity: 0.7;
+  animation-direction: reverse;
+  animation-duration: 1.3s;
+}
+
+.map__asking {
+  position: absolute;
+  z-index: 3;
+  padding: 0.15rem 0.6rem;
+  border: 1px solid var(--h);
+  border-radius: 999px;
   background: var(--surface-raised);
-  background-image: var(--card-texture, none);
-  box-shadow: var(--card-frame, none);
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
+  color: var(--h);
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transform: translate(-50%, -50%);
+  animation: bob 1.4s ease-in-out infinite;
 }
 
-.agents__card--working {
-  border-color: var(--h);
-  box-shadow:
-    var(--card-frame, 0 0 0 0 transparent),
-    0 0 0 3px color-mix(in srgb, var(--h) 18%, transparent);
-}
-
-.agents__scene {
-  padding: 0.9rem 1rem 0.2rem;
-  background: linear-gradient(180deg, var(--h-soft), transparent 85%);
-}
-
-.agents__body {
+.map__node {
+  position: absolute;
+  z-index: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.35rem;
-  padding: 0.6rem 1rem 1rem;
-}
+  width: clamp(10rem, 16vw, 13rem);
+  padding: 0;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  overflow: hidden;
+  transform: translate(-50%, -50%);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s,
+    transform 0.2s;
 
-.agents__name {
-  display: flex;
-  align-items: center;
-  gap: 0.45rem;
+  &:hover {
+    transform: translate(-50%, -50%) scale(1.03);
+  }
 
-  strong {
-    font-size: 1.02rem;
+  &:focus-visible {
+    outline: 3px solid var(--accent);
+    outline-offset: 2px;
   }
 }
 
-.agents__state {
+.map__node--hub {
+  z-index: 2;
+  width: clamp(13rem, 22vw, 17rem);
+}
+
+.map__node--working,
+.map__node--asked {
+  border-color: var(--h);
+  box-shadow:
+    0 0 0 4px color-mix(in srgb, var(--h) 20%, transparent),
+    0 14px 30px -18px var(--h);
+}
+
+.map__node--on {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+
+.map__name {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 0.7rem 0.55rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.map__state {
   margin-left: auto;
-  padding: 0.1rem 0.55rem;
+  padding: 0.05rem 0.45rem;
   border-radius: 999px;
   background: var(--surface-hover);
   color: var(--text-muted);
-  font-size: 0.72rem;
+  font-size: 0.68rem;
   font-weight: 600;
 }
 
-.agents__card--working .agents__state {
+.map__node--working .map__state {
   background: var(--h-soft);
   color: var(--h);
 }
 
-.agents__card--waiting .agents__state {
+.map__node--waiting .map__state {
   background: var(--accent-soft);
   color: var(--accent);
 }
 
-.agents__card--trouble .agents__state {
+.map__node--trouble .map__state {
   background: var(--danger-soft);
   color: var(--danger);
 }
 
-.agents__phrase {
-  margin: 0;
-  font-weight: 500;
+.detail {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem 1.2rem;
+  border: var(--card-border);
+  border-left: 4px solid var(--h);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  background-image: var(--card-texture, none);
+  box-shadow: var(--card-frame, none);
+
+  h2 {
+    margin: 0.2rem 0;
+    font-size: 1.15rem;
+  }
+
+  p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 0.88rem;
+  }
 }
 
-.agents__meta {
-  margin: 0;
-  font-size: 0.82rem;
-  color: var(--text-muted);
+.detail__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--h);
 }
 
-.agents__actions {
+.detail__actions {
   display: flex;
   flex-wrap: wrap;
   gap: 0.4rem;
-  margin-top: 0.35rem;
 }
 
-.agents__note {
+.note {
   margin: 0;
   font-size: 0.8rem;
   color: var(--text-muted);
 }
 
+@keyframes flow {
+  to {
+    stroke-dashoffset: -24;
+  }
+}
+
+@keyframes bob {
+  50% {
+    transform: translate(-50%, calc(-50% - 3px));
+  }
+}
+
 @media (max-width: 767px) {
-  .agents {
-    gap: 0.75rem;
+  .map {
+    height: 56rem;
   }
 
-  .agents__scene {
-    padding: 0.5rem 1rem 0;
+  .map__node {
+    width: 44%;
   }
 
-  .agents__scene ::ng-deep svg {
-    max-height: 9rem;
+  .map__node--hub {
+    width: 62%;
+  }
+
+  .map__name {
+    flex-wrap: wrap;
+    row-gap: 0.2rem;
+    font-size: 0.85rem;
+  }
+
+  .map__state {
+    margin-left: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .map__flow,
+  .map__asking {
+    animation: none;
   }
 }

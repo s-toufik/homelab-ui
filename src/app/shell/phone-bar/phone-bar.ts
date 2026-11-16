@@ -9,7 +9,8 @@ import { PageChromeStore } from '../application/page-chrome.store';
 import { ASSISTANT_PANEL } from '../application/assistant-panel';
 
 const TITLES: Readonly<Record<string, string>> = {
-  '': 'Today',
+  '': 'Center',
+  today: 'Today',
   assistant: 'Assistant',
   agents: 'Agents',
   map: 'Map',

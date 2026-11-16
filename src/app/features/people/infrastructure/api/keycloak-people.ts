@@ -17,6 +17,7 @@ export interface KeycloakUser {
 }
 
 interface KeycloakRole {
+  id?: string;
   name: string;
 }
 
@@ -47,6 +48,7 @@ export class KeycloakPeople implements PeopleDirectory {
   private readonly api = inject(GatewayApi);
   private readonly server = inject(HomelabServer);
   readonly preview = false;
+  private readonly roles = new Map<string, KeycloakRole>();
 
   private url(path: string): string {
     return this.server.api(PEOPLE, path);
@@ -90,15 +92,26 @@ export class KeycloakPeople implements PeopleDirectory {
   async grant(id: string, role: string): Promise<void> {
     await this.api.send(this.user(id, '/role-mappings/realm'), {
       method: 'POST',
-      body: [{ name: role }],
+      body: [await this.findRole(this.user(id, '/role-mappings/realm/available'), role)],
     });
   }
 
   async revoke(id: string, role: string): Promise<void> {
     await this.api.send(this.user(id, '/role-mappings/realm'), {
       method: 'DELETE',
-      body: [{ name: role }],
+      body: [await this.findRole(this.user(id, '/role-mappings/realm'), role)],
     });
+  }
+
+  private async findRole(listUrl: string, name: string): Promise<KeycloakRole> {
+    const known = this.roles.get(name);
+    if (known) return known;
+    const roles = await this.api.json<KeycloakRole[]>(listUrl);
+    for (const role of roles)
+      if (role.id) this.roles.set(role.name, { id: role.id, name: role.name });
+    const found = this.roles.get(name);
+    if (!found) throw new Error(`Keycloak has no role ${name}: run make apply R=keycloak.`);
+    return found;
   }
 
   async setEnabled(id: string, enabled: boolean): Promise<void> {

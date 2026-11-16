@@ -131,6 +131,11 @@
         <span class="hl-muted">Username</span><strong>{{ username() }}</strong>
         <span class="hl-muted">Temporary password</span><code>{{ password() }}</code>
       </div>
+      @if (pagesError(); as problem) {
+        <p class="hl-error">
+          {{ problem }} The account exists: give the pages from People once this is fixed.
+        </p>
+      }
       <div class="new__actions">
         <button type="button" class="hl-btn" (click)="copy()">
           {{ copied() ? 'Copied' : 'Copy the password' }}

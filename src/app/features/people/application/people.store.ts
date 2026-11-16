@@ -93,12 +93,20 @@ export class PeopleStore {
     return done;
   }
 
-  async create(person: NewPerson, roles: readonly string[]): Promise<string> {
+  async create(
+    person: NewPerson,
+    roles: readonly string[],
+  ): Promise<{ password: string; pagesError: string | null }> {
     const password = temporaryPassword();
     const id = await this.directory.create(person, password);
-    for (const role of roles) await this.directory.grant(id, role);
+    let pagesError: string | null = null;
+    try {
+      for (const role of roles) await this.directory.grant(id, role);
+    } catch (error) {
+      pagesError = peopleError(error, 'give the pages');
+    }
     await this.load();
-    return password;
+    return { password, pagesError };
   }
 
   isBusy(key: string): boolean {

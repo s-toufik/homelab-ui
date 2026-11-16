@@ -4,66 +4,140 @@
     title="Agents"
     hue="indigo"
     [summary]="
-      working()
-        ? working() + (working() === 1 ? ' agent is' : ' agents are') + ' working right now.'
-        : 'Everyone is resting. Ask one of them something.'
+      asking().size
+        ? 'The Assistant is asking ' +
+          asking().size +
+          (asking().size === 1 ? ' agent' : ' agents') +
+          ' right now.'
+        : working()
+          ? working() + (working() === 1 ? ' agent is' : ' agents are') + ' working right now.'
+          : 'Everyone is resting. Ask one of them something.'
     "
   />
 
-  <div class="agents">
-    @for (agent of agents(); track agent.name) {
-      <article
-        class="agents__card"
-        [class]="'agents__card hue-' + agent.look.hue + ' agents__card--' + agent.mood"
+  <section class="map" [class.map--narrow]="narrow()" aria-label="Agents map">
+    <svg class="map__links" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+      @for (node of map().nodes; track node.agent.name) {
+        <path class="map__link" [attr.d]="node.path" />
+        @if (node.active) {
+          <path
+            class="map__flow"
+            [class]="'map__flow hue-' + node.agent.look.hue"
+            [attr.d]="node.path"
+          />
+          <path
+            class="map__flow map__flow--back"
+            [class]="'map__flow map__flow--back hue-' + node.agent.look.hue"
+            [attr.d]="node.path"
+          />
+        }
+      }
+    </svg>
+
+    @for (node of map().nodes; track node.agent.name) {
+      @if (node.active && !narrow()) {
+        <span
+          class="map__asking"
+          [class]="'map__asking hue-' + node.agent.look.hue"
+          [style.left.%]="node.mid.x"
+          [style.top.%]="node.mid.y"
+          >asking {{ node.agent.look.label }}…</span
+        >
+      }
+    }
+
+    @if (hub(); as agent) {
+      <button
+        type="button"
+        class="map__node map__node--hub"
+        [class]="
+          'map__node map__node--hub hue-' +
+          agent.look.hue +
+          ' map__node--' +
+          agent.mood +
+          (selected()?.name === agent.name ? ' map__node--on' : '')
+        "
+        [style.left.%]="map().hub.x"
+        [style.top.%]="map().hub.y"
+        [attr.aria-pressed]="selected()?.name === agent.name"
+        (click)="selectedName.set(agent.name)"
       >
         <app-agent-scene
-          class="agents__scene"
           [agent]="agent.name"
           [mood]="agent.mood"
           [label]="agent.look.label + ': ' + agent.phrase"
         />
-        <div class="agents__body">
-          <div class="agents__name">
-            <span class="hl-dot"></span>
-            <strong>{{ agent.look.label }}</strong>
-            <span class="agents__state">{{
-              agent.mood === 'working'
-                ? 'working'
-                : agent.mood === 'waiting'
-                  ? 'waiting for you'
-                  : agent.mood === 'trouble'
-                    ? 'needs a look'
-                    : 'resting'
-            }}</span>
-          </div>
-          <p class="agents__phrase">{{ agent.phrase }}</p>
-          <p class="agents__meta">
-            {{ agent.look.greeting }}
-            @if (agent.count) {
-              · {{ agent.count }} conversation{{ agent.count === 1 ? '' : 's' }}
-            }
-          </p>
-          <div class="agents__actions">
-            <a
-              class="hl-btn hl-btn--small hl-btn--primary"
-              routerLink="/assistant/new"
-              [queryParams]="{ agent: agent.name }"
-              >Ask {{ agent.look.label }}</a
-            >
-            @if (agent.last; as last) {
-              <a class="hl-btn hl-btn--small" [routerLink]="['/assistant', last.id]">
-                {{ agent.waitingPlans ? 'Review the plan' : 'Last conversation' }}
-              </a>
-            }
-          </div>
-        </div>
-      </article>
+        <span class="map__name">
+          <span class="hl-dot"></span>{{ agent.look.label }}
+          <span class="map__state">{{ stateLabel(agent.mood) }}</span>
+        </span>
+      </button>
     }
-  </div>
 
-  <p class="agents__note">
+    @for (node of map().nodes; track node.agent.name) {
+      <button
+        type="button"
+        [class]="
+          'map__node hue-' +
+          node.agent.look.hue +
+          ' map__node--' +
+          node.agent.mood +
+          (node.active ? ' map__node--asked' : '') +
+          (selected()?.name === node.agent.name ? ' map__node--on' : '')
+        "
+        [style.left.%]="node.at.x"
+        [style.top.%]="node.at.y"
+        [attr.aria-pressed]="selected()?.name === node.agent.name"
+        (click)="selectedName.set(node.agent.name)"
+      >
+        <app-agent-scene
+          [agent]="node.agent.name"
+          [mood]="node.agent.mood"
+          [label]="node.agent.look.label + ': ' + node.agent.phrase"
+        />
+        <span class="map__name">
+          <span class="hl-dot"></span>{{ node.agent.look.label }}
+          <span class="map__state">{{ stateLabel(node.agent.mood, node.active) }}</span>
+        </span>
+      </button>
+    }
+  </section>
+
+  @if (selected(); as agent) {
+    <article class="detail" [class]="'detail hue-' + agent.look.hue">
+      <div class="detail__text">
+        <span class="detail__kicker"
+          ><span class="hl-dot"></span>{{ agent.look.label }} · {{ stateLabel(agent.mood) }}</span
+        >
+        <h2>{{ agent.phrase }}</h2>
+        <p>
+          {{ agent.look.greeting }}
+          @if (agent.count) {
+            · {{ agent.count }} conversation{{ agent.count === 1 ? '' : 's' }}
+          }
+        </p>
+      </div>
+      <div class="detail__actions">
+        <a
+          class="hl-btn hl-btn--primary"
+          routerLink="/assistant/new"
+          [queryParams]="{ agent: agent.name }"
+          >Ask {{ agent.look.label }}</a
+        >
+        @if (agent.last; as last) {
+          <a class="hl-btn" [routerLink]="['/assistant', last.id]">
+            {{ agent.waitingPlans ? 'Review the plan' : 'Last conversation' }}
+          </a>
+        }
+      </div>
+    </article>
+  }
+
+  <p class="note">
     @if (serverKnown()) {
-      Live from the homelab: an agent works while it answers anyone, refreshed every 10 seconds.
+      Live from the homelab every 5 seconds: an agent works while it answers anyone. A line lights
+      up between the Assistant and an agent working at the same time, which is how the Assistant
+      hands work out.
     } @else {
       Shows what this browser is asking. Live activity from the server needs the Metrics or
       Dashboards page.

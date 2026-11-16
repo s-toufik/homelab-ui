@@ -6,7 +6,7 @@
 
 **The homelab's apps, assistants and tools in one place, for everyone at home, on a computer, a tablet or a phone.**
 
-<img src="docs/screenshots/today.webp" alt="Today: the date, a greeting and a summary, a plan waiting in Kitchen, the homelab's apps, CPU, memory and disk, and the latest conversations" />
+<img src="docs/screenshots/center.webp" alt="Center: the homelab as a globe of constellations, Observe and Assistant in front, with the constellation list and zoom buttons" />
 
 </div>
 
@@ -14,16 +14,48 @@
 
 | Page           | Who                                          | What it does                                                                                                                                      |
 | -------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Center**     | Everyone                                     | The first page: every page you may open, as stars in constellations on a globe you turn, zoom and fly through                                     |
 | **Today**      | Everyone                                     | The day at a glance: plans waiting for you, alerts, the homelab's health, your latest conversations                                               |
 | **Assistant**  | Everyone, for the assistants they were given | Conversations with the homelab's assistants: Kitchen, Travel, Observation, Analysis, Coding, Security, and the supervisor that hands work to them |
-| **Agents**     | Everyone, for the assistants they were given | Each assistant as an animated scene, busy while it works                                                                                          |
+| **Agents**     | Everyone, for the assistants they were given | A live map: the Assistant in the middle, each agent as an animated scene, lines when the Assistant asks one                                       |
 | **Map**        | Admins                                       | The Kubernetes cluster, live: every service, its state, what it talks to                                                                          |
 | **People**     | Admins                                       | Accounts, and the pages each person may open                                                                                                      |
 | **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker                                           |
 | **Account**    | Everyone                                     | Profile, password, devices and sessions, deleting your account                                                                                    |
 | **Appearance** | Everyone                                     | Theme                                                                                                                                             |
 
+## Center
+
+The homelab opens on **Center** (`/`): a globe of the night sky where each page is a star and each group of pages a constellation.
+
+| Constellation                          | Stars                                                                  |
+| -------------------------------------- | ---------------------------------------------------------------------- |
+| **Assistant**                          | Assistant, Agents, and each assistant you may use (Kitchen, Travel, …) |
+| **Observe**, **Operate**, **Automate** | Your tool pages, as in the sidebar                                     |
+| **Home**                               | Today, Map and People (admins), Account, Appearance                    |
+
+| Do                                        | To                                                         |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| Drag                                      | Turn the globe; it keeps spinning a little when you let go |
+| Scroll, pinch, **+** / **−**              | Zoom on the pointer; names appear as you get closer        |
+| Shift-drag or right-drag                  | Move the globe                                             |
+| Click a constellation's name on the right | Fly to it                                                  |
+| Click a star                              | Fly to it and see what it is, with **Open**                |
+| Double-click a star                       | Open the page                                              |
+| Arrow keys, **+**, **−**, **0**           | Turn, zoom, back to the whole sky                          |
+
+The globe turns slowly on its own when you leave it, and the Assistant's star pulses while a plan waits for you. Screen readers get the same pages as a list.
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/center-star.webp" alt="Center zoomed on the Assistant constellation: Assistant, Agents, Kitchen, Travel, Observation, Analysis, Coding and Security, with the Assistant star's card and Open" /></td>
+    <td><img src="docs/screenshots/phone-center.webp" width="260" alt="Center on a phone: the globe with the constellations to fly to along the bottom" /></td>
+  </tr>
+</table>
+
 ## Today
+
+**Today** (`/today`) is the briefing.
 
 Today opens with the date, a greeting and a short summary, for example _"Kitchen has a plan waiting for you. The homelab is healthy: all 24 apps answer and no alert is firing."_ Below it:
 
@@ -31,11 +63,13 @@ Today opens with the date, a greeting and a short summary, for example _"Kitchen
 - **Homelab** (admins): how many apps answer, and the server's CPU, memory and disk;
 - **Pick up where you left off**: your latest conversations.
 
+<img src="docs/screenshots/today.webp" alt="Today: the date, a greeting and a summary, a plan waiting in Kitchen, the homelab's apps, CPU, memory and disk, and the latest conversations" />
+
 ## Finding your way
 
-- **Computer and iPad:** a sidebar with Today, Assistant, Map (admins), your pages grouped into Observe, Operate and Automate (each group folds), then People (admins), Appearance and your account. The button at its top, or **[**, folds it to icons. Folded, it opens over the page while the pointer is on it and closes when the pointer leaves; click the button again to keep it open. The choice is remembered.
+- **Computer and iPad:** a sidebar with Center, Today, Assistant, Agents, Map (admins), your pages grouped into Observe, Operate and Automate (each group folds), then People (admins), Appearance and your account. The button at its top, or **[**, folds it to icons. Folded, it opens over the page while the pointer is on it and closes when the pointer leaves; click the button again to keep it open. The choice is remembered.
 - **Side panels** work the same way everywhere: the sidebar, the conversations on Assistant and a page's settings appear while you hover their button or edge, stay when you click, and go away at the next click. Drag a panel's inner edge to resize it (double-click resets it); the width is remembered.
-- **Phone:** a slim top bar with the menu, the page's title and one action (search, or a new conversation on Assistant). The menu slides in from the left, or swipe right from the edge: search, a new conversation, Today, Assistant and Map, **Pages** (folded until you open it), then every conversation by day, each with a bin to delete it (tap twice). The page stays visible on the right; tap it or swipe left to go back.
+- **Phone:** a slim top bar with the menu, the page's title and one action (search, or a new conversation on Assistant). The menu slides in from the left, or swipe right from the edge: search, a new conversation, Center, Today, Assistant, Agents and Map, **Pages** (folded until you open it), then every conversation by day, each with a bin to delete it (tap twice). The page stays visible on the right; tap it or swipe left to go back.
 - **⌘K** (or **/**, or the search field at the top) finds any page or conversation, or asks an assistant directly: type _"what's for dinner"_ and pick **Ask Kitchen**. Arrow keys move, Enter opens, Esc closes.
 
 | Shortcut      | Does                              |
@@ -85,21 +119,23 @@ Deleting a conversation here removes it from this browser. The server copies exp
 
 ### Agents
 
-**Agents** (`/agents`, next to Assistant) shows every assistant you may use as a small animated scene, busy while it works:
+**Agents** (`/agents`, next to Assistant) is a live map: the **Assistant** (the supervisor that hands work out) in the middle, the other assistants around it, each as a small animated scene that gets busy while it works.
 
-| Agent                          | Scene                                                   |
-| ------------------------------ | ------------------------------------------------------- |
-| **Assistant** (the supervisor) | A conductor waving a baton while the other agents orbit |
-| **Kitchen**                    | A chef tossing a pan over the flames, steam rising      |
-| **Travel**                     | A plane circling the globe                              |
-| **Observation**                | A radar sweeping, blips lighting up                     |
-| **Analysis**                   | Bars of a chart moving under a magnifier                |
-| **Coding**                     | A laptop typing lines of code                           |
-| **Security**                   | A scan line sweeping a locked shield                    |
+| Agent           | Scene                                                                                           |
+| --------------- | ----------------------------------------------------------------------------------------------- |
+| **Assistant**   | A conductor at a podium, baton waving, notes flying to the other agents orbiting                |
+| **Kitchen**     | A chef tossing a pan over the flames, the pot lid rattling, a knife chopping, utensils swinging |
+| **Travel**      | A plane circling the globe with a contrail, pins popping, the suitcase hopping                  |
+| **Observation** | A radar sweeping with a trail and blips, a server rack blinking                                 |
+| **Analysis**    | Bars and a trend line drawing themselves, a pie turning, numbers rising under a magnifier       |
+| **Coding**      | An editor typing in colour, a terminal scrolling, hands on the keyboard, coffee steaming        |
+| **Security**    | A camera sweeping, a scan line over a shield, the padlock opening and closing                   |
 
-Each card says what the agent is doing (_"Cooking up an answer"_, _"A menu is waiting for your OK"_), with **Ask** and its last conversation or waiting plan. An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 10 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. Animations stop when the device asks for reduced motion.
+When the Assistant works at the same time as another agent, the line between them lights up and flows (_"asking Kitchen…"_; on a phone the card says _"asked by Assistant"_). Click an agent for what it is doing, **Ask** and its last conversation or waiting plan.
 
-<img src="docs/screenshots/agents.webp" alt="Agents: seven cards, Kitchen and Observation working (a chef tossing a pan, a radar sweeping), the others resting" />
+An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 5 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. The supervisor does not yet say which agent it is asking, so a line means "both busy at once", which is how it hands work out. Animations stop when the device asks for reduced motion.
+
+<img src="docs/screenshots/agents.webp" alt="The Agents map: the Assistant conducting in the middle, lines flowing to Kitchen (a chef at work) and Observation (a radar sweeping), Security, Travel, Coding and Analysis resting around it" />
 
 ## Map
 
@@ -217,7 +253,7 @@ Open the homelab in Safari, then **Share › Add to Home Screen**. It opens full
   <tr>
     <td><img src="docs/screenshots/phone-assistant-new.webp" width="200" alt="A new conversation on a phone: Kitchen as the title, suggestions above the rounded message box" /></td>
     <td><img src="docs/screenshots/phone-picker.webp" width="200" alt="The assistant picker on a phone, a sheet listing every assistant and Model and settings" /></td>
-    <td><img src="docs/screenshots/phone-agents.webp" width="200" alt="Agents on a phone: the Assistant conductor and the Kitchen chef at work" /></td>
+    <td><img src="docs/screenshots/phone-agents.webp" width="200" alt="The Agents map on a phone: the Assistant on top, lines down to Kitchen and Observation, asked by Assistant" /></td>
     <td><img src="docs/screenshots/phone-map.webp" width="200" alt="The map on a phone: networks, legend and ports" /></td>
   </tr>
 </table>
