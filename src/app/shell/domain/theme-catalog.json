@@ -4,6 +4,7 @@
     "name": "Navy",
     "tagline": "Deep blue, easy on the eyes",
     "dark": true,
+    "storybook": false,
     "surface": "#0A0F15"
   },
   {
@@ -11,6 +12,7 @@
     "name": "Light",
     "tagline": "The same layout, on white",
     "dark": false,
+    "storybook": false,
     "surface": "#F4F6F9"
   },
   {
@@ -18,6 +20,7 @@
     "name": "Contrast",
     "tagline": "Black on white, largest and clearest",
     "dark": false,
+    "storybook": false,
     "surface": "#FFFFFF"
   },
   {
@@ -25,6 +28,7 @@
     "name": "Blossom",
     "tagline": "Soft pink, rounded letters",
     "dark": false,
+    "storybook": false,
     "surface": "#FFF5F8"
   },
   {
@@ -32,6 +36,7 @@
     "name": "Lilac",
     "tagline": "Lavender and violet, light and airy",
     "dark": false,
+    "storybook": false,
     "surface": "#F8F5FF"
   },
   {
@@ -39,20 +44,39 @@
     "name": "Forest",
     "tagline": "Moss, bark and morning light",
     "dark": false,
+    "storybook": false,
     "surface": "#F3F5EE"
-  },
-  {
-    "id": "dragon",
-    "name": "Dragon Rider",
-    "tagline": "Obsidian, ember and gold, after Fourth Wing",
-    "dark": true,
-    "surface": "#0E0B0A"
   },
   {
     "id": "wizarding",
     "name": "Wizarding",
-    "tagline": "Burgundy, gold and parchment, after Harry Potter",
+    "tagline": "Parchment, ink and a leather-bound spine, after Harry Potter",
+    "dark": false,
+    "storybook": true,
+    "surface": "#EFE3C8"
+  },
+  {
+    "id": "dragon",
+    "name": "Dragon Rider",
+    "tagline": "Obsidian scales, ember and riders’ steel, after Fourth Wing",
     "dark": true,
-    "surface": "#1A0F14"
+    "storybook": true,
+    "surface": "#0D0A09"
+  },
+  {
+    "id": "demigod",
+    "name": "Demigod",
+    "tagline": "Marble, bronze and the Aegean, after Percy Jackson",
+    "dark": false,
+    "storybook": true,
+    "surface": "#F6F4EF"
+  },
+  {
+    "id": "regency",
+    "name": "Regency",
+    "tagline": "Wedgwood blue, gilt frames and florals, after Bridgerton",
+    "dark": false,
+    "storybook": true,
+    "surface": "#EEF3F9"
   }
 ]

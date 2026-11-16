@@ -1,36 +1,46 @@
-@if (ui.panelPinned()) {
-  <div class="page-panel__backdrop" (click)="ui.closePanel()"></div>
-}
-
-<aside
-  class="page-panel"
-  [class.page-panel--open]="ui.panelOpen()"
-  (mouseenter)="ui.hoverPanel(true)"
-  (mouseleave)="ui.hoverPanel(false)"
->
-  <div class="page-panel__header">
-    <h2 class="page-panel__title">Settings</h2>
-    <button
-      type="button"
-      class="page-panel__close"
-      title="Close"
-      aria-label="Close panel"
-      (click)="ui.closePanel()"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="16"
-        height="16"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.8"
+<app-side-pane side="right" label="Page settings" [edge]="false" [state]="ui.panel">
+  <div class="page-panel">
+    <div class="page-panel__header">
+      <h2 class="page-panel__title">Settings</h2>
+      <button
+        type="button"
+        class="page-panel__close"
+        [title]="ui.panelPinned() ? 'Close' : 'Keep open'"
+        [attr.aria-label]="ui.panelPinned() ? 'Close the settings' : 'Keep the settings open'"
+        (click)="ui.togglePanel()"
       >
-        <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
-      </svg>
-    </button>
-  </div>
+        @if (ui.panelPinned()) {
+          <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            aria-hidden="true"
+          >
+            <path d="M6 6l12 12M18 6L6 18" stroke-linecap="round" />
+          </svg>
+        } @else {
+          <svg
+            viewBox="0 0 24 24"
+            width="16"
+            height="16"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="M9 4h6l-1 6 3 3H7l3-3-1-6ZM12 13v7" />
+          </svg>
+        }
+      </button>
+    </div>
 
-  @if (chrome.rightPanel(); as template) {
-    <ng-container [ngTemplateOutlet]="template" />
-  }
-</aside>
+    @if (chrome.rightPanel(); as template) {
+      <ng-container [ngTemplateOutlet]="template" />
+    }
+  </div>
+</app-side-pane>

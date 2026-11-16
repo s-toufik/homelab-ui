@@ -1,9 +1,9 @@
 @use 'styles/themes';
+@use 'styles/skins';
 
 :root {
   --radius: 0.5rem;
   --radius-lg: 0.85rem;
-  --radius-card: 0.75rem;
   --radius-pill: 999px;
   --safe-top: env(safe-area-inset-top, 0px);
   --safe-bottom: env(safe-area-inset-bottom, 0px);
@@ -33,7 +33,7 @@ body {
 
 body {
   font-family: var(--font-sans);
-  font-size: 14px;
+  font-size: var(--body-size, 14px);
   line-height: 1.5;
   background: var(--surface);
   color: var(--text);
@@ -46,7 +46,21 @@ h1,
 h2,
 h3 {
   font-family: var(--font-head);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--head-tracking, -0.02em);
+}
+
+.hl-display {
+  font-family: var(--font-display, var(--font-head));
+  font-size-adjust: var(--display-adjust, none);
+}
+
+.hl-flourish::after {
+  content: var(--flourish-content, none);
+  display: block;
+  width: min(15rem, 70%);
+  height: 1.4rem;
+  margin-top: 0.55rem;
+  background: var(--flourish, none) left center / contain no-repeat;
 }
 
 input,
@@ -64,18 +78,25 @@ textarea {
 
 .hl-cap {
   margin: 0 0 0.6rem;
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-family: var(--font-caps, var(--font-sans));
+  font-size: var(--cap-size, 0.72rem);
   font-weight: 600;
-  letter-spacing: 0.09em;
-  text-transform: uppercase;
-  color: var(--h, var(--text-muted));
+  letter-spacing: var(--cap-tracking, 0.09em);
+  text-transform: var(--cap-transform, uppercase);
+  color: var(--cap-color, var(--h, var(--text-muted)));
+
+  &::before {
+    content: var(--cap-ornament, none);
+    white-space: pre;
+  }
 }
 
 .hl-list {
   border: var(--card-border);
   border-radius: var(--radius-card);
   background: var(--surface-raised);
+  background-image: var(--card-texture, none);
+  box-shadow: var(--card-frame, none);
   overflow: hidden;
 }
 
@@ -218,6 +239,10 @@ button.hl-list__row {
   padding: 1.75rem 2rem calc(1.75rem + var(--safe-bottom));
   gap: 1.25rem;
   overflow-y: auto;
+
+  > * {
+    flex-shrink: 0;
+  }
 }
 
 .hl-card {
@@ -226,6 +251,8 @@ button.hl-list__row {
   border: var(--card-border);
   border-radius: var(--radius-card);
   background: var(--surface-raised);
+  background-image: var(--card-texture, none);
+  box-shadow: var(--card-frame, none);
 }
 
 .hl-card__title {
@@ -260,12 +287,15 @@ button.hl-list__row {
   min-height: var(--control);
   padding: 0 0.8rem;
   border: var(--border-width) solid var(--border);
-  border-radius: 0.45rem;
+  border-radius: var(--btn-radius, 0.45rem);
   background: var(--surface-raised);
   color: var(--text);
   font: inherit;
-  font-size: 0.85rem;
-  font-weight: 500;
+  font-family: var(--btn-font, inherit);
+  font-size: var(--btn-size, 0.85rem);
+  font-weight: var(--btn-weight, 500);
+  letter-spacing: var(--btn-tracking, normal);
+  text-transform: var(--btn-transform, none);
   text-decoration: none;
   white-space: nowrap;
   cursor: pointer;
@@ -287,10 +317,13 @@ button.hl-list__row {
   &--primary {
     border-color: var(--accent);
     background: var(--accent);
+    background-image: var(--btn-primary-image, none);
     color: var(--on-accent);
 
     &:hover:not(:disabled) {
       background: var(--accent-hover);
+      background-image: var(--btn-primary-image, none);
+      filter: brightness(1.06);
     }
   }
 

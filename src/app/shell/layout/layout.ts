@@ -70,6 +70,7 @@ export class Layout {
     effect(() => {
       this.path();
       this.ui.drawerOpen.set(false);
+      if ((globalThis.innerWidth ?? 1440) < 768) this.ui.panel.setPinned(false, false);
     });
   }
 

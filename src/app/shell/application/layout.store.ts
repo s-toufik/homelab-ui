@@ -1,4 +1,5 @@
 import { Injectable, InjectionToken, computed, inject, signal } from '@angular/core';
+import { PaneState } from '@shared/ui/side-pane/pane-state';
 
 export const ASSISTANT_WIDTH_KEY = 'homelab-ui.assistant-width';
 export const ASSISTANT_DEFAULT_WIDTH = 416;
@@ -14,15 +15,8 @@ export const LAYOUT_STORAGE = new InjectionToken<Storage | null>('LAYOUT_STORAGE
   },
 });
 
-export const SIDEBAR_KEY = 'homelab-ui.sidebar-collapsed';
-
-function readFlag(storage: Storage | null, key: string): boolean {
-  try {
-    return storage?.getItem(key) === 'true';
-  } catch {
-    return false;
-  }
-}
+export const SIDEBAR_KEY = 'homelab-ui.sidebar';
+export const PAGE_PANEL_KEY = 'homelab-ui.page-panel';
 
 function readWidth(storage: Storage | null): number {
   try {
@@ -41,13 +35,29 @@ export function clampAssistantWidth(width: number, viewport: number): number {
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
   private readonly storage = inject(LAYOUT_STORAGE);
-  private readonly panelPinnedState = signal(false);
-  private readonly panelHoveringState = signal(false);
-  readonly panelPinned = this.panelPinnedState.asReadonly();
-  readonly panelOpen = computed(() => this.panelPinnedState() || this.panelHoveringState());
+
+  readonly sidebar = new PaneState({
+    key: SIDEBAR_KEY,
+    width: 240,
+    min: 200,
+    max: 360,
+    pinned: true,
+    storage: this.storage,
+  });
+  readonly sidebarCollapsed = computed(() => !this.sidebar.pinned());
+
+  readonly panel = new PaneState({
+    key: PAGE_PANEL_KEY,
+    width: 300,
+    min: 240,
+    max: 520,
+    pinned: false,
+    storage: this.storage,
+  });
+  readonly panelPinned = this.panel.pinned;
+  readonly panelOpen = this.panel.open;
 
   readonly drawerOpen = signal(false);
-  readonly sidebarCollapsed = signal(readFlag(this.storage, SIDEBAR_KEY));
 
   private readonly assistantOpenState = signal(false);
   readonly assistantOpen = this.assistantOpenState.asReadonly();
@@ -58,30 +68,20 @@ export class LayoutStore {
   readonly resizing = signal(false);
 
   toggleSidebar(): void {
-    this.sidebarCollapsed.update((collapsed) => !collapsed);
-    try {
-      this.storage?.setItem(SIDEBAR_KEY, String(this.sidebarCollapsed()));
-    } catch {
-      return;
-    }
+    this.sidebar.togglePin();
   }
 
   togglePanel(): void {
-    this.panelPinnedState.update((pinned) => !pinned);
-    if (this.panelPinnedState()) this.assistantOpenState.set(false);
+    this.panel.togglePin();
+    if (this.panel.pinned()) this.assistantOpenState.set(false);
   }
 
   closePanel(): void {
-    this.panelPinnedState.set(false);
-    this.panelHoveringState.set(false);
+    this.panel.setPinned(false);
   }
 
   hoverPanel(hovering: boolean): void {
-    this.panelHoveringState.set(hovering);
-  }
-
-  collapsePanelPeek(): void {
-    this.panelHoveringState.set(false);
+    this.panel.hover(hovering);
   }
 
   toggleAssistant(): void {

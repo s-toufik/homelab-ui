@@ -9,6 +9,8 @@ export const THEME_IDS = [
   'forest',
   'dragon',
   'wizarding',
+  'demigod',
+  'regency',
 ] as const;
 export type ThemeId = (typeof THEME_IDS)[number];
 export type ThemeChoice = ThemeId | 'auto';
@@ -18,6 +20,7 @@ export interface ThemeOption {
   readonly name: string;
   readonly tagline: string;
   readonly dark: boolean;
+  readonly storybook: boolean;
   readonly surface: string;
 }
 

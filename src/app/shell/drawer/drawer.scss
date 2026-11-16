@@ -13,12 +13,22 @@
 }
 
 .drawer {
+  --surface: var(--side-bg);
+  --surface-side: var(--side-bg);
+  --surface-raised: var(--side-active);
+  --surface-hover: var(--side-hover);
+  --text: var(--side-text);
+  --text-muted: var(--side-muted);
+  --border: var(--side-border);
+  --accent: var(--side-accent);
+  --on-accent: var(--side-on-accent);
+
   display: flex;
   flex-direction: column;
   height: 100%;
   padding: calc(0.6rem + var(--safe-top)) 0.6rem calc(0.6rem + var(--safe-bottom))
     calc(0.6rem + var(--safe-left));
-  background: var(--surface-side);
+  background: var(--side-texture, none) var(--side-bg);
 }
 
 .drawer__top {

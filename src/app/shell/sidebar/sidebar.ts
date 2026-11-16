@@ -14,6 +14,7 @@ import { FeatureIcon } from '../feature-icon/feature-icon';
   imports: [RouterLink, RouterLinkActive, FeatureIcon],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.scss',
+  host: { '[class.sidebar--pinned]': 'ui.sidebar.pinned()' },
 })
 export class Sidebar {
   protected readonly ui = inject(LayoutStore);
@@ -25,6 +26,7 @@ export class Sidebar {
   protected readonly waiting = computed(() => this.assistant?.waiting() ?? 0);
   protected readonly menuOpen = signal(false);
   protected readonly name = computed(() => this.session.user()?.username ?? 'You');
+  protected readonly rail = computed(() => !this.ui.sidebar.pinned() && !this.ui.sidebar.peeking());
 
   constructor() {
     void inject(AppsStore).load();

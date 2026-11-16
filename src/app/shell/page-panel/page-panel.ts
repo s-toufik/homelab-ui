@@ -1,11 +1,12 @@
 import { NgTemplateOutlet } from '@angular/common';
 import { Component, inject } from '@angular/core';
+import { SidePane } from '@shared/ui/side-pane/side-pane';
 import { LayoutStore } from '../application/layout.store';
 import { PageChromeStore } from '../application/page-chrome.store';
 
 @Component({
   selector: 'app-page-panel',
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, SidePane],
   templateUrl: './page-panel.html',
   styleUrl: './page-panel.scss',
 })

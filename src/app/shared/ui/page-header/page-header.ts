@@ -17,7 +17,7 @@ import { FeatureIcon } from '@shell/feature-icon/feature-icon';
           }
           {{ eyebrow() }}
         </p>
-        <h1 class="page-header__title">{{ title() }}</h1>
+        <h1 class="page-header__title hl-display hl-flourish">{{ title() }}</h1>
         @if (summary()) {
           <p class="page-header__summary">{{ summary() }}</p>
         }
@@ -48,11 +48,12 @@ import { FeatureIcon } from '@shell/feature-icon/feature-icon';
       align-items: center;
       gap: 0.4rem;
       margin: 0 0 0.35rem;
-      font-size: 0.72rem;
+      font-family: var(--font-caps, var(--font-sans));
+      font-size: var(--cap-size, 0.72rem);
       font-weight: 600;
-      letter-spacing: 0.09em;
-      text-transform: uppercase;
-      color: var(--h);
+      letter-spacing: var(--cap-tracking, 0.09em);
+      text-transform: var(--cap-transform, uppercase);
+      color: var(--cap-color, var(--h));
     }
     .page-header__title {
       margin: 0;

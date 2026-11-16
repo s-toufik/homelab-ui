@@ -2,7 +2,7 @@
   <div class="today__column">
     <header>
       <span class="today__date">{{ date }}</span>
-      <h1 class="today__hello">{{ hello() }}</h1>
+      <h1 class="today__hello hl-display hl-flourish">{{ hello() }}</h1>
       <p class="today__brief">
         @for (sentence of sentences(); track $index) {
           <span [class.today__soft]="$index > 0 && sentence.startsWith('One thing')"
