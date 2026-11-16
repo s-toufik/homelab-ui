@@ -1,4 +1,4 @@
-import { displayName, groupOf, sortPeople, type Person } from './person';
+import { displayName, groupOf, isEmail, peopleError, sortPeople, type Person } from './person';
 import { TEMPORARY_PASSWORD_LENGTH, temporaryPassword } from './temporary-password';
 
 function person(username: string, extra: Partial<Person> = {}): Person {
@@ -53,5 +53,19 @@ describe('temporary password', () => {
     let call = 0;
     const random = (bytes: Uint8Array) => bytes.fill(call++ === 0 ? 255 : 0);
     expect(temporaryPassword(random).replace(/-/g, '')).toBe('A'.repeat(20));
+  });
+});
+
+describe('account details', () => {
+  it('accepts a real-looking email address only', () => {
+    expect(['dora@example.com', 'jean.dupont@mail.co.uk'].map(isEmail)).toEqual([true, true]);
+    expect(
+      ['dora', 'dora@', '@example.com', 'dora@example', 'do ra@example.com'].map(isEmail),
+    ).toEqual([false, false, false, false, false]);
+  });
+
+  it('explains what to do when the gateway has no People API', () => {
+    expect(peopleError({ status: 404 }, 'create the account')).toContain('make apply R=caddy');
+    expect(peopleError({ status: 409 }, 'create the account')).toContain('already taken');
   });
 });

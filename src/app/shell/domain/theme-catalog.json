@@ -19,5 +19,40 @@
     "tagline": "Black on white, largest and clearest",
     "dark": false,
     "surface": "#FFFFFF"
+  },
+  {
+    "id": "blossom",
+    "name": "Blossom",
+    "tagline": "Soft pink, rounded letters",
+    "dark": false,
+    "surface": "#FFF5F8"
+  },
+  {
+    "id": "lilac",
+    "name": "Lilac",
+    "tagline": "Lavender and violet, light and airy",
+    "dark": false,
+    "surface": "#F8F5FF"
+  },
+  {
+    "id": "forest",
+    "name": "Forest",
+    "tagline": "Moss, bark and morning light",
+    "dark": false,
+    "surface": "#F3F5EE"
+  },
+  {
+    "id": "dragon",
+    "name": "Dragon Rider",
+    "tagline": "Obsidian, ember and gold, after Fourth Wing",
+    "dark": true,
+    "surface": "#0E0B0A"
+  },
+  {
+    "id": "wizarding",
+    "name": "Wizarding",
+    "tagline": "Burgundy, gold and parchment, after Harry Potter",
+    "dark": true,
+    "surface": "#1A0F14"
   }
 ]

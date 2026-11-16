@@ -1,4 +1,12 @@
-import { Component, ElementRef, afterRenderEffect, input, output, viewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  afterRenderEffect,
+  input,
+  output,
+  viewChild,
+} from '@angular/core';
 import type { ChatMessage } from '../../domain/chat-message';
 import { Message } from '../message/message';
 
@@ -30,6 +38,13 @@ export class Conversation {
         this.scrollAnchor()?.nativeElement.scrollIntoView?.({ block: 'end' });
       }
     });
+  }
+
+  @HostListener('window:scroll')
+  onWindowScroll(): void {
+    const root = document.scrollingElement ?? document.documentElement;
+    if (root.scrollHeight <= root.clientHeight) return;
+    this.stickToBottom = root.scrollHeight - root.scrollTop - root.clientHeight < NEAR_BOTTOM_PX;
   }
 
   onScroll(event: Event): void {

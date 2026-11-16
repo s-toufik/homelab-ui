@@ -15,10 +15,65 @@
 }
 
 .layout__main {
+  position: relative;
+  z-index: 2;
   flex: 1;
   min-width: 0;
   display: flex;
   flex-direction: column;
+  background: var(--surface);
+}
+
+.layout__shade {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  border: 0;
+  background: rgb(0 0 0 / 35%);
+  cursor: pointer;
+}
+
+.layout__tool.layout__tool--phone {
+  width: 2.5rem;
+  height: 2.5rem;
+  border: 0;
+  background: transparent;
+}
+
+@media (max-width: 767px) {
+  :host {
+    height: auto;
+    min-height: 100dvh;
+    --drawer-width: min(82vw, 20rem);
+  }
+
+  .layout {
+    display: block;
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .layout__main {
+    min-height: 100dvh;
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .layout--drawer {
+    height: 100dvh;
+    overflow: hidden;
+
+    .layout__main {
+      transform: translateX(var(--drawer-width));
+      border-left: var(--border-width) solid var(--border);
+      box-shadow: -12px 0 30px -12px rgb(0 0 0 / 40%);
+    }
+  }
+
+  .layout__content {
+    flex: none;
+    display: block;
+  }
 }
 
 .layout__content {

@@ -65,10 +65,17 @@
           class="hl-input"
           type="email"
           name="email"
+          inputmode="email"
           autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          [attr.aria-invalid]="!emailValid()"
           [ngModel]="email()"
           (ngModelChange)="email.set($event)"
         />
+        @if (!emailValid()) {
+          <span class="new__error">Enter an address like name@example.com, or leave it empty.</span>
+        }
       </label>
       <div class="new__actions">
         <a class="hl-btn" routerLink="/people">Cancel</a>

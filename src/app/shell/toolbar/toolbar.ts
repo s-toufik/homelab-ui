@@ -65,10 +65,7 @@ import { FeatureIcon } from '../feature-icon/feature-icon';
       gap: 0.4rem;
     }
     @media (max-width: 767px) {
-      .toolbar__search {
-        margin: 0 5.5rem 0 0;
-      }
-      kbd {
+      :host {
         display: none;
       }
     }

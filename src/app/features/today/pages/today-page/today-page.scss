@@ -137,8 +137,35 @@
 }
 
 @media (max-width: 767px) {
+  :host {
+    display: block;
+  }
+
   .today {
-    padding-top: 1.75rem;
+    overflow: visible;
+    padding: 1.1rem 0.9rem calc(1.5rem + var(--safe-bottom));
+  }
+
+  .today__column {
+    gap: 1.35rem;
+  }
+
+  .today__hello {
+    margin: 0.3rem 0 0.5rem;
+    font-size: 1.65rem;
+  }
+
+  .today__brief {
+    font-size: 0.95rem;
+    line-height: 1.55;
+  }
+
+  .today__stat {
+    padding: 0.7rem 0.8rem;
+
+    b {
+      font-size: 1.15rem;
+    }
   }
 
   .today__stats {

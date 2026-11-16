@@ -1,9 +1,10 @@
-import { Component, computed, inject, signal } from '@angular/core';
+import { Component, HostListener, computed, inject, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
 import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { AccessStore } from '../application/access.store';
 import { ASSISTANT_PANEL } from '../application/assistant-panel';
 import { AppsStore } from '../application/apps.store';
+import { LayoutStore } from '../application/layout.store';
 import { NavigationStore } from '../application/navigation.store';
 import { SHELL_ICONS } from '../domain/navigation';
 import { FeatureIcon } from '../feature-icon/feature-icon';
@@ -15,6 +16,7 @@ import { FeatureIcon } from '../feature-icon/feature-icon';
   styleUrl: './sidebar.scss',
 })
 export class Sidebar {
+  protected readonly ui = inject(LayoutStore);
   protected readonly nav = inject(NavigationStore);
   protected readonly access = inject(AccessStore);
   protected readonly session = inject(GatewaySession);
@@ -26,5 +28,16 @@ export class Sidebar {
 
   constructor() {
     void inject(AppsStore).load();
+  }
+
+  @HostListener('document:keydown', ['$event'])
+  protected onKey(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target && (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable))
+      return;
+    if (event.key === '[' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      event.preventDefault();
+      this.ui.toggleSidebar();
+    }
   }
 }

@@ -1,11 +1,21 @@
 import { InjectionToken, Provider, Signal, Type } from '@angular/core';
 import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 
+export interface RecentItem {
+  readonly id: string;
+  readonly label: string;
+  readonly hint: string;
+  readonly path: readonly string[];
+  readonly waiting: boolean;
+  readonly color: string;
+}
+
 export interface AssistantPanel {
   load: () => Promise<Type<unknown>>;
   hiddenOn: readonly string[];
   phase: Signal<SwarmPhase>;
   waiting: Signal<number>;
+  recent: Signal<readonly RecentItem[]>;
 }
 
 export const ASSISTANT_PANEL = new InjectionToken<AssistantPanel>('ASSISTANT_PANEL');

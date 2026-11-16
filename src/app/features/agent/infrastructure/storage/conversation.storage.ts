@@ -1,4 +1,5 @@
 import { Injectable, inject } from '@angular/core';
+import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { keepable, titleOf, type Conversation } from '../../domain/agent-conversation';
 import type { ChatMessage } from '../../domain/chat-message';
 import { PREFERENCES_STORAGE } from './agent-preferences.storage';
@@ -24,10 +25,28 @@ function messagesOf(value: unknown): ChatMessage[] {
 @Injectable({ providedIn: 'root' })
 export class ConversationStorage {
   private readonly storage = inject(PREFERENCES_STORAGE);
+  private readonly session = inject(GatewaySession, { optional: true });
+
+  private key(): string {
+    const username = this.session?.user()?.username;
+    return username ? `${CONVERSATIONS_KEY}.${username}` : CONVERSATIONS_KEY;
+  }
+
+  private raw(): string {
+    const key = this.key();
+    const own = this.storage?.getItem(key);
+    if (own !== null && own !== undefined) return own;
+    const shared = key === CONVERSATIONS_KEY ? null : this.storage?.getItem(CONVERSATIONS_KEY);
+    if (shared) {
+      this.storage?.setItem(key, shared);
+      this.storage?.removeItem(CONVERSATIONS_KEY);
+    }
+    return shared ?? '[]';
+  }
 
   read(): Conversation[] {
     try {
-      const saved: unknown = JSON.parse(this.storage?.getItem(CONVERSATIONS_KEY) ?? '[]');
+      const saved: unknown = JSON.parse(this.raw());
       if (Array.isArray(saved)) {
         return saved
           .filter((entry) => typeof entry?.id === 'string' && typeof entry?.agent === 'string')
@@ -63,7 +82,7 @@ export class ConversationStorage {
 
   write(conversations: readonly Conversation[]): void {
     try {
-      this.storage?.setItem(CONVERSATIONS_KEY, JSON.stringify(keepable(conversations)));
+      this.storage?.setItem(this.key(), JSON.stringify(keepable(conversations)));
     } catch {
       return;
     }

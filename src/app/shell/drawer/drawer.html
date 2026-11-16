@@ -1,0 +1,126 @@
+<nav
+  class="drawer"
+  aria-label="Menu"
+  [attr.aria-hidden]="!ui.drawerOpen()"
+  [attr.inert]="ui.drawerOpen() ? null : ''"
+>
+  <div class="drawer__top">
+    <button type="button" class="drawer__search" (click)="search()">
+      <app-feature-icon [paths]="icons.search" [size]="16" /> Search or ask
+    </button>
+    <a
+      class="drawer__new"
+      routerLink="/assistant/new"
+      aria-label="New conversation"
+      (click)="close()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="19"
+        height="19"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M12 20h8M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
+      </svg>
+    </a>
+  </div>
+
+  <div class="drawer__scroll">
+    <a
+      class="drawer__item"
+      routerLink="/"
+      routerLinkActive="drawer__item--on"
+      [routerLinkActiveOptions]="{ exact: true }"
+      (click)="close()"
+    >
+      <app-feature-icon [paths]="icons.today" [size]="17" />Today
+    </a>
+    <a
+      class="drawer__item"
+      routerLink="/assistant"
+      routerLinkActive="drawer__item--on"
+      (click)="close()"
+    >
+      <app-feature-icon [paths]="icons.assistant" [size]="17" />Assistant
+      @if (waiting()) {
+        <span class="drawer__count">{{ waiting() }}</span>
+      }
+    </a>
+    @if (access.isAdmin()) {
+      <a
+        class="drawer__item"
+        routerLink="/map"
+        routerLinkActive="drawer__item--on"
+        (click)="close()"
+      >
+        <app-feature-icon [paths]="icons.map" [size]="17" />Map
+      </a>
+    }
+
+    @if (recent().length) {
+      <span class="drawer__group drawer__group--static">Recent</span>
+      @for (item of recent(); track item.id) {
+        <a
+          class="drawer__recent"
+          [routerLink]="item.path"
+          routerLinkActive="drawer__item--on"
+          (click)="close()"
+        >
+          <span class="drawer__dot" [style.background]="item.color"></span>
+          <span class="drawer__recent-label">{{ item.label }}</span>
+          @if (item.waiting) {
+            <span class="drawer__waiting">plan</span>
+          }
+        </a>
+      }
+    }
+
+    @for (entry of nav.sections(); track entry.section) {
+      @let closed = nav.collapsed().has(entry.section);
+      <button
+        type="button"
+        class="drawer__group"
+        [attr.aria-expanded]="!closed"
+        (click)="nav.toggle(entry.section)"
+      >
+        {{ entry.section
+        }}<span [class.drawer__chevron--closed]="closed" class="drawer__chevron">⌄</span>
+      </button>
+      @if (!closed) {
+        @for (page of entry.pages; track page.id) {
+          <a
+            class="drawer__item"
+            [routerLink]="page.path"
+            routerLinkActive="drawer__item--on"
+            (click)="close()"
+          >
+            <app-feature-icon [paths]="page.icon" [size]="17" />{{ page.label }}
+          </a>
+        }
+      }
+    }
+  </div>
+
+  <div class="drawer__bottom">
+    @if (access.isAdmin()) {
+      <a class="drawer__item" routerLink="/people" (click)="close()"
+        ><app-feature-icon [paths]="icons.people" [size]="17" />People</a
+      >
+    }
+    <a class="drawer__item" routerLink="/appearance" (click)="close()"
+      ><app-feature-icon [paths]="icons.settings" [size]="17" />Appearance</a
+    >
+    <div class="drawer__me">
+      <span class="drawer__avatar">{{ name().charAt(0).toUpperCase() }}</span>
+      <a class="drawer__name" routerLink="/account" (click)="close()">{{ name() }}</a>
+      @if (session.enabled) {
+        <a class="drawer__signout" [href]="session.signOutUrl">Sign out</a>
+      }
+    </div>
+  </div>
+</nav>

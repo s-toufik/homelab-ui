@@ -3,6 +3,7 @@ import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { AppsStore } from '@shell/application/apps.store';
 import {
   groupOf,
+  peopleError,
   sortPeople,
   type NewPerson,
   type PageOption,
@@ -43,7 +44,7 @@ export class PeopleStore {
       this.people.set(sortPeople(await this.directory.list()));
       this.error.set(null);
     } catch (error) {
-      this.error.set(`Couldn't load the people: ${(error as Error).message}`);
+      this.error.set(peopleError(error, 'load the people'));
     } finally {
       this.loading.set(false);
     }
@@ -111,7 +112,7 @@ export class PeopleStore {
       return true;
     } catch (error) {
       undo?.();
-      this.error.set(`That didn't work: ${(error as Error).message}`);
+      this.error.set(peopleError(error, 'save the change'));
       return false;
     } finally {
       this.busy.update((keys) => new Set([...keys].filter((k) => k !== key)));

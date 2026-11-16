@@ -358,4 +358,37 @@ describe('AgentStore', () => {
       expect(store.sessionId()).toBe('s1');
     });
   });
+
+  describe('deleting', () => {
+    it('deletes one conversation, or all of them', async () => {
+      const store = storeStreaming([event('final', 'ok'), event('complete')]);
+      store.modelName.set('m');
+      store.newConversation('kitchen');
+      store.draft.set('soup?');
+      await store.send();
+      const kitchen = store.sessionId();
+      store.newConversation('travel');
+      store.draft.set('Lisbon?');
+      await store.send();
+
+      store.deleteConversation(kitchen);
+      expect(store.conversations().map((c) => c.agent)).toEqual(['travel']);
+
+      store.deleteAll();
+      expect(store.conversations()).toEqual([]);
+      expect(store.messages()).toEqual([]);
+    });
+
+    it('keeps the conversations of the agents a person cannot use when they delete all', async () => {
+      const store = storeStreaming([event('final', 'ok'), event('complete')]);
+      store.modelName.set('m');
+      for (const agent of ['kitchen', 'coding']) {
+        store.newConversation(agent);
+        store.draft.set('hi');
+        await store.send();
+      }
+      store.deleteAll((agent) => agent === 'kitchen');
+      expect(store.conversations().map((c) => c.agent)).toEqual(['coding']);
+    });
+  });
 });

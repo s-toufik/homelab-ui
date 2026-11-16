@@ -4,151 +4,178 @@
 
 # Homelab
 
-**Your homelab's apps and assistants, for everyone at home, on the phone, the tablet and the computer.**
+**The homelab's apps, assistants and tools in one place, for everyone at home, on a computer, a tablet or a phone.**
+
+<img src="docs/screenshots/today.webp" alt="Today: the date, a greeting and a summary, a plan waiting in Kitchen, the homelab's apps, CPU, memory and disk, and the latest conversations" />
 
 </div>
 
-## Today: a short briefing, not a wall of tiles
+## What's inside
 
-The first page reads like a note written for you: the date, a greeting, and one or two sentences of what matters — _"Kitchen has a plan waiting for you. The homelab is healthy: all 24 apps answer and no alert is firing."_ Below, only what has something to show:
+| Page           | Who                                          | What it does                                                                                                                                      |
+| -------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Today**      | Everyone                                     | The day at a glance: plans waiting for you, alerts, the homelab's health, your latest conversations                                               |
+| **Assistant**  | Everyone, for the assistants they were given | Conversations with the homelab's assistants: Kitchen, Travel, Observation, Analysis, Coding, Security, and the supervisor that hands work to them |
+| **Map**        | Admins                                       | The Kubernetes cluster, live: every service, its state, what it talks to                                                                          |
+| **People**     | Admins                                       | Accounts, and the pages each person may open                                                                                                      |
+| **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker                                           |
+| **Account**    | Everyone                                     | Profile, password, devices and sessions                                                                                                           |
+| **Appearance** | Everyone                                     | Theme                                                                                                                                             |
 
-- **Waiting for you** — plans to approve, and for admins the alerts and warnings (a disk filling up, a backup that didn't run), each with the button that deals with it;
-- **Homelab** — for admins, the apps answering and the server's CPU, memory and disk;
-- **Pick up where you left off** — your latest conversations.
+## Today
 
-Today never repeats the menu. Someone given only Kitchen and Travel sees only their plans and conversations; a page they weren't given isn't in any menu, its address sends them back to Today, and the homelab's gateway refuses its data anyway.
+Today opens with the date, a greeting and a short summary, for example _"Kitchen has a plan waiting for you. The homelab is healthy: all 24 apps answer and no alert is firing."_ Below it:
 
-**Moving around.** On a computer or an iPad, a quiet sidebar holds Today, Assistant, Map (admins), your pages in three groups — Observe, Operate, Automate, each folds away — then People (admins), Appearance and your account. On a phone, a tab bar: Today, Assistant, More.
+- **Waiting for you**: plans to approve and, for admins, firing alerts and warnings (a disk filling up, a backup that didn't run), each with a button to deal with it;
+- **Homelab** (admins): how many apps answer, and the server's CPU, memory and disk;
+- **Pick up where you left off**: your latest conversations.
 
-**One field for everything.** **⌘K** (or **/**, or the field at the top) finds any page or conversation, or asks an assistant: type _"what's for dinner"_ and pick **Ask Kitchen**. Arrow keys move, Enter opens, Esc closes.
+## Finding your way
 
-## The homelab map
+- **Computer and iPad:** a sidebar with Today, Assistant, Map (admins), your pages grouped into Observe, Operate and Automate (each group folds), then People (admins), Appearance and your account. The button at its top, or **[**, folds it to icons; the choice is remembered.
+- **Phone:** a slim top bar with the menu, the page's title and one action (search, or a new conversation on Assistant). The menu slides in from the left, or swipe right from the edge: search, a new conversation, your recent conversations, then every page. The page stays visible on the right; tap it or swipe left to go back.
+- **⌘K** (or **/**, or the search field at the top) finds any page or conversation, or asks an assistant directly: type _"what's for dinner"_ and pick **Ask Kitchen**. Arrow keys move, Enter opens, Esc closes.
 
-Admins get a **Map** of the cluster, laid out the way homelab-infra is: the networks (tailnet, pods, services, host ports, outbound), how a request travels from your devices through caddy and the sign-in check, every port open on the tailnet, how a question goes through the agents, then the server with its CPU, memory, disk and pods and every service as a card in five groups — Gateway & security, Apps, LLM & tools, Data & messaging, Observability.
+| Shortcut      | Does                                |
+| ------------- | ----------------------------------- |
+| **⌘K** or `/` | Search or ask                       |
+| `[`           | Fold or unfold the sidebar          |
+| `n`           | New conversation, on Assistant      |
+| **Esc**       | Close the palette, panel or details |
 
-Each card shows its live state from Kubernetes (ready, restarted today, failed, or a job's last run) every 30 seconds. **Click a card** and what it talks to and what uses it stay lit while the rest dims; its tailnet port lights up; a panel shows what it is, where it's reached, its image, and **Open**, **Logs**, **Metrics**, **Restart** (asks first) and **Ask about it**. Click a name in the panel to follow the path.
+A person sees only the pages they were given. Opening any other page's address brings them back to Today, and the gateway refuses that page's data.
 
-## Every tool, inside the homelab
+<img src="docs/screenshots/command-palette.webp" alt="The ⌘K palette with 'what's for dinner' typed and the choices Ask Assistant, Ask Kitchen, Ask Travel and Ask Observation" />
 
-Each tool has its own page here, in your theme, with no new tab to open:
+## Assistant
 
-| Page           | What you do there                                                                                                                                                                                          |
-| -------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts (Grafana's three dashboards, rebuilt)                                                                                                   |
-| **Metrics**    | Run a PromQL query as a chart or a table; see every scrape target and the alert rules                                                                                                                      |
-| **Logs**       | Search every container's logs with LogQL, pick a label and a value, filter by level, follow them live; a line from a traced request opens its trace                                                        |
-| **Traces**     | Find a request by service, operation or duration, and follow it span by span; `/traces?trace=<id>` opens one trace                                                                                         |
-| **Kafka**      | Topics, their messages, consumer groups and their lag; create or delete a topic and send a message (admins)                                                                                                |
-| **Pipeline**   | Alloy's components, their health, what feeds what                                                                                                                                                          |
-| **Models**     | Load and unload models, follow the LLM's logs, try a prompt                                                                                                                                                |
-| **Tools**      | Every tool the agent can use — its own and the ones it gets from Grafana's, MongoDB's and PostgreSQL's MCP servers (`grafana_*`, `mongodb_*`, `postgres_*`); fill in its arguments and run it              |
-| **Account**    | Your name and email, your devices and sessions (sign one out), and changing your password                                                                                                                  |
-| **Tool UIs**   | Links to each tool's own web interface — Grafana, Prometheus, Kafka UI, Alloy, the LLM playground, MCP Inspector, the agent's API docs, Headlamp (admins), your Keycloak account — with whether it answers |
-| **Kubernetes** | Admins only: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit an object's YAML, read a pod's logs and open a shell in it                    |
+Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did caddy restart?"_, _"Which tables are the largest?"_.
+
+- **Conversations** are listed by day (Today, This week, Earlier) next to the one that is open. Each conversation is with one assistant, picked when you start it with **+ New**. The first message opens the conversation and its answer streams in at once.
+- **Delete:** hover a conversation and click the bin, then click again to confirm. **Delete all** at the bottom of the list removes every conversation after a confirmation.
+- **Details column** (wide screens): the assistant, the number of messages and when the conversation started, the plan's steps, the last answer's model, time and tokens, **Copy as text** and **Delete**.
+- **Answers stream in** word by word. A small swarm of dots shows the assistant at work: calm while it thinks, faster while it runs a tool, red if something went wrong.
+- **Plans:** when a request needs real work (reading files, querying data, saving a report), the assistant first proposes a plan. A card under it offers **Approve and run**, **Change it** and **Dismiss**; nothing runs until you approve. A waiting plan also appears on Today and as a number next to Assistant.
+- **Answer details:** under each answer, the time it took and the tokens used, for example _(21s · ↑ 9.9k · ↓ 642 tokens)_. Open the details for the model, the tools used and the steps taken.
+- **Settings** (admins, button at the top right): the model, **Auto-approve plans**, the conversation id to pick up an old conversation, and the steps whose model is fixed by the server.
+- **Beside any tool page:** the assistant button at the top right opens it in a panel next to the page, for example to ask about an error on the Logs page. Drag its edge to resize it; **Esc** closes it.
+
+<img src="docs/screenshots/assistant.webp" alt="Assistant: the conversations by day, and Kitchen's plan of three steps with Approve and run, Change it and Dismiss" />
+
+<img src="docs/screenshots/assistant-wide.webp" alt="Assistant on a wide screen: the conversations, an answer from Observation, and the details column with the assistant, the conversation, the last answer and Copy as text" />
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/dashboards.webp" alt="Dashboards: the Homelab overview with CPU, memory and disk gauges, CPU by mode and load average charts" /></td>
-    <td><img src="docs/screenshots/metrics.webp" alt="Metrics: a PromQL query for memory by container drawn over the last hour" /></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/logs.webp" alt="Logs: lines over time by level, then each container's lines newest first, one opened with its labels" /></td>
-    <td><img src="docs/screenshots/traces.webp" alt="Traces: a list of requests and one opened as a waterfall of its spans, a tool call selected with its attributes" /></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/kafka.webp" alt="Kafka: the topics with their size, and one topic's latest messages, one opened as formatted JSON" /></td>
-    <td><img src="docs/screenshots/kubernetes.webp" alt="Kubernetes: the pods of the homelab namespace and one opened with its containers and conditions" /></td>
-  </tr>
-  <tr>
-    <td><img src="docs/screenshots/models.webp" alt="Models: the loaded and unloaded models with Load and Unload, a prompt box and the LLM's logs" /></td>
-    <td><img src="docs/screenshots/tools.webp" alt="Tools: the toolbox's tools, read_file filled in with a path and its result" /></td>
+    <td><img src="docs/screenshots/assistant-answer.webp" alt="An answer from Observation with the time it took and the tokens used" /></td>
+    <td><img src="docs/screenshots/assistant-beside-page.webp" alt="The Status page with the assistant open in a panel beside it" /></td>
   </tr>
 </table>
 
-Admins can change things where it makes sense — scale a deployment, delete a topic, unload a model — and every change that can't be undone asks you to confirm it first, the way the server's `make` commands do.
+### Where conversations are kept
 
-<img src="docs/screenshots/account.webp" alt="Account: your profile, your password and when it was set, and your devices and sessions with Sign out" />
+| Where                     | What                                                                                                                                                 | How long                                    |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| This browser              | The conversations you see, per account (`localStorage` key `homelab-ui.agent.conversations.<username>`), the latest 30 with their latest 40 messages | Until you delete them                       |
+| agent-runtime, MongoDB    | The assistant's memory of each conversation: database `agent_<assistant>`, collections `checkpoints` and `checkpoint_writes`                         | 7 days (`CONVERSATION_TTL`), by a TTL index |
+| agent-runtime, PostgreSQL | The A2A tasks: table `agent_runtime.tasks_<assistant>`                                                                                               | 7 days (`A2A_TASK_TTL`), purged hourly      |
 
-## Check every container
+Deleting a conversation here removes it from this browser. The server copies expire on their own after 7 days.
 
-The **Status** page lists every container of the homelab, grouped the way the server is organised — Gateway, Repository, Message broker, Observability, LLM, Apps — each marked **Ready**, **Not ready** or **Unknown**. The top line counts how many are ready; the page checks again every 30 seconds, or at once with **Check now**.
+## Map
 
-Every service also carries what you need to use it:
+The Map (admins) draws the cluster in sections:
 
-- **links** to its page here — Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, your Account — and to the agent's API docs;
-- its **connection address**, ready to copy — the MongoDB URI, Kafka's bootstrap server, the OTLP endpoints, the LLM's OpenAI-compatible URL;
-- the **folder** it lives in on the server, for when you need to look at its configuration.
+- **Networks:** tailnet, pods, services, host ports, outbound;
+- **The way in:** from your devices over the tailnet to caddy, then the sign-in and page check by oauth2-proxy and Keycloak;
+- **Open on the tailnet:** each port, its service, and whether it uses HTTPS;
+- **Agent pipeline:** from your question through the supervisor to the assistants, their tools and the model;
+- **The server:** CPU, memory, disk and pods, then every service as a card in five groups: Gateway & security, Apps, LLM & tools, Data & messaging, Observability.
 
-<img src="docs/screenshots/status.webp" alt="The Status page: every container Ready, grouped Gateway, Repository, Message broker, Observability, LLM and Apps, each with its folder, links to its page and a copyable connection address" />
+Each card shows the service's live state from Kubernetes, refreshed every 30 seconds: ready, restarted today, failed, or a job's last run. Click a card to highlight what it talks to and what uses it, light up its tailnet port, and open its details: what it does, where it's reached, its image, and **Open**, **Logs**, **Metrics**, **Restart** (asks for confirmation) and **Ask about it**. Click a name in the details to move to that service.
 
-## Ask the agent
+<img src="docs/screenshots/map.webp" alt="The map: networks and legend, the way in through caddy and oauth2-proxy, the ports open on the tailnet, the agent pipeline, then the server with its services as cards; backups is selected, showing its failed last run, what it talks to and its actions" />
 
-Ask in plain words, the way you would ask a colleague: _"Summarise sales.csv by region"_, _"What's in change.md?"_, _"Which tools can you use?"_.
+## Tool pages
 
-A question it can answer straight away — _"What is a KV cache?"_ — comes back **as it is written**: the words appear one after another, so you can start reading at once. While the agent works, a small swarm of dots moves in your theme's colours: calm while it thinks, faster while it runs a tool, red if something went wrong.
+| Page           | What you do there                                                                                                                                                                                                                                                 |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Status**     | Every container grouped as on the server (Gateway, Repository, Message broker, Observability, LLM, Apps), marked Ready, Not ready or Unknown, with links, copyable connection addresses and the folder it lives in; checks every 30 seconds or with **Check now** |
+| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts                                                                                                                                                                                                |
+| **Metrics**    | PromQL queries as a chart or a table; scrape targets and alert rules                                                                                                                                                                                              |
+| **Logs**       | Every container's logs with LogQL: pick a label and a value, filter by level, follow live; a line from a traced request opens its trace                                                                                                                           |
+| **Traces**     | Find a request by service, operation or duration and follow it span by span; `/traces?trace=<id>` opens one trace                                                                                                                                                 |
+| **Kafka**      | Topics, messages, consumer groups and their lag; create or delete a topic and send a message (admins)                                                                                                                                                             |
+| **Pipeline**   | Alloy's components, their health and what feeds what                                                                                                                                                                                                              |
+| **Models**     | Load and unload models, follow the LLM's logs, try a prompt                                                                                                                                                                                                       |
+| **Tools**      | Every tool the assistants can use, including those from the Grafana, MongoDB and PostgreSQL MCP servers; fill in the arguments and run one                                                                                                                        |
+| **Tool UIs**   | Links to each tool's own web interface, with whether it answers                                                                                                                                                                                                   |
+| **Kubernetes** | Admins: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit YAML, read a pod's logs and open a shell                                                                                                  |
+| **Tasker**     | Automations as blocks on a canvas (Trigger, HTTP request, Code, Transform, Output): several canvases side by side, named and grouped blocks, favourites, each block's last result; saved to your account                                                          |
 
-<img src="docs/screenshots/streaming.webp" alt="The agent writing its answer to 'What is a KV cache?', the animated swarm next to the step it is on" />
+<table>
+  <tr>
+    <td><img src="docs/screenshots/status.webp" alt="Status: every container grouped as on the server, all Ready, with links and a copyable connection address" /></td>
+    <td><img src="docs/screenshots/kubernetes.webp" alt="Kubernetes: the overview of pods and recent warnings, with the resource list on the left" /></td>
+  </tr>
+</table>
 
-**Assistant** lists your conversations — today, this week, earlier — next to the one you have open; each says which assistant it's with (Kitchen, Travel…), chosen when you start it. When a request needs real work, the agent first shows you **its plan**, and a card under it waits for you: **Approve and run**, **Change it**, or **Dismiss**. Nothing runs until you say so, and a waiting plan shows on Today and as a number next to Assistant. Conversations are remembered on that device.
+Changes that can't be undone ask for confirmation first.
 
-<img src="docs/screenshots/chat.webp" alt="A conversation: the agent proposes a plan, the user replies yes, the agent answers with a table; under each answer, the time it took and the tokens it used" />
+## People and access
 
-Under each answer you see how long it took and how many tokens went in and out, like _(21s · ↑ 9.9k · ↓ 642 tokens)_. Hover over the answer for a button that copies it, and an arrow that opens everything the agent reported about it: the model, the tools it used, the steps it took, and any detail the agent adds later.
+Admins manage accounts from **People**: the list of everyone who can sign in, next to the selected person's details.
 
-<img src="docs/screenshots/answer-details.webp" width="532" alt="An answer with its details open: elapsed time, input and output tokens, model, outcome, tools used, iteration and max iteration" />
+- **Pages** appear as switches, grouped into Assistants, Apps and Tools. A change applies at the person's next session refresh, within 4 minutes. Admins always have every page.
+- **New password**, **Sign out**, **Disable** and **Enable** act on the selected person.
+- **+ Add** creates an account: name, username and email (checked as you type, optional), the pages the person may open, then a **temporary password**, shown once. The person chooses their own password at their first sign-in.
+- If the gateway has no People API yet, the page says so: deploy homelab-infra's Keycloak and Caddy changes (`make apply R=keycloak`, then `make apply R=caddy`).
 
-## The assistant on every page
+Each page is a Keycloak realm role (`agent:kitchen`, `app:tasker`, `page:metrics`, …). The list of roles and the terminal commands are in homelab-infra's Keycloak README.
 
-The button at the top right of a tool page opens the assistant beside it: ask about an error on the Logs page, carry on with it in Assistant. Choose the model, start a new conversation, or open the Agent page from the panel; **Esc** or ✕ closes it.
+<img src="docs/screenshots/people.webp" alt="People: the list of accounts beside Dora, whose pages are switches: Kitchen and Travel on, everything else off" />
 
-Drag the panel's left edge to make it wider or narrower (double-click it to reset); the width is remembered on that device, and on a wide screen the page makes room for it. Close the panel while the agent is working and the button keeps moving, so you know an answer is on its way.
+## Appearance
 
-<img src="docs/screenshots/assistant.webp" alt="The Logs page with the assistant open beside it, answering why Caddy logged an error" />
+Eight themes, or **Match my device**, which uses Light by day and Navy at night:
 
-## Stay in control
+| Theme              | Look                                               | Headings              |
+| ------------------ | -------------------------------------------------- | --------------------- |
+| **Navy** (default) | Deep blue, dark                                    | Geist                 |
+| **Light**          | White and grey                                     | Geist                 |
+| **Contrast**       | Black on white                                     | Atkinson Hyperlegible |
+| **Blossom**        | Soft pink, raspberry buttons                       | Quicksand             |
+| **Lilac**          | Lavender and violet                                | Quicksand             |
+| **Forest**         | Moss and cream, green buttons                      | Fraunces              |
+| **Dragon Rider**   | Obsidian, ember and gold, after _Fourth Wing_      | Cinzel                |
+| **Wizarding**      | Burgundy, gold and parchment, after _Harry Potter_ | IM Fell English       |
 
-The settings panel lets you choose the **agent** you talk to, the **model** that answers, start a **new conversation**, or pick up an old one by pasting its id.
+The choice is saved on your account, so it is the same on every device. Text meets the WCAG AA contrast ratio in every theme, and touch screens get larger tap targets.
 
-- **The agents** come from the supervisor, which knows them all: the supervisor (the default, which answers what needs no data and hands the rest to the others), observation, analysis, coding, security, kitchen and travel. Under the list, a line says what the chosen agent does. Choosing another agent starts a new conversation with it.
-- **The models** come from the chosen agent itself: when a new model is added there, it shows up here.
+<img src="docs/screenshots/themes.webp" alt="Today in four themes: Blossom, Dragon Rider, Wizarding and Forest" />
 
-Trust the agent with a task? Turn on **Auto-approve plans** and it carries out its plans without waiting for your yes. Your agent, model and auto-approve choices are **remembered** on that device. Code blocks in Tasker ask the agent you chose here.
+<table>
+  <tr>
+    <td><img src="docs/screenshots/appearance.webp" alt="Appearance: a preview, Match my device, and the Navy, Light and Contrast themes" /></td>
+    <td><img src="docs/screenshots/today-light.webp" alt="Today in the Light theme" /></td>
+  </tr>
+</table>
 
-At the bottom, **Fixed by the server** shows the steps that always use the same model whatever you pick — for example understanding your request or writing a plan.
+## On a phone or tablet
 
-<img src="docs/screenshots/settings.webp" alt="The settings panel: the agent (analysis, with what it does), model, auto-approve, conversation id, new conversation, and the steps fixed by the server with their model" />
+Open the homelab in Safari, then **Share › Add to Home Screen**. It opens full screen with its own icon and respects the notch and the home indicator. Pages scroll with the phone's own scrolling; the top bar and the message box stay in place.
 
-## Automate with Tasker
-
-Build automations by connecting blocks on a canvas: a **Trigger**, **HTTP requests**, **Code**, **Transforms** and an **Output**. **Run** starts from every block nothing feeds into — a Trigger, or a block on its own — and you follow each block's result.
-
-- **Several canvases side by side** — open tabs, split the workspace horizontally or vertically, and resize the panes freely.
-- **Name your blocks** so the canvas reads like the flow; a block saved as a favorite takes the favorite's name, and comes back with it when you add the favorite.
-- **Group blocks** into one reusable block, and open it to edit what is inside.
-- **Saved to your account** — workflows and favourite blocks are stored in the homelab's PostgreSQL; the right panel lists your workflows, with **New canvas** to start another. Nobody else sees them.
-- **Inspect any block** — select it to edit its settings and see what it returned on the last run.
-
-<img src="docs/screenshots/tasker.webp" alt="Tasker with two canvases side by side: 'Kafka lag check' with a grouped block, and 'Nightly backup report' after a run, its HTTP request block selected with its settings and last result in the right panel" />
-
-## Themes
-
-**Appearance** offers **Navy** (deep blue, the default), **Light** (the same layout on white) and **Contrast** (black on white, the easy-to-read Atkinson Hyperlegible font), or **Match my device**: Light by day, Navy at night. The choice is saved on your account, so it follows you from your phone to your computer. Every text colour is checked at 4.5:1 or more against what's behind it, in every theme. With a mouse the rows are compact; on a touch screen the same layout gets finger-sized targets.
-
-## People and what each one may open
-
-Admins manage people from **People**: the list of everyone who can sign in beside the one you pick — their pages as switches, grouped Assistants / Apps / Tools, and **New password**, **Sign out**, **Disable** / **Enable**. A switch counts from that person's next session refresh, at most 4 minutes; admins always have everything.
-
-**+ Add** asks a name and a username, the pages they may open, then shows a **temporary password** generated on your device, once. Give it to them: at their first sign-in they choose their own.
-
-Each page is a Keycloak realm role (`agent:kitchen`, `app:tasker`, `page:metrics`…); the list and the terminal commands are in homelab-infra's Keycloak README.
-
-## On your phone too
-
-Install it like an app: open the homelab in Safari, then **Share › Add to Home Screen**. It opens full screen with its own icon, respects the notch and the home bar, keeps buttons within thumb reach, and never zooms when you type.
+<table>
+  <tr>
+    <td><img src="docs/screenshots/phone-today.webp" width="200" alt="Today on a phone, with the top bar: menu, Today, search" /></td>
+    <td><img src="docs/screenshots/phone-drawer.webp" width="200" alt="The menu open on a phone: search, Today, Assistant, Map, recent conversations and the pages, with the conversation still visible on the right" /></td>
+    <td><img src="docs/screenshots/phone-assistant.webp" width="200" alt="Kitchen's plan on a phone, with Approve and run" /></td>
+    <td><img src="docs/screenshots/phone-map.webp" width="200" alt="The map on a phone: networks, legend and ports" /></td>
+  </tr>
+</table>
 
 ## How it connects
 
-The UI is one static page served by the homelab's gateway. The browser only ever talks to one HTTPS address, and one sign-in covers the UI and every tool it links to.
+The UI is a static page served by the homelab's gateway. The browser talks to one HTTPS address, and one sign-in covers the UI and every tool it links to.
 
 ```text
  Browser ── https://<server>.<tailnet>.ts.net ──► Caddy ── signed in? ──► oauth2-proxy ◄──► Keycloak
@@ -164,22 +191,25 @@ The UI is one static page served by the homelab's gateway. The browser only ever
      /api/toolbox/mcp     Tools         ◄───────────┤──► agent-toolbox (MCP)
      /api/account/…       Account, theme ◄──────────┤──► Keycloak's account API
      /api/people/…        People        ◄───────────┤──► Keycloak's admin API (admins)
-     /api/kube/…          Kubernetes    ◄───────────┤──► kube-api ──► Kubernetes API (admins)
+     /api/kube/…          Kubernetes, Map ◄─────────┤──► kube-api ──► Kubernetes API (admins)
      /api/health/<name>   Status page   ◄───────────┘──► each container's health endpoint
 ```
 
-Changes (anything but reading) carry the header `X-Homelab-Request: 1`, which the gateway requires so another site can't make them in your name. Each API also needs the page that uses it: the gateway lets a person through only with the `admin` role or that page's role.
-
-Devices on the tailnet can also reach the supervisor directly: its API on `http://<server>.<tailnet>.ts.net:8000` and its tools (MCP) on `:8001/mcp`.
+- Changes (anything but reading) carry the header `X-Homelab-Request: 1`, which the gateway requires.
+- Each API also requires the page that uses it: the `admin` role or that page's role.
+- Devices on the tailnet can also reach the supervisor's API on `http://<server>.<tailnet>.ts.net:8000` and its tools (MCP) on `:8001/mcp`.
 
 ## Open it
 
-On any device on your Tailscale network, open `https://<your-server>.<tailnet>.ts.net/` and sign in. Admins add people from **People**, or on the server with `make user-add ACCOUNT=<name>` (see homelab-infra's `devops_guide.md`); the old address `http://<your-server>:8002` redirects there.
+On a device on your Tailscale network, open `https://<your-server>.<tailnet>.ts.net/` and sign in. The old address `http://<your-server>:8002` redirects there.
 
-Your account's menu (bottom of the sidebar, or More on a phone) has **Sign out**, which ends the session everywhere. The **Account** page changes your profile and password; passwords expire after 90 days, and the sign-in page then asks for a new one. The Map, People, the Kubernetes page, Kafka changes and unloading a model need the `admin` role (`make user-admin ACCOUNT=<name>` on the server).
+- **Accounts:** admins add people from **People**, or on the server with `make user-add ACCOUNT=<name>` (see homelab-infra's `devops_guide.md`).
+- **Admin role:** the Map, People, the Kubernetes page, Kafka changes and unloading a model need it (`make user-admin ACCOUNT=<name>` on the server).
+- **Sign out** is in your account's menu (bottom of the sidebar, or of the menu on a phone) and ends the session everywhere.
+- **Passwords** expire after 90 days; the sign-in page then asks for a new one. **Account** changes your profile and password.
 
 ---
 
-The screenshots show sample data; some still show the look before the Draft 2 redesign.
+The screenshots show sample data.
 
-**Developers:** project structure, how addresses are built, adding a page or a status, the shared charts, and publishing the image — **[docs/development.md](docs/development.md)**.
+**Developers:** project structure, themes, how addresses are built, adding a page, and publishing the image are in **[docs/development.md](docs/development.md)**.
