@@ -51,6 +51,14 @@
         <span class="drawer__count">{{ waiting() }}</span>
       }
     </a>
+    <a
+      class="drawer__item"
+      routerLink="/agents"
+      routerLinkActive="drawer__item--on"
+      (click)="close()"
+    >
+      <app-feature-icon [paths]="icons.agents" [size]="17" />Agents
+    </a>
     @if (access.isAdmin()) {
       <a
         class="drawer__item"
@@ -92,7 +100,16 @@
     }
 
     @if (conversations().length) {
-      <span class="drawer__heading">Conversations</span>
+      <div class="drawer__heading">
+        <span>Conversations</span>
+        <app-delete-button
+          [all]="true"
+          [count]="conversationCount()"
+          [size]="16"
+          label="Delete all conversations"
+          (confirmed)="removeAll()"
+        />
+      </div>
       @for (group of conversations(); track group.title) {
         <span class="drawer__section">{{ group.title }}</span>
         @for (item of group.items; track item.id) {
@@ -109,34 +126,12 @@
                 <span class="drawer__waiting">plan</span>
               }
             </a>
-            <button
-              type="button"
+            <app-delete-button
               class="drawer__delete"
-              [class.drawer__delete--confirm]="confirming() === item.id"
-              [attr.aria-label]="
-                confirming() === item.id ? 'Confirm: delete ' + item.label : 'Delete ' + item.label
-              "
-              (click)="remove(item)"
-              (blur)="confirming.set(null)"
-            >
-              @if (confirming() === item.id) {
-                Delete?
-              } @else {
-                <svg
-                  viewBox="0 0 24 24"
-                  width="15"
-                  height="15"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
-                </svg>
-              }
-            </button>
+              [label]="'Delete ' + item.label"
+              [size]="16"
+              (confirmed)="remove(item)"
+            />
           </div>
         }
       }

@@ -110,6 +110,10 @@ export class KeycloakPeople implements PeopleDirectory {
     await this.api.send(this.user(id, '/logout'), { method: 'POST' });
   }
 
+  async remove(id: string): Promise<void> {
+    await this.api.send(this.user(id), { method: 'DELETE' });
+  }
+
   async resetPassword(id: string, temporaryPassword: string): Promise<void> {
     await this.api.send(this.user(id, '/reset-password'), {
       method: 'PUT',

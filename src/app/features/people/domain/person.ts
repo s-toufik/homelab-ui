@@ -11,7 +11,11 @@ export function isEmail(value: string): boolean {
 export function peopleError(error: unknown, action: string): string {
   const status = (error as { status?: number }).status;
   if (status === 404) {
-    return `Couldn't ${action}: the gateway has no People API yet. On the server, apply homelab-infra's changes: make apply R=keycloak, then make apply R=caddy.`;
+    const message = (error as Error).message ?? '';
+    if (/^404: /.test(message)) {
+      return `Couldn't ${action}: Keycloak answered ${message}.`;
+    }
+    return `Couldn't ${action}: the gateway refused the address (404 from Caddy, no reply from Keycloak). On the server: git pull in homelab-infra, make validate, then make apply R=caddy.`;
   }
   if (status === 401)
     return `Couldn't ${action}: your session ended. Reload the page to sign in again.`;

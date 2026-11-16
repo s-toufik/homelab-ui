@@ -31,8 +31,27 @@ export class AccountPage {
     })}`,
   );
 
+  protected readonly deleteAccountUrl = this.api.keycloakUrl(
+    `/protocol/openid-connect/auth?${new URLSearchParams({
+      client_id: 'account-console',
+      redirect_uri: this.api.keycloakUrl('/account/'),
+      response_type: 'code',
+      scope: 'openid',
+      kc_action: 'delete_account',
+    })}`,
+  );
+  protected readonly confirmingDelete = signal(false);
+
   constructor() {
     void this.load();
+  }
+
+  protected deleteAccount(): void {
+    if (!this.confirmingDelete()) {
+      this.confirmingDelete.set(true);
+      return;
+    }
+    location.assign(this.deleteAccountUrl);
   }
 
   protected async load(): Promise<void> {

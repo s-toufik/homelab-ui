@@ -121,4 +121,36 @@
       }
     </ul>
   </section>
+
+  <section class="hl-card account-page__danger">
+    <h2 class="hl-card__title">Delete my account</h2>
+    <p class="hl-muted account-page__note">
+      Keycloak asks you to confirm, then deletes your account and signs you out everywhere. Your
+      conversations stay in this browser until you delete them, and your Tasker canvases stay on the
+      server until an admin removes them. If you are the only admin, give someone else the admin
+      role first.
+    </p>
+    <button
+      type="button"
+      class="hl-btn hl-btn--danger"
+      [class.account-page__delete--confirm]="confirmingDelete()"
+      (click)="deleteAccount()"
+      (blur)="confirmingDelete.set(false)"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="14"
+        height="14"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+      </svg>
+      {{ confirmingDelete() ? 'Yes, continue to Keycloak' : 'Delete my account' }}
+    </button>
+  </section>
 </div>

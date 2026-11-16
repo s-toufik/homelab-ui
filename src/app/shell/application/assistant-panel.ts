@@ -18,6 +18,7 @@ export interface AssistantPanel {
   waiting: Signal<number>;
   recent: Signal<readonly RecentItem[]>;
   remove: (id: string) => void;
+  removeAll: () => void;
 }
 
 export const ASSISTANT_PANEL = new InjectionToken<AssistantPanel>('ASSISTANT_PANEL');

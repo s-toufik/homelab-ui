@@ -245,6 +245,10 @@ button.hl-list__row {
   }
 }
 
+.hl-page--narrow {
+  max-width: 40rem;
+}
+
 .hl-card {
   min-width: 0;
   padding: 1rem 1.1rem;
@@ -399,6 +403,9 @@ textarea.hl-input {
 }
 
 .hl-tab {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   flex-shrink: 0;
   min-height: calc(var(--control) - 0.36rem);
   padding: 0 0.75rem;

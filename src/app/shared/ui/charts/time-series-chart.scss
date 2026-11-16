@@ -12,6 +12,55 @@
 .chart__svg {
   display: block;
   overflow: visible;
+  cursor: crosshair;
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.chart__axis-zone {
+  fill: transparent;
+
+  &--y {
+    cursor: ns-resize;
+  }
+
+  &--x {
+    cursor: ew-resize;
+  }
+
+  &:hover {
+    fill: color-mix(in srgb, var(--accent) 7%, transparent);
+  }
+}
+
+.chart__brush {
+  fill: color-mix(in srgb, var(--accent) 14%, transparent);
+  stroke: var(--accent);
+  stroke-width: 1;
+  stroke-dasharray: 4 3;
+  pointer-events: none;
+}
+
+.chart__reset {
+  position: absolute;
+  top: 0.2rem;
+  right: 0.75rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.55rem;
+  border: var(--border-width) solid var(--border);
+  border-radius: 999px;
+  background: var(--surface-raised);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.72rem;
+  cursor: pointer;
+
+  &:hover {
+    border-color: var(--accent-border);
+  }
 }
 
 .chart__grid {
@@ -23,6 +72,7 @@
   fill: var(--text-muted);
   font-size: 0.68rem;
   font-family: var(--font-sans);
+  pointer-events: none;
 }
 
 .chart__line {

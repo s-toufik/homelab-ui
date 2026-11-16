@@ -16,10 +16,11 @@
 | -------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Today**      | Everyone                                     | The day at a glance: plans waiting for you, alerts, the homelab's health, your latest conversations                                               |
 | **Assistant**  | Everyone, for the assistants they were given | Conversations with the homelab's assistants: Kitchen, Travel, Observation, Analysis, Coding, Security, and the supervisor that hands work to them |
+| **Agents**     | Everyone, for the assistants they were given | Each assistant as an animated scene, busy while it works                                                                                          |
 | **Map**        | Admins                                       | The Kubernetes cluster, live: every service, its state, what it talks to                                                                          |
 | **People**     | Admins                                       | Accounts, and the pages each person may open                                                                                                      |
 | **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker                                           |
-| **Account**    | Everyone                                     | Profile, password, devices and sessions                                                                                                           |
+| **Account**    | Everyone                                     | Profile, password, devices and sessions, deleting your account                                                                                    |
 | **Appearance** | Everyone                                     | Theme                                                                                                                                             |
 
 ## Today
@@ -55,7 +56,7 @@ A person sees only the pages they were given. Opening any other page's address b
 Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did caddy restart?"_, _"Which tables are the largest?"_.
 
 - **Conversations** are listed by day (Today, This week, Earlier) next to the one that is open. Each conversation is with one assistant, picked when you start it with **+ New**. The first message opens the conversation and its answer streams in at once.
-- **Delete:** hover a conversation and click the bin, then click again to confirm. **Delete all** at the top of the list removes every conversation after a confirmation.
+- **Delete:** the bin next to a conversation deletes it, the double bin at the top of the list deletes them all (on a phone, both are in the menu). The first tap turns the button red with a ✓; tap again to confirm.
 - **On a phone** it works like the ChatGPT and Claude apps: the assistant's name is the title, tap it to pick another assistant (admins also find **Model and settings** there). Suggestions sit just above the message box, which stays at the bottom of the screen.
 - **Answers stream in** word by word. A small swarm of dots shows the assistant at work: calm while it thinks, faster while it runs a tool, red if something went wrong.
 - **Plans:** when a request needs real work (reading files, querying data, saving a report), the assistant first proposes a plan. A card under it offers **Approve and run**, **Change it** and **Dismiss**; nothing runs until you approve. A waiting plan also appears on Today and as a number next to Assistant.
@@ -82,6 +83,24 @@ Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did c
 
 Deleting a conversation here removes it from this browser. The server copies expire on their own after 7 days.
 
+### Agents
+
+**Agents** (`/agents`, next to Assistant) shows every assistant you may use as a small animated scene, busy while it works:
+
+| Agent                          | Scene                                                   |
+| ------------------------------ | ------------------------------------------------------- |
+| **Assistant** (the supervisor) | A conductor waving a baton while the other agents orbit |
+| **Kitchen**                    | A chef tossing a pan over the flames, steam rising      |
+| **Travel**                     | A plane circling the globe                              |
+| **Observation**                | A radar sweeping, blips lighting up                     |
+| **Analysis**                   | Bars of a chart moving under a magnifier                |
+| **Coding**                     | A laptop typing lines of code                           |
+| **Security**                   | A scan line sweeping a locked shield                    |
+
+Each card says what the agent is doing (_"Cooking up an answer"_, _"A menu is waiting for your OK"_), with **Ask** and its last conversation or waiting plan. An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 10 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. Animations stop when the device asks for reduced motion.
+
+<img src="docs/screenshots/agents.webp" alt="Agents: seven cards, Kitchen and Observation working (a chef tossing a pan, a radar sweeping), the others resting" />
+
 ## Map
 
 The Map (admins) draws the cluster in sections:
@@ -101,7 +120,7 @@ Each card shows the service's live state from Kubernetes, refreshed every 30 sec
 | Page           | What you do there                                                                                                                                                                                                                                                 |
 | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **Status**     | Every container grouped as on the server (Gateway, Repository, Message broker, Observability, LLM, Apps), marked Ready, Not ready or Unknown, with links, copyable connection addresses and the folder it lives in; checks every 30 seconds or with **Check now** |
-| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts                                                                                                                                                                                                |
+| **Dashboards** | The server, containers, Kafka, the LLM and server health as charts; zoom and move every chart (below)                                                                                                                                                             |
 | **Metrics**    | PromQL queries as a chart or a table; scrape targets and alert rules                                                                                                                                                                                              |
 | **Logs**       | Every container's logs with LogQL: pick a label and a value, filter by level, follow live; a line from a traced request opens its trace                                                                                                                           |
 | **Traces**     | Find a request by service, operation or duration and follow it span by span; `/traces?trace=<id>` opens one trace                                                                                                                                                 |
@@ -122,12 +141,25 @@ Each card shows the service's live state from Kubernetes, refreshed every 30 sec
 
 Changes that can't be undone ask for confirmation first.
 
+**Charts** (Dashboards, Metrics) can be explored:
+
+| Do                                          | To                                                                |
+| ------------------------------------------- | ----------------------------------------------------------------- |
+| Drag across the chart                       | Zoom on that time span; drag a tall box to zoom on the values too |
+| Scroll over the time axis or the value axis | Zoom on that axis around the pointer                              |
+| Pinch, or ⌘ / Ctrl + scroll on the chart    | Zoom on time                                                      |
+| Drag an axis                                | Move along it                                                     |
+| Double-click, or **Reset zoom**             | Back to the whole range                                           |
+
+<img src="docs/screenshots/chart-zoom.webp" alt="Dashboards with the CPU chart zoomed on a few hours and a Reset zoom button" />
+
 ## People and access
 
 Admins manage accounts from **People**: the list of everyone who can sign in, next to the selected person's details.
 
 - **Pages** appear as switches, grouped into Assistants, Apps and Tools. A change applies at the person's next session refresh, within 4 minutes. Admins always have every page.
-- **New password**, **Sign out**, **Disable** and **Enable** act on the selected person.
+- **New password**, **Sign out**, **Disable**, **Enable** and **Delete account** act on the selected person (not yourself). Delete asks once more (_"Delete Dora for good?"_) and removes the Keycloak account; `make user-remove` on the server also deletes their Tasker data.
+- **Everyone** can delete their own account from **Account › Delete my account**: Keycloak asks to confirm, deletes it and signs them out.
 - **+ Add** creates an account: name, username and email (checked as you type, optional), the pages the person may open, then a **temporary password**, shown once. The person chooses their own password at their first sign-in.
 - If the gateway has no People API yet, the page says so: deploy homelab-infra's Keycloak and Caddy changes (`make apply R=keycloak`, then `make apply R=caddy`).
 
@@ -185,6 +217,7 @@ Open the homelab in Safari, then **Share › Add to Home Screen**. It opens full
   <tr>
     <td><img src="docs/screenshots/phone-assistant-new.webp" width="200" alt="A new conversation on a phone: Kitchen as the title, suggestions above the rounded message box" /></td>
     <td><img src="docs/screenshots/phone-picker.webp" width="200" alt="The assistant picker on a phone, a sheet listing every assistant and Model and settings" /></td>
+    <td><img src="docs/screenshots/phone-agents.webp" width="200" alt="Agents on a phone: the Assistant conductor and the Kitchen chef at work" /></td>
     <td><img src="docs/screenshots/phone-map.webp" width="200" alt="The map on a phone: networks, legend and ports" /></td>
   </tr>
 </table>

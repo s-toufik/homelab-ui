@@ -114,7 +114,7 @@ export function provideAgentFeature(): Provider[] {
       const access = inject(AccessStore);
       return {
         load: () => import('./components/assistant/assistant').then((m) => m.Assistant),
-        hiddenOn: ['/assistant', '/', '/people', '/appearance'],
+        hiddenOn: ['/assistant', '/agents', '/', '/people', '/appearance'],
         phase: store.phase,
         waiting: computed(() => store.waiting().filter((c) => access.canUseAgent(c.agent)).length),
         recent: computed(() =>
@@ -132,6 +132,7 @@ export function provideAgentFeature(): Provider[] {
             })),
         ),
         remove: (id) => store.deleteConversation(id),
+        removeAll: () => store.deleteAll((agent) => access.canUseAgent(agent)),
       };
     }),
   ];

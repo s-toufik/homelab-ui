@@ -51,7 +51,7 @@ src/app/
 │   ├── control-center/          -- the store behind Today's homelab numbers: alerts, gauges, warnings
 │   ├── people/                  -- /people, /people/new: accounts and page roles through /api/people (admins)
 │   ├── status/                  -- /status: every homelab-infra container, its state, links, connection
-│   ├── agent/                   -- /assistant: conversations (each with its agent), plans, commands, the drawer
+│   ├── agent/                   -- /assistant: conversations (each with its agent), plans, commands, the drawer; /agents: a scene per agent (components/agent-scene, domain/agent-activity)
 │   ├── tasker/                  -- block canvas, split panes, groups; workflows and favorites via PostgREST
 │   ├── grafana/                 -- /dashboards/:id: Grafana's dashboards as panel lists (domain/dashboards.ts)
 │   ├── prometheus/              -- /metrics: PromQL, targets, rules
@@ -84,6 +84,10 @@ src/app/
 ```
 
 **Side panels.** `shared/ui/side-pane/` has `PaneState` (pinned, peeking, width, saved under `<key>.pinned` and `<key>.width`; `hover(true|false)` opens after 90 ms and closes 320 ms after the pointer leaves) and `<app-side-pane side="left|right" [state]>`, which draws the panel, the hover edge, the resize grip (drag, arrow keys, double-click to reset) and, on a phone, an overlay with a shade. The sidebar, the page settings and the Assistant's conversations all use it. On the phone, a page can set `PageChromeStore.titleMenu` to make the top bar's title a menu button (Assistant uses it for the assistant picker).
+
+**Charts.** `shared/ui/charts/time-series-chart` draws SVG and handles its own zoom: a `view` signal (`x0`, `x1`, optional `y0`, `y1`) overrides the data bounds; drag in the plot brushes a box, the axis gutters zoom (wheel) and pan (drag), ⌘/Ctrl + wheel or a pinch zooms time, double-click resets. Lines are clipped to the plot.
+
+**Delete buttons.** `shared/ui/delete-button` is the bin (or double bin with `[all]`) that turns red with a ✓ on the first tap and emits `confirmed` on the second; its host gets `delete-button-host--confirm` while it waits.
 
 **Themes.** `scripts/themes.mjs` (`npm run themes`) holds the ten themes' tokens (six Everyday, four Storybook) and writes `src/styles/_themes.scss` and `theme-catalog.json`; it refuses any text colour below 4.5:1. Each theme sets `--surface`, `--surface-side`, `--surface-raised`, `--surface-hover`, `--text`, `--text-muted`, `--border`, `--card-border`, `--accent`, `--mono` (addresses), `--font-sans`, `--font-mono`, and per app colour (`orange`, `teal`, `indigo`, `purple`, `blue`, `green`, `rose`, `amber`, `slate`) `--hue-<name>` and `--hue-<name>-soft`. Put `class="hue-<name>"` on an element to use `--h` and `--h-soft` inside it; `.hl-cap` (coloured capitals), `.hl-list`/`.hl-list__row`, `.hl-dot` and `.hl-addr` are the shared pieces. `--row` and `--control` are 2 rem with a mouse and 2.75 rem on touch (`pointer: coarse`). Storybook themes also set skin tokens: `--page-texture`, `--card-texture`, `--card-frame`, `--side-texture`, `--side-*` colours for the sidebar and menu, `--font-display` (`.hl-display`), `--font-caps`, `--cap-*` (`.hl-cap`), `--flourish` (`.hl-flourish`, the ornament under titles), `--btn-*` and `--radius-card`; every theme writes them all, so a nested `data-theme` never inherits another theme's skin. The shapes tokens cannot express (cut corners, wax seal, gilt sidebar line) are in `src/styles/_skins.scss`. Fonts are bundled from `@fontsource` (Geist, Geist Mono, Atkinson Hyperlegible, Quicksand, Fraunces, Cinzel, Cinzel Decorative, IM Fell English, EB Garamond, Cormorant Garamond, Pinyon Script, Marcellus).
 

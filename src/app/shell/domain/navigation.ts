@@ -12,6 +12,12 @@ export function navSection(feature: Pick<HomelabFeature, 'category'>): NavSectio
 export const SHELL_ICONS = {
   today: ['M4 5h16v15H4z', 'M4 9h16', 'M9 3v4M15 3v4'],
   assistant: ['M5 5h14v10H9l-4 4z'],
+  agents: [
+    'M4 20v-1a5 5 0 0 1 10 0v1',
+    'M9 12a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z',
+    'M18 4l.8 1.9L21 7l-2.2.6L18 10l-.8-2.4L15 7l2.2-1.1z',
+    'M15.5 14.5a4.5 4.5 0 0 1 4.5 4.5v1',
+  ],
   map: ['M9 4L3 6.5v13.5l6-2.5 6 2.5 6-2.5V4l-6 2.5z', 'M9 4v13.5M15 6.5V20'],
   people: [
     'M9 11a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Z',

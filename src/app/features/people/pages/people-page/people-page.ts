@@ -23,6 +23,7 @@ export class PeoplePage {
   protected readonly selectedId = signal<string | null>(null);
   protected readonly revealed = signal<{ id: string; password: string } | null>(null);
   protected readonly copied = signal(false);
+  protected readonly deleting = signal<string | null>(null);
   protected readonly displayName = displayName;
   protected readonly isAdmin = isAdmin;
 
@@ -62,6 +63,15 @@ export class PeoplePage {
   protected select(person: Person): void {
     this.revealed.set(null);
     this.selectedId.set(person.id);
+  }
+
+  protected async removePerson(person: Person): Promise<void> {
+    if (this.deleting() !== person.id) {
+      this.deleting.set(person.id);
+      return;
+    }
+    this.deleting.set(null);
+    if (await this.store.remove(person)) this.selectedId.set(null);
   }
 
   protected async newPassword(person: Person): Promise<void> {
