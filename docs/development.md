@@ -17,7 +17,7 @@ src/app/
 │   ├── toolbar/                 -- the ⌘K field; the page's settings and assistant buttons
 │   ├── command-palette/         -- ⌘K or /: pages, conversations, ask an assistant (COMMAND_SOURCES)
 │   ├── phone-bar/               -- < 768 px: menu, the page's title (PageChromeStore), search or new conversation
-│   ├── drawer/                  -- < 768 px: the menu sliding from the left; recent conversations (ASSISTANT_PANEL.recent) and every page
+│   ├── drawer/                  -- < 768 px: the menu sliding from the left; Pages (folded), then every conversation by day (ASSISTANT_PANEL.recent / remove)
 │   ├── appearance/              -- the eight themes and "Match my device" (settings modal and /appearance)
 │   ├── page-panel/              -- the page's settings, in a right side-pane (LayoutStore.panel)
 │   ├── assistant-drawer/        -- the assistant beside any page; its content comes from ASSISTANT_PANEL

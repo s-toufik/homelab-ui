@@ -57,6 +57,27 @@ describe('service status from pods', () => {
     ).toBe('fail');
   });
 
+  it("leaves a release's job pods out of its count, and warns when the last one failed", () => {
+    const job = (phase: string, created: string): KubeObject => ({
+      ...pod('keycloak', { phase, containerStatuses: [{ ready: false, restartCount: 0 }] }),
+      metadata: {
+        name: `keycloak-sync-${phase}`,
+        labels: { 'app.kubernetes.io/instance': 'keycloak' },
+        creationTimestamp: created,
+        ownerReferences: [{ kind: 'Job', name: 'keycloak-sync' }],
+      },
+    });
+    const done = job('Succeeded', '2026-11-16T10:00:00Z');
+    expect(serviceStatus('keycloak', 'Deployment', [pod('keycloak'), done], NOW)).toMatchObject({
+      state: 'ok',
+      count: '1/1',
+    });
+    const failed = job('Failed', '2026-11-16T12:00:00Z');
+    const status = serviceStatus('keycloak', 'Deployment', [pod('keycloak'), done, failed], NOW);
+    expect(status).toMatchObject({ state: 'warn', count: '1/1' });
+    expect(status.label).toContain('keycloak-sync failed');
+  });
+
   it("reads a job's last run, and finds postgres by its CloudNativePG label", () => {
     expect(
       serviceStatus('backups', 'CronJob', [pod('backups', { phase: 'Failed' })], NOW).state,

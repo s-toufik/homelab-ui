@@ -37,6 +37,20 @@ function recentRestarts(pod: KubeObject, now: number): number {
   }).length;
 }
 
+function isJobPod(pod: KubeObject): boolean {
+  return (pod.metadata.ownerReferences ?? []).some((owner) => owner.kind === 'Job');
+}
+
+function jobName(pod: KubeObject): string {
+  return pod.metadata.ownerReferences?.find((owner) => owner.kind === 'Job')?.name ?? 'a job';
+}
+
+function newest(pods: readonly KubeObject[]): KubeObject | undefined {
+  return [...pods].sort((a, b) =>
+    (b.metadata.creationTimestamp ?? '').localeCompare(a.metadata.creationTimestamp ?? ''),
+  )[0];
+}
+
 function time(value: string | undefined): string {
   const date = new Date(value ?? '');
   return Number.isNaN(date.getTime())
@@ -51,14 +65,13 @@ export function serviceStatus(
   now = Date.now(),
 ): ServiceStatus {
   const own = podsOf(id, pods);
-  const image = own[0]?.spec?.['containers']?.[0]?.image ?? '';
+  const image =
+    (own.find((pod) => !isJobPod(pod)) ?? own[0])?.spec?.['containers']?.[0]?.image ?? '';
   if (!own.length)
     return { state: 'unknown', label: 'no pod found', count: '–', image, restartsToday: 0 };
 
   if (kind === 'CronJob' || kind === 'Job') {
-    const latest = [...own].sort((a, b) =>
-      (b.metadata.creationTimestamp ?? '').localeCompare(a.metadata.creationTimestamp ?? ''),
-    )[0];
+    const latest = newest(own)!;
     const phase = latest.status?.['phase'];
     const at = time(latest.status?.['startTime'] ?? latest.metadata.creationTimestamp);
     if (phase === 'Failed')
@@ -80,11 +93,23 @@ export function serviceStatus(
     return { state: 'ok', label: 'running now', count: 'running', image, restartsToday: 0 };
   }
 
-  const ready = own.filter(isReady).length;
-  const restartsToday = own.reduce((sum, pod) => sum + recentRestarts(pod, now), 0);
-  const count = `${ready}/${own.length}`;
-  if (ready < own.length)
+  const jobs = own.filter(isJobPod);
+  const workload = own.filter((pod) => !isJobPod(pod));
+  const ready = workload.filter(isReady).length;
+  const restartsToday = workload.reduce((sum, pod) => sum + recentRestarts(pod, now), 0);
+  const count = `${ready}/${workload.length}`;
+  if (ready < workload.length)
     return { state: 'fail', label: `${count} ready`, count, image, restartsToday };
+  const lastJob = newest(jobs);
+  if (lastJob?.status?.['phase'] === 'Failed') {
+    return {
+      state: 'warn',
+      label: `${count} ready · ${jobName(lastJob)} failed at ${time(lastJob.status?.['startTime'])}`,
+      count,
+      image,
+      restartsToday,
+    };
+  }
   if (restartsToday) {
     return {
       state: 'warn',

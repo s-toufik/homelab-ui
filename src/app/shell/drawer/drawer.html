@@ -62,47 +62,87 @@
       </a>
     }
 
-    @if (recent().length) {
-      <span class="drawer__group drawer__group--static">Recent</span>
-      @for (item of recent(); track item.id) {
-        <a
-          class="drawer__recent"
-          [routerLink]="item.path"
-          routerLinkActive="drawer__item--on"
-          (click)="close()"
-        >
-          <span class="drawer__dot" [style.background]="item.color"></span>
-          <span class="drawer__recent-label">{{ item.label }}</span>
-          @if (item.waiting) {
-            <span class="drawer__waiting">plan</span>
+    @if (nav.sections().length) {
+      <button
+        type="button"
+        class="drawer__item drawer__pages"
+        [attr.aria-expanded]="pagesOpen()"
+        (click)="togglePages()"
+      >
+        <app-feature-icon [paths]="icons.chevron" [size]="15" />Pages
+        <span class="drawer__pages-count">{{ pageCount() }}</span>
+      </button>
+      @if (pagesOpen()) {
+        <div class="drawer__pages-list">
+          @for (entry of nav.sections(); track entry.section) {
+            <span class="drawer__section">{{ entry.section }}</span>
+            @for (page of entry.pages; track page.id) {
+              <a
+                class="drawer__item"
+                [routerLink]="page.path"
+                routerLinkActive="drawer__item--on"
+                (click)="close()"
+              >
+                <app-feature-icon [paths]="page.icon" [size]="17" />{{ page.label }}
+              </a>
+            }
           }
-        </a>
+        </div>
       }
     }
 
-    @for (entry of nav.sections(); track entry.section) {
-      @let closed = nav.collapsed().has(entry.section);
-      <button
-        type="button"
-        class="drawer__group"
-        [attr.aria-expanded]="!closed"
-        (click)="nav.toggle(entry.section)"
-      >
-        {{ entry.section
-        }}<span [class.drawer__chevron--closed]="closed" class="drawer__chevron">⌄</span>
-      </button>
-      @if (!closed) {
-        @for (page of entry.pages; track page.id) {
-          <a
-            class="drawer__item"
-            [routerLink]="page.path"
-            routerLinkActive="drawer__item--on"
-            (click)="close()"
-          >
-            <app-feature-icon [paths]="page.icon" [size]="17" />{{ page.label }}
-          </a>
+    @if (conversations().length) {
+      <span class="drawer__heading">Conversations</span>
+      @for (group of conversations(); track group.title) {
+        <span class="drawer__section">{{ group.title }}</span>
+        @for (item of group.items; track item.id) {
+          <div class="drawer__conversation">
+            <a
+              class="drawer__recent"
+              [routerLink]="item.path"
+              routerLinkActive="drawer__item--on"
+              (click)="close()"
+            >
+              <span class="drawer__dot" [style.background]="item.color"></span>
+              <span class="drawer__recent-label">{{ item.label }}</span>
+              @if (item.waiting) {
+                <span class="drawer__waiting">plan</span>
+              }
+            </a>
+            <button
+              type="button"
+              class="drawer__delete"
+              [class.drawer__delete--confirm]="confirming() === item.id"
+              [attr.aria-label]="
+                confirming() === item.id ? 'Confirm: delete ' + item.label : 'Delete ' + item.label
+              "
+              (click)="remove(item)"
+              (blur)="confirming.set(null)"
+            >
+              @if (confirming() === item.id) {
+                Delete?
+              } @else {
+                <svg
+                  viewBox="0 0 24 24"
+                  width="15"
+                  height="15"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+                </svg>
+              }
+            </button>
+          </div>
         }
       }
+    } @else {
+      <span class="drawer__heading">Conversations</span>
+      <p class="drawer__none">Your conversations will appear here.</p>
     }
   </div>
 

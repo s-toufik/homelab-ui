@@ -128,8 +128,10 @@ export function provideAgentFeature(): Provider[] {
               path: ['/assistant', c.id],
               waiting: isWaiting(c),
               color: `var(--hue-${agentLook(c.agent).hue})`,
+              updatedAt: c.updatedAt,
             })),
         ),
+        remove: (id) => store.deleteConversation(id),
       };
     }),
   ];

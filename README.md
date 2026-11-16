@@ -34,7 +34,7 @@ Today opens with the date, a greeting and a short summary, for example _"Kitchen
 
 - **Computer and iPad:** a sidebar with Today, Assistant, Map (admins), your pages grouped into Observe, Operate and Automate (each group folds), then People (admins), Appearance and your account. The button at its top, or **[**, folds it to icons. Folded, it opens over the page while the pointer is on it and closes when the pointer leaves; click the button again to keep it open. The choice is remembered.
 - **Side panels** work the same way everywhere: the sidebar, the conversations on Assistant and a page's settings appear while you hover their button or edge, stay when you click, and go away at the next click. Drag a panel's inner edge to resize it (double-click resets it); the width is remembered.
-- **Phone:** a slim top bar with the menu, the page's title and one action (search, or a new conversation on Assistant). The menu slides in from the left, or swipe right from the edge: search, a new conversation, your recent conversations, then every page. The page stays visible on the right; tap it or swipe left to go back.
+- **Phone:** a slim top bar with the menu, the page's title and one action (search, or a new conversation on Assistant). The menu slides in from the left, or swipe right from the edge: search, a new conversation, Today, Assistant and Map, **Pages** (folded until you open it), then every conversation by day, each with a bin to delete it (tap twice). The page stays visible on the right; tap it or swipe left to go back.
 - **⌘K** (or **/**, or the search field at the top) finds any page or conversation, or asks an assistant directly: type _"what's for dinner"_ and pick **Ask Kitchen**. Arrow keys move, Enter opens, Esc closes.
 
 | Shortcut      | Does                              |
@@ -179,7 +179,7 @@ Open the homelab in Safari, then **Share › Add to Home Screen**. It opens full
 <table>
   <tr>
     <td><img src="docs/screenshots/phone-today.webp" width="200" alt="Today on a phone, with the top bar: menu, Today, search" /></td>
-    <td><img src="docs/screenshots/phone-drawer.webp" width="200" alt="The menu open on a phone: search, Today, Assistant, Map, recent conversations and the pages, with the conversation still visible on the right" /></td>
+    <td><img src="docs/screenshots/phone-drawer.webp" width="200" alt="The menu open on a phone: search, Today, Assistant, Map, the folded Pages group, then the conversations by day with a bin each" /></td>
     <td><img src="docs/screenshots/phone-assistant.webp" width="200" alt="Kitchen's plan on a phone, with Approve and run" /></td>
   </tr>
   <tr>

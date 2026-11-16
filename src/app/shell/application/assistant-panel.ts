@@ -8,6 +8,7 @@ export interface RecentItem {
   readonly path: readonly string[];
   readonly waiting: boolean;
   readonly color: string;
+  readonly updatedAt: number;
 }
 
 export interface AssistantPanel {
@@ -16,6 +17,7 @@ export interface AssistantPanel {
   phase: Signal<SwarmPhase>;
   waiting: Signal<number>;
   recent: Signal<readonly RecentItem[]>;
+  remove: (id: string) => void;
 }
 
 export const ASSISTANT_PANEL = new InjectionToken<AssistantPanel>('ASSISTANT_PANEL');
