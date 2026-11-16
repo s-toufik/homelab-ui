@@ -86,6 +86,13 @@ export class PeopleStore {
     return done ? password : null;
   }
 
+  async remove(person: Person): Promise<boolean> {
+    if (person.username === this.me()) return false;
+    const done = await this.run(person.id, () => this.directory.remove(person.id));
+    if (done) this.people.update((people) => people.filter((p) => p.id !== person.id));
+    return done;
+  }
+
   async create(person: NewPerson, roles: readonly string[]): Promise<string> {
     const password = temporaryPassword();
     const id = await this.directory.create(person, password);

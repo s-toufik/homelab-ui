@@ -12,6 +12,7 @@ import {
 import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PaneState } from '@shared/ui/side-pane/pane-state';
+import { DeleteButton } from '@shared/ui/delete-button/delete-button';
 import { SidePane } from '@shared/ui/side-pane/side-pane';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccessStore } from '@shell/application/access.store';
@@ -47,6 +48,7 @@ function when(at: number, now = Date.now()): string {
     Conversation,
     Composer,
     SidePane,
+    DeleteButton,
   ],
   templateUrl: './assistant-page.html',
   styleUrl: './assistant-page.scss',
@@ -74,7 +76,6 @@ export class AssistantPage {
   });
   protected readonly changing = signal(false);
   protected readonly picking = signal(false);
-  protected readonly confirming = signal<string | null>(null);
   protected readonly look = agentLook;
   protected readonly when = when;
   protected readonly isWaiting = isWaiting;
@@ -196,22 +197,12 @@ export class AssistantPage {
   }
 
   protected remove(conversation: ConversationEntry): void {
-    if (this.confirming() !== conversation.id) {
-      this.confirming.set(conversation.id);
-      return;
-    }
-    this.confirming.set(null);
     const open = conversation.id === this.store.sessionId();
     this.store.deleteConversation(conversation.id);
     if (open || this.routeId() === conversation.id) void this.router.navigate(['/assistant']);
   }
 
   protected removeAll(): void {
-    if (this.confirming() !== 'all') {
-      this.confirming.set('all');
-      return;
-    }
-    this.confirming.set(null);
     this.store.deleteAll((agent) => this.access.canUseAgent(agent));
     void this.router.navigate(['/assistant']);
   }

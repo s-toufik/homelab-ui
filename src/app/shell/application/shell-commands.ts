@@ -25,6 +25,7 @@ export function provideShellCommands(): Provider {
         const pages: Command[] = [
           go('today', 'Today', '/', 'home briefing'),
           go('assistant', 'Assistant', '/assistant', 'chat conversations'),
+          go('agents', 'Agents', '/agents', 'who is working animation kitchen travel'),
           ...(access.isAdmin()
             ? [
                 go('map', 'Map', '/map', 'cluster k3s topology'),

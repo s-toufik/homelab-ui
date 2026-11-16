@@ -10,6 +10,7 @@ export interface PeopleDirectory {
   setEnabled(id: string, enabled: boolean): Promise<void>;
   signOut(id: string): Promise<void>;
   resetPassword(id: string, temporaryPassword: string): Promise<void>;
+  remove(id: string): Promise<void>;
 }
 
 export const PEOPLE_DIRECTORY = new InjectionToken<PeopleDirectory>('PEOPLE_DIRECTORY');

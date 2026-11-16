@@ -92,34 +92,18 @@
   position: absolute;
   right: 0.35rem;
   bottom: 0.4rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 1.6rem;
-  height: 1.6rem;
-  padding: 0 0.35rem;
-  border: 0;
-  border-radius: 0.35rem;
+  --delete-size: 1.6rem;
+  border-radius: 0.45rem;
   background: var(--surface-hover);
-  color: var(--text-muted);
-  font: inherit;
-  font-size: 0.72rem;
   opacity: 0;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--danger);
-  }
 
   @media (pointer: coarse) {
     opacity: 1;
   }
-}
 
-.assistant__delete--confirm {
-  opacity: 1;
-  background: var(--danger-soft);
-  color: var(--danger);
+  &.delete-button-host--confirm {
+    opacity: 1;
+  }
 }
 
 .assistant__item {

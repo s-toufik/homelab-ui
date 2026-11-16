@@ -66,6 +66,9 @@ describe('account details', () => {
 
   it('explains what to do when the gateway has no People API', () => {
     expect(peopleError({ status: 404 }, 'create the account')).toContain('make apply R=caddy');
+    expect(
+      peopleError({ status: 404, message: '404: Realm not found' }, 'load the people'),
+    ).toContain('Keycloak answered 404: Realm not found');
     expect(peopleError({ status: 409 }, 'create the account')).toContain('already taken');
   });
 });

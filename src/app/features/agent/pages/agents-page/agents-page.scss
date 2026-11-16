@@ -1,0 +1,118 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.agents {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(19rem, 100%), 1fr));
+  gap: 1rem;
+}
+
+.agents__card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  background-image: var(--card-texture, none);
+  box-shadow: var(--card-frame, none);
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.agents__card--working {
+  border-color: var(--h);
+  box-shadow:
+    var(--card-frame, 0 0 0 0 transparent),
+    0 0 0 3px color-mix(in srgb, var(--h) 18%, transparent);
+}
+
+.agents__scene {
+  padding: 0.9rem 1rem 0.2rem;
+  background: linear-gradient(180deg, var(--h-soft), transparent 85%);
+}
+
+.agents__body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.6rem 1rem 1rem;
+}
+
+.agents__name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+
+  strong {
+    font-size: 1.02rem;
+  }
+}
+
+.agents__state {
+  margin-left: auto;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  background: var(--surface-hover);
+  color: var(--text-muted);
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.agents__card--working .agents__state {
+  background: var(--h-soft);
+  color: var(--h);
+}
+
+.agents__card--waiting .agents__state {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.agents__card--trouble .agents__state {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.agents__phrase {
+  margin: 0;
+  font-weight: 500;
+}
+
+.agents__meta {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.agents__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.35rem;
+}
+
+.agents__note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 767px) {
+  .agents {
+    gap: 0.75rem;
+  }
+
+  .agents__scene {
+    padding: 0.5rem 1rem 0;
+  }
+
+  .agents__scene ::ng-deep svg {
+    max-height: 9rem;
+  }
+}

@@ -11,6 +11,7 @@ import { ASSISTANT_PANEL } from '../application/assistant-panel';
 const TITLES: Readonly<Record<string, string>> = {
   '': 'Today',
   assistant: 'Assistant',
+  agents: 'Agents',
   map: 'Map',
   people: 'People',
   appearance: 'Appearance',

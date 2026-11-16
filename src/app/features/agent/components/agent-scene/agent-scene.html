@@ -1,0 +1,176 @@
+<svg
+  class="scene"
+  [class]="'scene scene--' + mood() + ' scene--' + kind()"
+  viewBox="0 0 240 150"
+  role="img"
+  [attr.aria-label]="label()"
+>
+  <line class="scene__floor" x1="12" y1="136" x2="228" y2="136" />
+
+  @switch (kind()) {
+    @case ('kitchen') {
+      <g class="kitchen">
+        <rect class="scene__furniture" x="118" y="96" width="98" height="40" rx="4" />
+        <circle class="scene__knob" cx="134" cy="118" r="4" />
+        <circle class="scene__knob" cx="150" cy="118" r="4" />
+        <g class="kitchen__flames">
+          <path class="kitchen__flame" d="M150 96c-4-6 2-9 0-14 6 5 7 9 3 14z" />
+          <path
+            class="kitchen__flame kitchen__flame--2"
+            d="M162 96c-4-7 3-11 1-17 7 6 8 11 3 17z"
+          />
+          <path class="kitchen__flame kitchen__flame--3" d="M174 96c-3-5 2-8 0-12 5 4 6 8 2 12z" />
+        </g>
+        <g class="kitchen__pan">
+          <path
+            class="scene__metal"
+            d="M140 80h48a2 2 0 0 1 2 2c-2 8-8 10-14 10h-24c-6 0-12-2-14-10a2 2 0 0 1 2-2z"
+          />
+          <rect class="scene__metal" x="96" y="80" width="46" height="5" rx="2.5" />
+          <circle class="kitchen__food" cx="156" cy="78" r="4" />
+          <circle class="kitchen__food kitchen__food--2" cx="168" cy="77" r="3.5" />
+          <circle class="kitchen__food kitchen__food--3" cx="177" cy="78" r="3" />
+        </g>
+        <g class="kitchen__steam">
+          <path d="M156 66c-4-6 4-10 0-16" />
+          <path d="M168 64c-4-6 4-10 0-16" />
+          <path d="M180 66c-4-6 4-10 0-16" />
+        </g>
+        <g class="chef">
+          <rect class="scene__cloth" x="44" y="72" width="44" height="64" rx="14" />
+          <path class="scene__line" d="M66 84v40" />
+          <circle class="scene__skin" cx="66" cy="56" r="15" />
+          <g class="scene__eyes">
+            <circle cx="60" cy="55" r="1.8" />
+            <circle cx="72" cy="55" r="1.8" />
+          </g>
+          <path class="scene__line" d="M61 63q5 4 10 0" />
+          <path
+            class="scene__cloth"
+            d="M50 44c-8-2-8-16 4-14 2-10 22-10 24 0 12-2 12 12 4 14v4H50z"
+          />
+          <g class="chef__arm">
+            <path class="scene__cloth-line" d="M84 86c8 2 12 0 14-4" />
+          </g>
+        </g>
+      </g>
+    }
+    @case ('travel') {
+      <g class="travel">
+        <ellipse class="travel__orbit-path" cx="120" cy="76" rx="70" ry="30" />
+        <circle class="travel__globe" cx="120" cy="76" r="38" />
+        <path
+          class="travel__land"
+          d="M98 60c8-6 18-2 20 4s-6 10-2 16-8 10-14 6-12-4-10-12 0-10 6-14zM132 54c6-2 16 2 18 10s-4 8-10 8-6 6-12 2 0-16 4-20zM128 96c6-2 12 0 12 4s-8 6-12 4z"
+        />
+        <ellipse class="travel__meridian" cx="120" cy="76" rx="14" ry="38" />
+        <line class="travel__meridian" x1="82" y1="76" x2="158" y2="76" />
+        <g class="travel__plane-orbit">
+          <g class="travel__plane">
+            <path
+              d="M190 72l-14 3-9-7-4 1 5 8-10 2-4-3-3 1 3 5-3 4 3 1 4-3 10 2-5 8 4 1 9-7 14 3c3 0 3-4 0-4z"
+            />
+          </g>
+        </g>
+        <g class="travel__cloud">
+          <path d="M30 44a8 8 0 0 1 15-4 7 7 0 0 1 11 6H30z" />
+        </g>
+        <g class="travel__cloud travel__cloud--2">
+          <path d="M186 24a7 7 0 0 1 13-3 6 6 0 0 1 9 5h-22z" />
+        </g>
+        <g class="travel__case">
+          <rect class="scene__furniture" x="24" y="104" width="34" height="32" rx="4" />
+          <path class="scene__line" d="M34 104v-6h14v6M24 118h34" />
+        </g>
+      </g>
+    }
+    @case ('observation') {
+      <g class="watch">
+        <circle class="watch__screen" cx="120" cy="74" r="56" />
+        <circle class="watch__ring" cx="120" cy="74" r="38" />
+        <circle class="watch__ring" cx="120" cy="74" r="20" />
+        <line class="watch__ring" x1="64" y1="74" x2="176" y2="74" />
+        <line class="watch__ring" x1="120" y1="18" x2="120" y2="130" />
+        <g class="watch__sweep">
+          <path d="M120 74L120 18A56 56 0 0 1 168 46z" />
+        </g>
+        <circle class="watch__blip" cx="146" cy="52" r="3.5" />
+        <circle class="watch__blip watch__blip--2" cx="96" cy="96" r="3" />
+        <circle class="watch__blip watch__blip--3" cx="140" cy="104" r="2.6" />
+        <circle class="watch__core" cx="120" cy="74" r="3.5" />
+      </g>
+    }
+    @case ('analysis') {
+      <g class="analysis">
+        <path class="scene__line" d="M40 128h160M40 128V30" />
+        <rect class="analysis__bar" x="54" y="80" width="18" height="48" rx="2" />
+        <rect class="analysis__bar analysis__bar--2" x="82" y="56" width="18" height="72" rx="2" />
+        <rect class="analysis__bar analysis__bar--3" x="110" y="92" width="18" height="36" rx="2" />
+        <rect class="analysis__bar analysis__bar--4" x="138" y="44" width="18" height="84" rx="2" />
+        <rect class="analysis__bar analysis__bar--5" x="166" y="68" width="18" height="60" rx="2" />
+        <path class="analysis__trend" d="M63 74L91 50 119 86 147 38 175 62" />
+        <g class="analysis__lens">
+          <circle class="analysis__glass" cx="90" cy="50" r="16" />
+          <path class="scene__line analysis__handle" d="M101 62l14 14" />
+        </g>
+      </g>
+    }
+    @case ('coding') {
+      <g class="coding">
+        <rect class="scene__furniture" x="52" y="22" width="136" height="88" rx="6" />
+        <rect class="coding__screen" x="60" y="30" width="120" height="72" rx="3" />
+        <path class="scene__metal" d="M40 112h160l-10 14H50z" />
+        <rect class="coding__line" x="68" y="40" width="40" height="5" rx="2" />
+        <rect class="coding__line coding__line--2" x="76" y="51" width="62" height="5" rx="2" />
+        <rect class="coding__line coding__line--3" x="76" y="62" width="48" height="5" rx="2" />
+        <rect class="coding__line coding__line--4" x="84" y="73" width="70" height="5" rx="2" />
+        <rect class="coding__line coding__line--5" x="68" y="84" width="30" height="5" rx="2" />
+        <rect class="coding__cursor" x="101" y="83" width="3" height="8" />
+        <g class="coding__hands">
+          <ellipse class="scene__skin" cx="96" cy="120" rx="9" ry="5" />
+          <ellipse class="scene__skin coding__hand--2" cx="144" cy="120" rx="9" ry="5" />
+        </g>
+      </g>
+    }
+    @case ('security') {
+      <g class="security">
+        <circle class="security__pulse" cx="120" cy="76" r="44" />
+        <path
+          class="security__shield"
+          d="M120 22l42 14v32c0 30-20 50-42 60-22-10-42-30-42-60V36z"
+        />
+        <rect class="security__lock" x="106" y="72" width="28" height="24" rx="4" />
+        <path class="scene__line" d="M112 72v-8a8 8 0 0 1 16 0v8" />
+        <circle class="security__key" cx="120" cy="84" r="3" />
+        <line class="security__scan" x1="80" y1="40" x2="160" y2="40" />
+      </g>
+    }
+    @default {
+      <g class="conductor">
+        <circle class="conductor__track" cx="120" cy="74" r="52" />
+        <circle class="conductor__track" cx="120" cy="74" r="34" />
+        <g class="conductor__ring">
+          <circle class="conductor__orb" cx="120" cy="22" r="7" style="fill: var(--hue-orange)" />
+          <circle class="conductor__orb" cx="165" cy="100" r="7" style="fill: var(--hue-teal)" />
+          <circle class="conductor__orb" cx="75" cy="100" r="7" style="fill: var(--hue-green)" />
+        </g>
+        <g class="conductor__ring conductor__ring--inner">
+          <circle class="conductor__orb" cx="154" cy="74" r="6" style="fill: var(--hue-blue)" />
+          <circle class="conductor__orb" cx="103" cy="45" r="6" style="fill: var(--hue-slate)" />
+          <circle class="conductor__orb" cx="103" cy="103" r="6" style="fill: var(--hue-rose)" />
+        </g>
+        <circle class="conductor__core" cx="120" cy="74" r="14" />
+        <g class="conductor__baton">
+          <line class="scene__line" x1="120" y1="74" x2="148" y2="44" />
+        </g>
+      </g>
+    }
+  }
+
+  @if (mood() === 'waiting' || mood() === 'trouble') {
+    <g class="scene__badge">
+      <circle cx="214" cy="26" r="14" />
+      <text x="214" y="31" text-anchor="middle">{{ mood() === 'waiting' ? '?' : '!' }}</text>
+    </g>
+  }
+</svg>

@@ -7,6 +7,7 @@ import { CommandPaletteStore } from '../application/commands';
 import { LAYOUT_STORAGE, LayoutStore } from '../application/layout.store';
 import { NavigationStore } from '../application/navigation.store';
 import { SHELL_ICONS } from '../domain/navigation';
+import { DeleteButton } from '@shared/ui/delete-button/delete-button';
 import { FeatureIcon } from '../feature-icon/feature-icon';
 
 export const DRAWER_PAGES_KEY = 'homelab-ui.drawer.pages-open';
@@ -33,7 +34,7 @@ export function groupByDay(items: readonly RecentItem[], now = Date.now()): Conv
 
 @Component({
   selector: 'app-drawer',
-  imports: [RouterLink, RouterLinkActive, FeatureIcon],
+  imports: [RouterLink, RouterLinkActive, FeatureIcon, DeleteButton],
   templateUrl: './drawer.html',
   styleUrl: './drawer.scss',
 })
@@ -51,7 +52,7 @@ export class Drawer {
   protected readonly waiting = computed(() => this.assistant?.waiting() ?? 0);
   protected readonly name = computed(() => this.session.user()?.username ?? 'You');
   protected readonly pagesOpen = signal(this.read(DRAWER_PAGES_KEY) === 'true');
-  protected readonly confirming = signal<string | null>(null);
+  protected readonly conversationCount = computed(() => this.assistant?.recent().length ?? 0);
   protected readonly pageCount = computed(() =>
     this.nav.sections().reduce((sum, entry) => sum + entry.pages.length, 0),
   );
@@ -62,8 +63,12 @@ export class Drawer {
   }
 
   protected close(): void {
-    this.confirming.set(null);
     this.ui.drawerOpen.set(false);
+  }
+
+  protected removeAll(): void {
+    this.assistant?.removeAll();
+    if (this.router.url.startsWith('/assistant/')) void this.router.navigate(['/assistant']);
   }
 
   protected togglePages(): void {
@@ -76,11 +81,6 @@ export class Drawer {
   }
 
   protected remove(item: RecentItem): void {
-    if (this.confirming() !== item.id) {
-      this.confirming.set(item.id);
-      return;
-    }
-    this.confirming.set(null);
     this.assistant?.remove(item.id);
     if (this.router.url.split(/[?#]/)[0] === `/assistant/${item.id}`) {
       void this.router.navigate(['/assistant']);

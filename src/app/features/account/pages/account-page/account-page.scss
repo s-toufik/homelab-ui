@@ -52,3 +52,14 @@
   padding-left: 1rem;
   font-size: 0.82rem;
 }
+
+.account-page__danger {
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+}
+
+.account-page__delete--confirm,
+.account-page__delete--confirm:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--surface);
+}

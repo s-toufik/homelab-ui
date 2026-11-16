@@ -278,3 +278,10 @@
     display: block;
   }
 }
+
+.people__delete--confirm,
+.people__delete--confirm:hover:not(:disabled) {
+  border-color: var(--danger);
+  background: var(--danger);
+  color: var(--surface);
+}

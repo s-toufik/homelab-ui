@@ -18,6 +18,11 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/agent/pages/assistant-page/assistant-page').then((m) => m.AssistantPage),
   },
+  {
+    path: 'agents',
+    loadComponent: () =>
+      import('./features/agent/pages/agents-page/agents-page').then((m) => m.AgentsPage),
+  },
   { path: 'agent', redirectTo: 'assistant' },
   { path: 'agent/:name', redirectTo: ({ params }) => `/assistant?agent=${params['name']}` },
   {

@@ -54,6 +54,9 @@
       <span class="side__count" [attr.aria-label]="waiting() + ' waiting'">{{ waiting() }}</span>
     }
   </a>
+  <a class="side__item" routerLink="/agents" routerLinkActive="side__item--on" title="Agents">
+    <app-feature-icon [paths]="icons.agents" [size]="16" /><span class="side__label">Agents</span>
+  </a>
   @if (access.isAdmin()) {
     <a class="side__item" routerLink="/map" routerLinkActive="side__item--on" title="Map">
       <app-feature-icon [paths]="icons.map" [size]="16" /><span class="side__label">Map</span>

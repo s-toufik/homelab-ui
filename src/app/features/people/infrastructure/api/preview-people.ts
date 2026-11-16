@@ -65,6 +65,10 @@ export class PreviewPeople implements PeopleDirectory {
     return;
   }
 
+  async remove(id: string): Promise<void> {
+    this.people = this.people.filter((person) => person.id !== id);
+  }
+
   async resetPassword(id: string): Promise<void> {
     this.update(id, (person) => ({ ...person, mustSetPassword: true }));
   }

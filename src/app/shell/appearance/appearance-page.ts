@@ -6,7 +6,7 @@ import { Appearance } from './appearance';
   selector: 'app-appearance-page',
   imports: [PageHeader, Appearance],
   template: `
-    <div class="hl-page">
+    <div class="hl-page hl-page--narrow">
       <app-page-header eyebrow="Settings" title="Appearance" hue="indigo" />
       <app-appearance />
     </div>
