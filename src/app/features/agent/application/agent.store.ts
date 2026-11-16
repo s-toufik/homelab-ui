@@ -1,39 +1,56 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 import { newId } from '@shared/utils/uuid';
+import { byRecent, isWaiting, titleOf, type Conversation } from '../domain/agent-conversation';
 import { answerMetadata } from '../domain/answer-metadata';
 import type { ChatMessage } from '../domain/chat-message';
 import type { AgentProfile } from '../domain/agent-directory';
 import { NO_MODELS, type ModelListing } from '../domain/model-catalog';
+import {
+  APPROVE_REPLY,
+  AWAITING_APPROVAL,
+  DROP_REPLY,
+  pendingPlan,
+  withoutApprovalPrompt,
+} from '../domain/pending-plan';
 import type { StreamEvent } from '../domain/stream-event';
 import { AgentApiService } from '../infrastructure/api/agent-api.service';
 import { AgentDirectoryService } from '../infrastructure/api/agent-directory.service';
 import { AgentModelsService } from '../infrastructure/api/agent-models.service';
 import { AgentPreferencesStorage } from '../infrastructure/storage/agent-preferences.storage';
+import { ConversationStorage } from '../infrastructure/storage/conversation.storage';
 
 @Injectable({ providedIn: 'root' })
 export class AgentStore {
   private readonly api = inject(AgentApiService);
   private readonly modelCatalog = inject(AgentModelsService);
-  private readonly directory = inject(AgentDirectoryService);
+  private readonly directoryService = inject(AgentDirectoryService);
   private readonly preferences = inject(AgentPreferencesStorage);
+  private readonly conversationStorage = inject(ConversationStorage);
   private readonly saved = this.preferences.read();
+  private readonly all = signal<Conversation[]>(this.conversationStorage.read());
+  private readonly latest = byRecent(this.all())[0];
 
   readonly agents = signal<AgentProfile[]>([]);
   readonly agentsError = signal<string | null>(null);
-  readonly agentName = signal(this.saved.agentName);
+  readonly agentName = signal(this.latest?.agent ?? this.saved.agentName);
   readonly agent = computed(() => this.agents().find((agent) => agent.name === this.agentName()));
   readonly modelListing = signal<ModelListing>(NO_MODELS);
   readonly modelsError = signal<string | null>(null);
   readonly modelNames = computed(() => this.modelListing().models.map((model) => model.name));
   readonly pinnedSteps = computed(() => this.modelListing().pinnedSteps);
   readonly modelName = signal(this.saved.modelName);
-  readonly sessionId = signal(newId());
+  readonly sessionId = signal(this.latest?.id ?? newId());
   readonly autoApprove = signal(this.saved.autoApprove);
   readonly draft = signal('');
-  readonly messages = signal<ChatMessage[]>([]);
   readonly isStreaming = signal(false);
   readonly requestError = signal<string | null>(null);
+
+  readonly conversation = computed(() => this.all().find((c) => c.id === this.sessionId()) ?? null);
+  readonly messages = computed<readonly ChatMessage[]>(() => this.conversation()?.messages ?? []);
+  readonly conversations = computed(() => byRecent(this.all()));
+  readonly waiting = computed(() => this.conversations().filter(isWaiting));
+  readonly plan = computed(() => (this.isStreaming() ? null : pendingPlan(this.messages())));
   readonly canSend = computed(
     () => this.draft().trim().length > 0 && !this.isStreaming() && this.modelName() !== '',
   );
@@ -47,6 +64,7 @@ export class AgentStore {
   });
 
   private abortController: AbortController | null = null;
+  private directory: Promise<void> | null = null;
 
   constructor() {
     effect(() => {
@@ -56,27 +74,87 @@ export class AgentStore {
         autoApprove: this.autoApprove(),
       });
     });
+
+    effect(() => {
+      if (this.isStreaming()) return;
+      this.conversationStorage.write(this.all());
+    });
+  }
+
+  loadDirectory(): Promise<void> {
+    this.directory ??= this.directoryService.list().then(
+      (agents) => {
+        this.agents.set(agents);
+        this.agentsError.set(null);
+      },
+      () => {
+        this.directory = null;
+        this.agentsError.set("Couldn't load the agents from the supervisor.");
+      },
+    );
+    return this.directory;
   }
 
   async loadAgents(): Promise<void> {
-    try {
-      const agents = await this.directory.list();
-      this.agents.set(agents);
-      this.agentsError.set(null);
-      if (!agents.some((agent) => agent.name === this.agentName())) {
-        this.agentName.set(agents[0]?.name ?? this.agentName());
-      }
-    } catch {
-      this.agentsError.set("Couldn't load the agents from the supervisor.");
+    this.directory = null;
+    await this.loadDirectory();
+    const agents = this.agents();
+    if (agents.length && !agents.some((agent) => agent.name === this.agentName())) {
+      this.newConversation(agents[0].name);
     }
     await this.loadModels();
   }
 
   async chooseAgent(name: string): Promise<void> {
-    if (name === this.agentName()) return;
-    this.agentName.set(name);
-    this.newSession();
+    if (name === this.agentName() && this.messages().length === 0) return;
+    this.newConversation(name);
     await this.loadModels();
+  }
+
+  async openConversation(id: string): Promise<void> {
+    const conversation = this.all().find((c) => c.id === id);
+    if (!conversation) return;
+    this.abortController?.abort();
+    this.sessionId.set(conversation.id);
+    this.requestError.set(null);
+    if (conversation.agent !== this.agentName()) {
+      this.agentName.set(conversation.agent);
+      await this.loadModels();
+    }
+  }
+
+  async openAgent(name: string): Promise<void> {
+    const latest = this.conversations().find((c) => c.agent === name);
+    if (latest) await this.openConversation(latest.id);
+    else {
+      this.newConversation(name);
+      await this.loadModels();
+    }
+  }
+
+  newConversation(agent = this.agentName()): void {
+    this.abortController?.abort();
+    this.agentName.set(agent);
+    this.sessionId.set(newId());
+    this.requestError.set(null);
+  }
+
+  newSession(): void {
+    this.newConversation();
+  }
+
+  async ask(agent: string, text: string): Promise<void> {
+    this.newConversation(agent);
+    await this.loadModels();
+    await this.resend(text);
+  }
+
+  async approve(): Promise<void> {
+    await this.resend(APPROVE_REPLY);
+  }
+
+  async dropPlan(): Promise<void> {
+    await this.resend(DROP_REPLY);
   }
 
   async loadModels(): Promise<void> {
@@ -92,13 +170,6 @@ export class AgentStore {
       this.modelListing.set(NO_MODELS);
       this.modelsError.set(`Couldn't load the models from the ${this.agentName()} agent.`);
     }
-  }
-
-  newSession(): void {
-    this.abortController?.abort();
-    this.sessionId.set(newId());
-    this.messages.set([]);
-    this.requestError.set(null);
   }
 
   async send(): Promise<void> {
@@ -122,14 +193,12 @@ export class AgentStore {
 
   private async dispatch(text: string): Promise<void> {
     this.requestError.set(null);
-    this.messages.update((current) => [
-      ...current,
-      { id: newId(), role: 'user', content: text, streaming: false },
-    ]);
+    const id = this.sessionId();
+    const agent = this.agentName();
+    this.addMessages(id, agent, [{ id: newId(), role: 'user', content: text, streaming: false }]);
 
     const assistantId = newId();
-    this.messages.update((current) => [
-      ...current,
+    this.addMessages(id, agent, [
       { id: assistantId, role: 'assistant', content: '', streaming: true },
     ]);
 
@@ -138,11 +207,11 @@ export class AgentStore {
 
     try {
       const events = this.api.stream(
-        this.agentName(),
+        agent,
         {
           message: text,
           model_name: this.modelName(),
-          request_id: this.sessionId(),
+          request_id: id,
           auto_approve: this.autoApprove(),
         },
         this.abortController.signal,
@@ -157,7 +226,12 @@ export class AgentStore {
             this.setAssistantStatus(assistantId, event.content);
             break;
           case 'final':
-            this.setAssistantContent(assistantId, event.content);
+            this.setAssistantContent(
+              assistantId,
+              event.metadata?.['outcome'] === AWAITING_APPROVAL
+                ? withoutApprovalPrompt(event.content)
+                : event.content,
+            );
             this.setAssistantMetadata(assistantId, event.metadata);
             this.setAssistantStatus(assistantId, undefined);
             break;
@@ -178,6 +252,21 @@ export class AgentStore {
       this.isStreaming.set(false);
       this.abortController = null;
     }
+  }
+
+  private addMessages(id: string, agent: string, added: ChatMessage[]): void {
+    this.all.update((all) => {
+      const existing = all.find((c) => c.id === id);
+      const messages = [...(existing?.messages ?? []), ...added];
+      const next: Conversation = {
+        id,
+        agent: existing?.agent ?? agent,
+        title: existing && existing.messages.length ? existing.title : titleOf(messages),
+        updatedAt: Date.now(),
+        messages,
+      };
+      return existing ? all.map((c) => (c.id === id ? next : c)) : [...all, next];
+    });
   }
 
   private appendToAssistant(id: string, chunk: string): void {
@@ -214,6 +303,16 @@ export class AgentStore {
   }
 
   private updateMessage(id: string, updater: (message: ChatMessage) => ChatMessage): void {
-    this.messages.update((current) => current.map((m) => (m.id === id ? updater(m) : m)));
+    this.all.update((all) =>
+      all.map((conversation) =>
+        conversation.messages.some((m) => m.id === id)
+          ? {
+              ...conversation,
+              updatedAt: Date.now(),
+              messages: conversation.messages.map((m) => (m.id === id ? updater(m) : m)),
+            }
+          : conversation,
+      ),
+    );
   }
 }

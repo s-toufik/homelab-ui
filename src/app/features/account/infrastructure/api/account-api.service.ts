@@ -111,6 +111,24 @@ export class AccountApiService {
     });
   }
 
+  async attribute(name: string): Promise<string | null> {
+    const body = await this.api.json<ProfileResponse>(this.url('/'));
+    const attributes = (body['attributes'] ?? {}) as Record<string, unknown>;
+    const value = attributes[name];
+    return Array.isArray(value) && typeof value[0] === 'string' ? value[0] : null;
+  }
+
+  async saveAttribute(name: string, value: string): Promise<void> {
+    const { userProfileMetadata: _metadata, ...fields } = await this.api.json<ProfileResponse>(
+      this.url('/'),
+    );
+    const attributes = (fields['attributes'] ?? {}) as Record<string, unknown>;
+    await this.api.json(this.url('/'), {
+      method: 'POST',
+      body: { ...fields, attributes: { ...attributes, [name]: [value] } },
+    });
+  }
+
   async devices(): Promise<Device[]> {
     return toDevices(await this.api.json<DeviceResponse[]>(this.url('/sessions/devices')));
   }

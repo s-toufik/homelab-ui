@@ -5,6 +5,7 @@ export interface AssistantPanel {
   load: () => Promise<Type<unknown>>;
   hiddenOn: readonly string[];
   phase: Signal<SwarmPhase>;
+  waiting: Signal<number>;
 }
 
 export const ASSISTANT_PANEL = new InjectionToken<AssistantPanel>('ASSISTANT_PANEL');

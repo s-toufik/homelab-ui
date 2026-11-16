@@ -9,6 +9,7 @@ function feature(id: string, checkHealth?: () => Promise<boolean>): HomelabFeatu
     label: id,
     description: '',
     icon: [],
+    hue: 'slate',
     color: '#3b82f6',
     category: 'Observability',
     entry: { kind: 'page', path: `/${id}` },

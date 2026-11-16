@@ -1,0 +1,112 @@
+.services {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13.5rem, 1fr));
+  gap: 0.9rem;
+}
+
+.services__column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  min-width: 0;
+
+  .hl-cap {
+    margin-bottom: 0.15rem;
+  }
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.55rem 0.6rem;
+  border: var(--card-border);
+  border-radius: 0.55rem;
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    opacity 0.15s,
+    border-color 0.15s;
+
+  &:hover {
+    border-color: color-mix(in srgb, var(--text) 30%, transparent);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+  }
+}
+
+.card--on {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px var(--accent);
+}
+
+.card--near {
+  border-color: var(--accent-border);
+}
+
+.card--dim {
+  opacity: 0.38;
+}
+
+.card__glyph {
+  width: 1.85rem;
+  height: 1.85rem;
+  flex-shrink: 0;
+  border-radius: 0.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--h);
+  background: var(--h-soft);
+}
+
+.card__text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    font-size: 0.82rem;
+    font-weight: 600;
+    padding-right: 2.6rem;
+  }
+}
+
+.card__summary,
+.card__addr {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__summary {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+}
+
+.card__addr {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  color: var(--mono);
+}
+
+.card__state {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.55rem;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  color: var(--text-muted);
+}

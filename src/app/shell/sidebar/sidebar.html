@@ -1,0 +1,80 @@
+<nav class="side" aria-label="Main">
+  <a class="side__brand" routerLink="/">
+    <span class="side__logo" aria-hidden="true"><i></i></span>Homelab
+  </a>
+
+  <a
+    class="side__item"
+    routerLink="/"
+    routerLinkActive="side__item--on"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    <app-feature-icon [paths]="icons.today" [size]="16" />Today
+  </a>
+  <a class="side__item" routerLink="/assistant" routerLinkActive="side__item--on">
+    <app-feature-icon [paths]="icons.assistant" [size]="16" />Assistant
+    @if (waiting()) {
+      <span class="side__count" [attr.aria-label]="waiting() + ' waiting'">{{ waiting() }}</span>
+    }
+  </a>
+  @if (access.isAdmin()) {
+    <a class="side__item" routerLink="/map" routerLinkActive="side__item--on">
+      <app-feature-icon [paths]="icons.map" [size]="16" />Map
+    </a>
+  }
+
+  <div class="side__scroll">
+    @for (entry of nav.sections(); track entry.section) {
+      @let closed = nav.collapsed().has(entry.section);
+      <button
+        type="button"
+        class="side__group"
+        [attr.aria-expanded]="!closed"
+        (click)="nav.toggle(entry.section)"
+      >
+        {{ entry.section }}
+        <span class="side__chevron" [class.side__chevron--closed]="closed">
+          <app-feature-icon [paths]="icons.chevron" [size]="12" />
+        </span>
+      </button>
+      @if (!closed) {
+        @for (page of entry.pages; track page.id) {
+          <a class="side__item" [routerLink]="page.path" routerLinkActive="side__item--on">
+            <app-feature-icon [paths]="page.icon" [size]="16" />{{ page.label }}
+          </a>
+        }
+      }
+    }
+  </div>
+
+  @if (access.isAdmin()) {
+    <a class="side__item" routerLink="/people" routerLinkActive="side__item--on">
+      <app-feature-icon [paths]="icons.people" [size]="16" />People
+    </a>
+  }
+  <a class="side__item" routerLink="/appearance" routerLinkActive="side__item--on">
+    <app-feature-icon [paths]="icons.settings" [size]="16" />Appearance
+  </a>
+
+  <div class="side__account">
+    <button
+      type="button"
+      class="side__me"
+      aria-haspopup="menu"
+      [attr.aria-expanded]="menuOpen()"
+      (click)="menuOpen.set(!menuOpen())"
+    >
+      <span class="side__avatar" aria-hidden="true">{{ name().charAt(0).toUpperCase() }}</span>
+      {{ name() }}
+    </button>
+    @if (menuOpen()) {
+      <div class="side__backdrop" (click)="menuOpen.set(false)"></div>
+      <div class="side__menu" role="menu">
+        <a role="menuitem" routerLink="/account" (click)="menuOpen.set(false)">Account</a>
+        @if (session.enabled) {
+          <a role="menuitem" [href]="session.signOutUrl">Sign out</a>
+        }
+      </div>
+    }
+  </div>
+</nav>

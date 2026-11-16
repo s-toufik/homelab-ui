@@ -1,0 +1,138 @@
+<div class="hl-page">
+  <app-page-header
+    eyebrow="People"
+    title="Add a person"
+    hue="indigo"
+    [summary]="'Step ' + step() + ' of 3'"
+  />
+
+  <ol class="new__steps" aria-label="Steps">
+    <li [class.new__steps--on]="step() >= 1">Name</li>
+    <li [class.new__steps--on]="step() >= 2">Pages</li>
+    <li [class.new__steps--on]="step() >= 3">Password</li>
+  </ol>
+
+  @if (step() === 1) {
+    <form
+      class="hl-card new__card"
+      (submit)="$event.preventDefault(); canContinue() && step.set(2)"
+    >
+      <label class="hl-field">
+        First name
+        <input
+          class="hl-input"
+          name="firstName"
+          autocomplete="off"
+          [ngModel]="firstName()"
+          (ngModelChange)="firstName.set($event)"
+          (blur)="suggestUsername()"
+          required
+        />
+      </label>
+      <label class="hl-field">
+        Last name (optional)
+        <input
+          class="hl-input"
+          name="lastName"
+          autocomplete="off"
+          [ngModel]="lastName()"
+          (ngModelChange)="lastName.set($event)"
+        />
+      </label>
+      <label class="hl-field">
+        Username, to sign in
+        <input
+          class="hl-input"
+          name="username"
+          autocomplete="off"
+          autocapitalize="none"
+          spellcheck="false"
+          [ngModel]="username()"
+          (ngModelChange)="username.set($event)"
+          required
+        />
+        @if (username() && !usernameValid()) {
+          <span class="new__error"
+            >Lowercase letters, digits, '.', '_' or '-', 2 to 63 characters.</span
+          >
+        } @else if (usernameTaken()) {
+          <span class="new__error">Someone already has this username.</span>
+        }
+      </label>
+      <label class="hl-field">
+        Email (optional)
+        <input
+          class="hl-input"
+          type="email"
+          name="email"
+          autocomplete="off"
+          [ngModel]="email()"
+          (ngModelChange)="email.set($event)"
+        />
+      </label>
+      <div class="new__actions">
+        <a class="hl-btn" routerLink="/people">Cancel</a>
+        <button type="submit" class="hl-btn hl-btn--primary" [disabled]="!canContinue()">
+          Next
+        </button>
+      </div>
+    </form>
+  } @else if (step() === 2) {
+    <div class="hl-card new__card">
+      <h2 class="hl-card__title">What can {{ name() }} open?</h2>
+      @for (entry of groups(); track entry.group) {
+        <span class="new__group">{{ entry.group }}</span>
+        <div class="new__options">
+          @for (option of entry.options; track option.role) {
+            <button
+              type="button"
+              class="new__option"
+              [class]="'hue-' + option.hue"
+              [class.new__option--on]="chosen().has(option.role)"
+              [attr.aria-pressed]="chosen().has(option.role)"
+              (click)="toggle(option.role)"
+            >
+              {{ option.label }}
+            </button>
+          }
+        </div>
+      }
+      <p class="hl-muted">You can change this later in People › Access.</p>
+      @if (failure()) {
+        <p class="hl-error" role="alert">{{ failure() }}</p>
+      }
+      <div class="new__actions">
+        <button type="button" class="hl-btn" (click)="step.set(1)">Back</button>
+        <button
+          type="button"
+          class="hl-btn hl-btn--primary"
+          [disabled]="saving()"
+          (click)="create()"
+        >
+          {{ saving() ? 'Creating…' : 'Create ' + name() + "'s account" }}
+        </button>
+      </div>
+    </div>
+  } @else {
+    <div class="hl-card new__card">
+      <h2 class="hl-card__title">{{ name() }} can sign in</h2>
+      <p>
+        Give {{ name() }} this temporary password. It is shown only once; at the first sign-in,
+        {{ name() }} chooses a new one.
+      </p>
+      <div class="new__password">
+        <span class="hl-muted">Username</span><strong>{{ username() }}</strong>
+        <span class="hl-muted">Temporary password</span><code>{{ password() }}</code>
+      </div>
+      <div class="new__actions">
+        <button type="button" class="hl-btn" (click)="copy()">
+          {{ copied() ? 'Copied' : 'Copy the password' }}
+        </button>
+        <a class="hl-btn hl-btn--primary" routerLink="/people">Done</a>
+      </div>
+      <p class="hl-muted">
+        To install it on an iPhone: open the homelab in Safari, then Share › Add to Home Screen.
+      </p>
+    </div>
+  }
+</div>

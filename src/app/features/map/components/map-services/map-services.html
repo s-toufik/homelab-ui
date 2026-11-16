@@ -1,0 +1,33 @@
+<div class="services">
+  @for (category of categories; track category.title) {
+    <div class="services__column" [class]="'hue-' + category.hue">
+      <h3 class="hl-cap">{{ category.title }}</h3>
+      @for (service of category.services; track service.id) {
+        @let status = store.statuses()[service.id];
+        @let on = store.selected() === service.id;
+        @let near = related().has(service.id);
+        <button
+          type="button"
+          class="card"
+          [class.card--on]="on"
+          [class.card--near]="near"
+          [class.card--dim]="store.selected() && !on && !near"
+          [attr.aria-pressed]="on"
+          (click)="pick(service.id)"
+        >
+          <span class="card__glyph"
+            ><app-feature-icon [paths]="glyphs[service.glyph]" [size]="15"
+          /></span>
+          <span class="card__text">
+            <strong>{{ service.id }}</strong>
+            <span class="card__summary">{{ service.summary }}</span>
+            <span class="card__addr">{{ service.address }}</span>
+          </span>
+          <span class="card__state">
+            <span class="hl-dot" [style.background]="color[status.state]"></span>{{ status.count }}
+          </span>
+        </button>
+      }
+    </div>
+  }
+</div>

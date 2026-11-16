@@ -1,11 +1,11 @@
 <footer class="composer" [class.composer--compact]="compact()">
   <div class="composer__line">
-    <span class="composer__prompt" aria-hidden="true">&gt;</span>
     <textarea
       #textarea
       class="composer__input"
       rows="1"
-      placeholder="Message the agent..."
+      [attr.aria-label]="placeholder()"
+      [placeholder]="placeholder()"
       [ngModel]="draft()"
       (ngModelChange)="draft.set($event)"
       (keydown)="onKeydown($event)"
@@ -20,7 +20,7 @@
       aria-label="Stop"
       (click)="cancel.emit()"
     >
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden="true">
         <rect x="6" y="6" width="12" height="12" rx="1.5" />
       </svg>
     </button>
@@ -35,12 +35,16 @@
     >
       <svg
         viewBox="0 0 24 24"
-        width="14"
-        height="14"
-        fill="currentColor"
-        style="transform: translate(-1px, 1px)"
+        width="20"
+        height="20"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.6"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
       >
-        <path d="M3 11.5 21 3l-5 18-5.5-7.5L3 11.5Z" />
+        <path d="M12 19V5M5 12l7-7 7 7" />
       </svg>
     </button>
   }

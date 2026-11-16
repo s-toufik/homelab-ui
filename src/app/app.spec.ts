@@ -17,7 +17,7 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('renders the shell with the control center at the root route', async () => {
+  it('renders the sidebar, the toolbar and the Today briefing at the root route', async () => {
     const router = TestBed.inject(Router);
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
@@ -27,11 +27,12 @@ describe('App', () => {
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-nav-sidebar')).toBeTruthy();
-    expect(compiled.querySelector('app-control-center-page')).toBeTruthy();
+    expect(compiled.querySelector('app-sidebar')).toBeTruthy();
+    expect(compiled.querySelector('app-toolbar')).toBeTruthy();
+    expect(compiled.querySelector('app-today-page')).toBeTruthy();
   });
 
-  it('renders the agent page, with its settings in the right panel, at /agent', async () => {
+  it('sends the old /agent address to the assistant, with its settings in the right panel', async () => {
     const router = TestBed.inject(Router);
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
@@ -41,7 +42,7 @@ describe('App', () => {
     await fixture.whenStable();
 
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('app-agent-page')).toBeTruthy();
+    expect(compiled.querySelector('app-assistant-page')).toBeTruthy();
     expect(compiled.querySelector('app-page-panel')).toBeTruthy();
     expect(compiled.querySelector('app-settings-panel')).toBeTruthy();
     expect(compiled.querySelector('app-assistant-drawer')).toBeNull();
@@ -58,6 +59,8 @@ describe('App', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('app-assistant-drawer')).toBeTruthy();
-    expect(compiled.querySelector('[aria-label="Open the assistant"]')).toBeTruthy();
+    expect(
+      compiled.querySelector('[aria-label="Open the assistant beside this page"]'),
+    ).toBeTruthy();
   });
 });

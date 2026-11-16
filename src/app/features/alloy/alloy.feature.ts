@@ -8,6 +8,8 @@ export function provideAlloyFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'alloy',
+      hue: 'blue',
+      access: 'page:pipeline',
       label: 'Pipeline',
       description: 'Collection pipelines for host metrics and container logs.',
       category: 'Observability',

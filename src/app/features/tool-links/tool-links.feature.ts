@@ -4,6 +4,8 @@ import { provideHomelabFeature } from '@shell/application/homelab-features';
 export function provideToolLinksFeature(): Provider {
   return provideHomelabFeature(() => ({
     id: 'tool-links',
+    hue: 'slate',
+    access: 'page:tool-uis',
     label: 'Tool UIs',
     description: "Open each tool's own web interface: Grafana, Prometheus, Kafka UI, Alloy…",
     category: 'Platform',

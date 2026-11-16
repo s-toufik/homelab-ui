@@ -11,7 +11,7 @@
   align-items: center;
   gap: 0.4rem;
   padding: 0 1rem 0.5rem;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
 }
 
 .assistant__model {
@@ -19,7 +19,7 @@
   min-width: 0;
   height: 2.25rem;
   padding: 0 0.6rem;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-raised);
   color: var(--text);
@@ -34,7 +34,7 @@
   justify-content: center;
   width: 2.25rem;
   height: 2.25rem;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: transparent;
   color: var(--text);

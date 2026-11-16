@@ -1,4 +1,4 @@
-import { DestroyRef, Injectable, computed, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, InjectionToken, computed, inject, signal } from '@angular/core';
 import { API_ROUTING } from './homelab-server';
 
 export interface SignedInUser {
@@ -13,6 +13,19 @@ interface UserInfoResponse {
   readonly groups?: readonly string[];
 }
 
+export const PREVIEW_GROUPS_KEY = 'homelab-ui.preview-groups';
+
+export const PREVIEW_GROUPS = new InjectionToken<readonly string[] | null>('PREVIEW_GROUPS', {
+  factory: () => {
+    try {
+      const saved = JSON.parse(globalThis.localStorage?.getItem(PREVIEW_GROUPS_KEY) ?? 'null');
+      return Array.isArray(saved) ? saved.filter((group) => typeof group === 'string') : null;
+    } catch {
+      return null;
+    }
+  },
+});
+
 const USERINFO_PATH = '/oauth2/userinfo';
 const ADMIN_GROUP = 'role:admin';
 const TIMEOUT_MS = 4000;
@@ -22,9 +35,14 @@ const CHECK_INTERVAL_MS = 60_000;
 export class GatewaySession {
   private readonly destroyRef = inject(DestroyRef);
   readonly enabled = inject(API_ROUTING) === 'gateway';
-  readonly user = signal<SignedInUser | null>(null);
-  readonly groups = signal<readonly string[]>([]);
-  readonly isAdmin = computed(() => !this.enabled || this.groups().includes(ADMIN_GROUP));
+  private readonly preview = this.enabled ? null : inject(PREVIEW_GROUPS);
+  readonly user = signal<SignedInUser | null>(
+    this.preview ? { username: 'preview', email: null } : null,
+  );
+  readonly groups = signal<readonly string[]>(this.preview ?? []);
+  readonly isAdmin = computed(
+    () => (!this.enabled && !this.preview) || this.groups().includes(ADMIN_GROUP),
+  );
   readonly signOutUrl = '/oauth2/sign_out?rd=%2F';
 
   async load(): Promise<void> {

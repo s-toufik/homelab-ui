@@ -8,6 +8,8 @@ export function provideGrafanaFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'grafana',
+      hue: 'indigo',
+      access: 'page:dashboards',
       label: 'Dashboards',
       description: 'The server, containers, Kafka, the LLM and server health at a glance.',
       category: 'Observability',

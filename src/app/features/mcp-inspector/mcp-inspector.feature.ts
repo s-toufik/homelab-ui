@@ -8,6 +8,8 @@ export function provideMcpInspectorFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'mcp-inspector',
+      hue: 'purple',
+      access: 'page:tools',
       label: 'Tools',
       description: "List and try the agent's tools (agent-toolbox, MCP).",
       category: 'AI',

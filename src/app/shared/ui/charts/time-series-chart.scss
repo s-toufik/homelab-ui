@@ -49,7 +49,7 @@
   min-width: 10rem;
   max-width: 22rem;
   padding: 0.5rem 0.65rem;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-raised);
   box-shadow: var(--shadow-float);

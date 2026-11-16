@@ -8,6 +8,8 @@ export function provideKafkaUiFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'kafka-ui',
+      hue: 'rose',
+      access: 'page:kafka',
       label: 'Kafka',
       description: 'Topics, messages and consumer groups.',
       category: 'Streaming',

@@ -8,7 +8,7 @@
 .settings-panel__group {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: 0.6rem;
   background: var(--surface-raised);
   overflow: hidden;
@@ -33,7 +33,7 @@
   cursor: pointer;
 
   & + & {
-    border-top: 1px solid var(--border);
+    border-top: var(--border-width) solid var(--border);
   }
 
   &:focus-within {

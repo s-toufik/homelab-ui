@@ -1,0 +1,147 @@
+@if (access.isAdmin()) {
+  <ng-template appPagePanelContent>
+    <app-settings-panel
+      [agents]="store.agents()"
+      [agentsError]="store.agentsError()"
+      [agentName]="store.agentName()"
+      (agentChange)="store.chooseAgent($event)"
+      [models]="store.modelNames()"
+      [pinnedSteps]="store.pinnedSteps()"
+      [modelsError]="store.modelsError()"
+      [(modelName)]="store.modelName"
+      [(sessionId)]="store.sessionId"
+      [(autoApprove)]="store.autoApprove"
+      (newSession)="newConversation()"
+    />
+  </ng-template>
+}
+
+<div class="assistant" [class.assistant--thread]="routeId()">
+  <aside class="assistant__list" aria-label="Conversations">
+    <div class="assistant__list-head">
+      <h1>Conversations</h1>
+      <button type="button" class="hl-btn hl-btn--small" (click)="newConversation()">+ New</button>
+    </div>
+    @for (group of groups(); track group.title) {
+      <span class="assistant__group">{{ group.title }}</span>
+      @for (c of group.items; track c.id) {
+        <button
+          type="button"
+          class="assistant__item"
+          [class.assistant__item--on]="c.id === store.sessionId()"
+          [attr.aria-current]="c.id === store.sessionId()"
+          (click)="open(c)"
+        >
+          <span class="assistant__item-top">
+            <span class="assistant__item-title">{{ c.title }}</span>
+            <span class="assistant__when">{{ when(c.updatedAt) }}</span>
+          </span>
+          <span class="assistant__agent" [class]="'hue-' + look(c.agent).hue">
+            <span class="hl-dot"></span>{{ look(c.agent).label }}
+            @if (isWaiting(c)) {
+              <span class="assistant__waiting">· plan waiting</span>
+            }
+          </span>
+        </button>
+      }
+    } @empty {
+      <p class="assistant__none">Your conversations will appear here.</p>
+    }
+  </aside>
+
+  <section class="assistant__thread">
+    <header class="assistant__head">
+      <a class="assistant__back" routerLink="/assistant" aria-label="Back to conversations">‹</a>
+      <span class="assistant__title">{{ title() }}</span>
+      <span class="assistant__chip-wrap">
+        <button
+          type="button"
+          class="assistant__chip"
+          [class]="'hue-' + look(store.agentName()).hue"
+          [disabled]="!empty()"
+          [attr.aria-label]="
+            'Assistant: ' + look(store.agentName()).label + (empty() ? ', change' : '')
+          "
+          (click)="picking.set(!picking())"
+        >
+          <span class="hl-dot"></span>{{ look(store.agentName()).label }}
+          @if (empty()) {
+            <span aria-hidden="true">▾</span>
+          }
+        </button>
+        @if (picking()) {
+          <span class="assistant__menu" role="menu">
+            @for (agent of agents(); track agent) {
+              <button
+                type="button"
+                role="menuitem"
+                [class]="'hue-' + look(agent).hue"
+                (click)="pickAgent(agent)"
+              >
+                <span class="hl-dot"></span>{{ look(agent).label }}
+                <small>{{ look(agent).greeting }}</small>
+              </button>
+            }
+          </span>
+        }
+      </span>
+    </header>
+
+    @if (empty()) {
+      <div class="assistant__welcome">
+        <h2>Ask {{ look(store.agentName()).label }}</h2>
+        <p>{{ look(store.agentName()).greeting }}</p>
+        <div class="assistant__suggestions">
+          @for (suggestion of look(store.agentName()).suggestions; track suggestion) {
+            <button type="button" class="hl-btn" (click)="ask(suggestion)">{{ suggestion }}</button>
+          }
+        </div>
+      </div>
+    } @else {
+      <app-conversation [messages]="store.messages()" (resend)="store.resend($event)" />
+    }
+
+    @if (store.requestError()) {
+      <p class="assistant__error hl-error" role="alert">{{ store.requestError() }}</p>
+    }
+
+    @if (store.plan(); as plan) {
+      @if (!changing()) {
+        <div class="assistant__plan" role="region" aria-label="Plan waiting for you">
+          <div class="assistant__plan-head">
+            <strong>Plan</strong>
+            <span
+              >{{ plan.steps.length }} step{{ plan.steps.length === 1 ? '' : 's' }} · nothing runs
+              until you say so</span
+            >
+          </div>
+          <div class="assistant__plan-actions">
+            <button type="button" class="hl-btn hl-btn--primary" (click)="store.approve()">
+              Approve and run
+            </button>
+            <button type="button" class="hl-btn" (click)="changePlan()">Change it</button>
+            <span class="assistant__spacer"></span>
+            <button type="button" class="hl-btn hl-btn--ghost" (click)="store.dropPlan()">
+              Dismiss
+            </button>
+          </div>
+        </div>
+      }
+    }
+
+    @if (!store.plan() || changing()) {
+      <app-composer
+        [(draft)]="store.draft"
+        [canSend]="store.canSend()"
+        [isStreaming]="store.isStreaming()"
+        [placeholder]="
+          changing()
+            ? 'Say what to change'
+            : (empty() ? 'Ask ' : 'Reply to ') + look(store.agentName()).label
+        "
+        (send)="store.send()"
+        (cancel)="store.cancel()"
+      />
+    }
+  </section>
+</div>

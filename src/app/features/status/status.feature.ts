@@ -4,6 +4,8 @@ import { provideHomelabFeature } from '@shell/application/homelab-features';
 export function provideStatusFeature(): Provider {
   return provideHomelabFeature(() => ({
     id: 'status',
+    hue: 'green',
+    access: 'page:status',
     label: 'Status',
     description: 'Is every container ready? Links and addresses for each one.',
     category: 'Platform',

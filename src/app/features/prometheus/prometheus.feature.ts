@@ -8,6 +8,8 @@ export function providePrometheusFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'prometheus',
+      hue: 'amber',
+      access: 'page:metrics',
       label: 'Metrics',
       description: 'Query Prometheus, check scrape targets and alerts.',
       category: 'Observability',

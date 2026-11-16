@@ -284,4 +284,78 @@ describe('AgentStore', () => {
       expect(sentTo).toEqual(['observation']);
     });
   });
+
+  describe('conversations', () => {
+    function withAnswer(final: StreamEvent) {
+      const sentBodies: AgentRequestBody[] = [];
+      const store = storeStreaming([final, event('complete')], () => {}, sentBodies);
+      store.modelName.set('m');
+      return { store, sentBodies };
+    }
+
+    it('keeps each conversation with its agent, and opens it again', async () => {
+      const { store } = withAnswer(event('final', 'Pasta.'));
+      store.newConversation('kitchen');
+      store.draft.set('dinner?');
+      await store.send();
+      const kitchen = store.sessionId();
+
+      store.newConversation('travel');
+      expect(store.messages()).toEqual([]);
+      await store.openConversation(kitchen);
+
+      expect(store.agentName()).toBe('kitchen');
+      expect(store.messages().map((m) => m.content)).toEqual(['dinner?', 'Pasta.']);
+      expect(store.conversations().map((c) => [c.agent, c.title])).toEqual([
+        ['kitchen', 'dinner?'],
+      ]);
+    });
+
+    it('shows a plan waiting for approval without the reply instructions, and answers it', async () => {
+      const { store, sentBodies } = withAnswer({
+        type: 'final',
+        content:
+          'For four:\n1. Pick dinners\n\n---\nReply **yes** to approve the plan, **Drop plan** to cancel.',
+        metadata: { outcome: 'awaiting_approval' },
+      });
+      store.draft.set('plan dinners');
+      await store.send();
+
+      expect(store.plan()?.steps).toEqual(['Pick dinners']);
+      expect(store.messages().at(-1)!.content).toBe('For four:\n1. Pick dinners');
+      expect(store.waiting().length).toBe(1);
+
+      await store.approve();
+      await store.dropPlan();
+      expect(sentBodies.slice(1).map((body) => body.message)).toEqual(['yes', 'Drop plan']);
+      expect(new Set(sentBodies.map((body) => body.request_id)).size).toBe(1);
+    });
+
+    it('remembers the conversations after a reload', async () => {
+      const { store } = withAnswer(event('final', 'Lisbon.'));
+      store.newConversation('travel');
+      store.draft.set('where?');
+      await store.send();
+      TestBed.flushEffects();
+
+      const saved = JSON.parse(storage.getItem('homelab-ui.agent.conversations')!);
+      expect(saved.map((c: { agent: string; title: string }) => [c.agent, c.title])).toEqual([
+        ['travel', 'where?'],
+      ]);
+    });
+
+    it('reads conversations saved in the older one-per-agent format', () => {
+      storage.setItem(
+        'homelab-ui.agent.conversations',
+        JSON.stringify({
+          kitchen: { sessionId: 's1', messages: [{ id: 'u', role: 'user', content: 'soup?' }] },
+        }),
+      );
+      const store = TestBed.inject(AgentStore);
+      expect(store.conversations().map((c) => [c.id, c.agent, c.title])).toEqual([
+        ['s1', 'kitchen', 'soup?'],
+      ]);
+      expect(store.sessionId()).toBe('s1');
+    });
+  });
 });

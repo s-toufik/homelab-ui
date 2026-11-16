@@ -12,6 +12,7 @@ export class Composer {
   readonly canSend = input.required<boolean>();
   readonly isStreaming = input.required<boolean>();
   readonly compact = input(false);
+  readonly placeholder = input('Ask anything');
   readonly send = output<void>();
   readonly cancel = output<void>();
 
@@ -22,6 +23,10 @@ export class Composer {
       this.draft();
       requestAnimationFrame(() => this.autoGrow());
     });
+  }
+
+  focus(): void {
+    this.textarea()?.nativeElement.focus();
   }
 
   onKeydown(event: KeyboardEvent): void {

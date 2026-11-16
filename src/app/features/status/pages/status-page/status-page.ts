@@ -2,6 +2,7 @@ import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { Component, OnDestroy, OnInit, inject, signal } from '@angular/core';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
+import { PageHeader } from '@shared/ui/page-header/page-header';
 import { copyText } from '@shared/utils/clipboard';
 import { StackStatusStore } from '../../application/stack-status.store';
 import {
@@ -22,7 +23,7 @@ const STATE_LABEL: Record<ServiceState, string> = {
 
 @Component({
   selector: 'app-status-page',
-  imports: [DatePipe, RouterLink],
+  imports: [DatePipe, RouterLink, PageHeader],
   templateUrl: './status-page.html',
   styleUrl: './status-page.scss',
 })

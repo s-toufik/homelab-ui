@@ -1,0 +1,97 @@
+<div class="overview">
+  <div class="overview__stack">
+    <section class="panel">
+      <span class="panel__tab">Networks</span>
+      @for (net of networks; track net.name) {
+        <div class="net" [class]="'hue-' + net.hue">
+          <span class="net__text"
+            ><strong>{{ net.name }}</strong
+            ><span>{{ net.detail }}</span></span
+          >
+          <span class="hl-addr">{{ net.range }}</span>
+        </div>
+      }
+    </section>
+    <section class="panel legend">
+      <span class="panel__tab">Legend</span>
+      <span class="legend__dots"
+        ><span class="hl-dot ok"></span><span class="hl-dot warn"></span
+        ><span class="hl-dot fail"></span></span
+      ><span>ready · needs a look · failed</span> <span class="legend__line"></span
+      ><span>HTTPS through the gateway</span> <span class="legend__line legend__line--dotted"></span
+      ><span>out to the internet</span> <span class="hl-addr">:3000</span
+      ><span>where you reach it</span>
+    </section>
+  </div>
+
+  <div class="path" aria-label="How a request reaches the cluster">
+    <div class="path__row">
+      <div class="node">
+        <strong>Your devices</strong><span>phone · laptop · iPad, on Tailscale</span>
+      </div>
+      <div class="node node--cloud">
+        <strong>Internet</strong><span>LLM provider · images</span>
+      </div>
+    </div>
+    <span class="path__link"
+      ><span class="hl-addr">tailnet · HTTPS · &lt;server&gt;.ts.net</span></span
+    >
+    <div class="node node--wide hue-orange">
+      <strong>caddy <small>· gateway</small></strong>
+      <span class="ports">
+        @for (p of ports; track p.port) {
+          <span
+            class="ports__item"
+            [class.ports__item--https]="p.https"
+            [class.ports__item--lit]="lit(p.services)"
+          >
+            <i></i>{{ p.port }}
+          </span>
+        }
+      </span>
+    </div>
+    <span class="path__link"></span>
+    <div class="node hue-orange">
+      <strong>oauth2-proxy → keycloak</strong><span>every request: signed in? which pages?</span>
+    </div>
+    <span class="path__link path__link--long"
+      ><span class="hl-addr">/api/* · page roles checked, into the cluster below</span></span
+    >
+  </div>
+
+  <div class="overview__stack">
+    <section class="panel">
+      <span class="panel__tab">Open on the tailnet</span>
+      @for (p of ports; track p.port) {
+        <div class="port" [class.port--lit]="lit(p.services)">
+          <span class="hl-addr port__number">:{{ p.port }}</span>
+          <span class="port__text"
+            ><strong>{{ p.name }}</strong
+            ><span>{{ p.detail }}</span></span
+          >
+          <span class="chip" [class.chip--https]="p.https">{{ p.https ? 'HTTPS' : 'HTTP' }}</span>
+        </div>
+      }
+    </section>
+    <section class="panel pipeline">
+      <span class="panel__tab">Agent pipeline</span>
+      <div class="pipeline__row">
+        <span class="step">You</span>→<span class="step">homelab-ui</span>→<span class="step"
+          >agent-supervisor</span
+        >
+      </div>
+      <div class="pipeline__row">
+        <span class="pipeline__turn">↳ plan approved</span
+        ><span class="step">kitchen · travel …</span>→<span class="step step--purple"
+          >llm / provider</span
+        >
+      </div>
+      <div class="pipeline__row">
+        <span class="pipeline__turn">↳ tools</span
+        ><span class="step step--purple">agent-toolbox</span>→<span class="step step--green"
+          >grafana · postgres · mongodb</span
+        >
+      </div>
+    </section>
+  </div>
+</div>

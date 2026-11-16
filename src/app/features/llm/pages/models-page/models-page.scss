@@ -21,7 +21,7 @@
   align-items: center;
   gap: 0.75rem;
   padding: 0.55rem 0;
-  border-bottom: 1px solid var(--border);
+  border-bottom: var(--border-width) solid var(--border);
 }
 
 .models-page__name {
@@ -46,7 +46,7 @@
 
 .models-page__answer {
   padding: 0.75rem;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   font-size: 0.88rem;
 }

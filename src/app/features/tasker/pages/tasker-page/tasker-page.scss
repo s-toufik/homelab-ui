@@ -19,9 +19,9 @@
   flex: 0 0 auto;
   align-items: center;
   justify-content: space-between;
-  height: 64px;
-  padding: 0 24px 0 64px;
-  border-bottom: 1px solid var(--border);
+  height: 52px;
+  padding: 0 20px;
+  border-bottom: var(--border-width) solid var(--border);
   background: var(--surface-raised);
 }
 
@@ -32,14 +32,20 @@
 }
 
 .tasker-page__brand {
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.45rem;
+  background: var(--hue-purple-soft);
+  color: var(--hue-purple);
+  font-family: var(--font-head);
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 800;
+  text-decoration: none;
 }
 
 .tasker-page__name {
   min-width: 220px;
   padding: 6px 12px;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface);
   color: var(--text);

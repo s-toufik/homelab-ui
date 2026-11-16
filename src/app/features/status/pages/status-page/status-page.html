@@ -1,32 +1,23 @@
-<div class="status-page">
-  <header class="status-page__header">
-    <div>
-      <p class="status-page__eyebrow">Homelab</p>
-      <h1 class="status-page__title">Status</h1>
-      <p class="status-page__summary">
-        @if (store.checkedAt(); as checkedAt) {
-          <strong>{{ store.summary().ready }} of {{ store.summary().total }} ready</strong>
-          @if (store.summary().notReady) {
-            · <span class="status-page__bad">{{ store.summary().notReady }} not ready</span>
-          }
-          @if (store.summary().unknown) {
-            · {{ store.summary().unknown }} unknown
-          }
-          · checked at {{ checkedAt | date: 'HH:mm:ss' }}, every 30 s
-        } @else {
-          Checking every container…
+<div class="hl-page status-page">
+  <app-page-header eyebrow="Homelab" title="Status">
+    <p class="status-page__summary" summary>
+      @if (store.checkedAt(); as checkedAt) {
+        <strong>{{ store.summary().ready }} of {{ store.summary().total }} ready</strong>
+        @if (store.summary().notReady) {
+          · <span class="status-page__bad">{{ store.summary().notReady }} not ready</span>
         }
-      </p>
-    </div>
-    <button
-      type="button"
-      class="status-page__refresh"
-      [disabled]="store.refreshing()"
-      (click)="store.refresh()"
-    >
+        @if (store.summary().unknown) {
+          · {{ store.summary().unknown }} unknown
+        }
+        · checked at {{ checkedAt | date: 'HH:mm:ss' }}, every 30 s
+      } @else {
+        Checking every container…
+      }
+    </p>
+    <button type="button" class="hl-btn" [disabled]="store.refreshing()" (click)="store.refresh()">
       {{ store.refreshing() ? 'Checking…' : 'Check now' }}
     </button>
-  </header>
+  </app-page-header>
 
   <div class="status-page__groups">
     @for (section of store.groups; track section.group) {

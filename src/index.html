@@ -1,31 +1,26 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="auto">
   <head>
     <meta charset="utf-8" />
     <title>Homelab</title>
     <base href="/" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="theme-color" content="#070b16" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#0A0F15" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="Homelab" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+    <link rel="manifest" href="manifest.webmanifest" crossorigin="use-credentials" />
     <script>
       (function () {
         try {
           var saved =
             JSON.parse(localStorage.getItem('homelab-ui.theme-preferences') || 'null') || {};
-          var palette = [
-            'classic',
-            'terminal',
-            'paper',
-            'nightshift',
-            'aurora',
-            'arcade',
-            'nord',
-            'neon',
-            'sandstone',
-          ].includes(saved.palette)
-            ? saved.palette
-            : 'classic';
-          document.documentElement.setAttribute('data-palette', palette);
+          var themes = ['auto', 'navy', 'light', 'contrast'];
+          var theme = themes.indexOf(saved.theme) >= 0 ? saved.theme : 'auto';
+          document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {}
       })();
     </script>

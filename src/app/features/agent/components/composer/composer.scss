@@ -4,56 +4,52 @@
 
 .composer {
   display: flex;
-  align-items: center;
-  gap: 0.6rem;
-  width: 90%;
-  max-width: 56rem;
-  margin: 0 auto 1rem;
-  padding: 0.65rem 0.85rem;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border);
+  align-items: flex-end;
+  gap: 0.5rem;
+  width: calc(100% - 2rem);
+  max-width: 44rem;
+  margin: 0 auto calc(1rem + var(--safe-bottom));
+  padding: 0.45rem 0.45rem 0.45rem 1.2rem;
+  border: var(--card-border);
+  border-radius: var(--radius-card);
   background: var(--surface-raised);
-  box-shadow: var(--shadow-float);
-  transition: border-color 0.15s ease;
+  box-shadow: var(--shadow-card);
 
   &:focus-within {
-    border-color: var(--accent-border);
+    border-color: var(--accent);
   }
 }
 
 .composer--compact {
   width: auto;
   max-width: none;
-  margin: 0 max(1rem, calc((100% - 56rem) / 2)) 1rem;
+  margin: 0 1rem 1rem;
 }
 
 .composer__line {
   flex: 1 1 auto;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   min-width: 0;
-}
-
-.composer__prompt {
-  flex: 0 0 auto;
-  font-family: var(--font-mono);
-  color: var(--accent);
-  font-weight: 600;
-  line-height: 1.4;
+  min-height: 2.1rem;
 }
 
 .composer__input {
   flex: 1 1 auto;
   resize: none;
   max-height: 40vh;
-  min-height: 1.4em;
+  min-height: 1.5em;
+  padding: 0;
   border: none;
   background: transparent;
   color: var(--text);
   font: inherit;
-  line-height: 1.4;
-  padding: 0;
+  font-size: max(16px, 1.05rem);
+  line-height: 1.45;
+
+  &::placeholder {
+    color: var(--text-muted);
+  }
 
   &:focus-visible {
     outline: none;
@@ -65,37 +61,21 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem;
-  height: 2rem;
+  width: 2.1rem;
+  height: 2.1rem;
   border: none;
-  border-radius: 50%;
+  border-radius: 0.45rem;
   background: var(--accent);
   color: var(--on-accent);
-  font-size: 0.85rem;
-  line-height: 1;
   cursor: pointer;
 
   &:disabled {
-    opacity: 0.5;
+    opacity: 0.35;
     cursor: not-allowed;
-  }
-
-  &:not(:disabled):hover {
-    background: var(--accent-hover);
   }
 }
 
 .composer__send--stop {
   background: var(--danger);
-
-  &:hover {
-    background: var(--danger);
-    opacity: 0.9;
-  }
-}
-
-@media (max-width: 640px) {
-  .composer:not(.composer--compact) {
-    width: 94%;
-  }
+  color: #ffffff;
 }

@@ -1,0 +1,86 @@
+<aside class="details" aria-label="Service details">
+  @if (service(); as s) {
+    <div class="details__head" [class]="'hue-' + (category()?.hue ?? 'blue')">
+      <span class="details__glyph"><app-feature-icon [paths]="glyphs[s.glyph]" [size]="18" /></span>
+      <span class="details__name">
+        <span class="hl-cap">{{ category()?.title }} · {{ s.workload }}</span>
+        <strong>{{ s.id }}</strong>
+        <span class="details__state"
+          ><span class="hl-dot" [style.background]="color[status()!.state]"></span
+          >{{ status()!.label }}</span
+        >
+      </span>
+      <button
+        type="button"
+        class="details__close"
+        aria-label="Close"
+        (click)="store.selected.set(null)"
+      >
+        ×
+      </button>
+    </div>
+    <p class="details__desc">{{ s.description }}</p>
+    <div class="details__actions">
+      @if (s.page) {
+        <a class="hl-btn hl-btn--primary" [routerLink]="s.page">Open</a>
+      }
+      <a class="hl-btn" routerLink="/logs">Logs</a>
+      <a class="hl-btn" routerLink="/metrics">Metrics</a>
+      @if (store.canRestart(s.id)) {
+        @if (confirming()) {
+          <button
+            type="button"
+            class="hl-btn hl-btn--danger"
+            [disabled]="store.restarting() === s.id"
+            (click)="restart()"
+          >
+            Restart {{ s.id }}?
+          </button>
+        } @else {
+          <button type="button" class="hl-btn" (click)="confirming.set(true)">Restart</button>
+        }
+      }
+      <button type="button" class="hl-btn hl-btn--ghost" (click)="ask()">Ask about it</button>
+    </div>
+    <section>
+      <h3 class="hl-cap">Reached at</h3>
+      @for (where of s.reach; track where) {
+        <span class="hl-addr details__line">{{ where }}</span>
+      }
+      @if (status()!.image) {
+        <span class="details__muted">Image {{ status()!.image }}</span>
+      }
+    </section>
+    <section>
+      <h3 class="hl-cap">Talks to</h3>
+      @for (link of links().out; track link.id) {
+        <button
+          type="button"
+          class="details__rel"
+          [disabled]="!link.clickable"
+          (click)="select(link.id)"
+        >
+          <span class="hl-dot" [style.background]="color[link.state]"></span>{{ link.label
+          }}<small>{{ link.group }}</small>
+        </button>
+      } @empty {
+        <span class="details__muted">nothing</span>
+      }
+    </section>
+    <section>
+      <h3 class="hl-cap">Used by</h3>
+      @for (link of links().used; track link.id) {
+        <button type="button" class="details__rel" (click)="select(link.id)">
+          <span class="hl-dot" [style.background]="color[link.state]"></span>{{ link.label
+          }}<small>{{ link.group }}</small>
+        </button>
+      } @empty {
+        <span class="details__muted">nothing</span>
+      }
+    </section>
+  } @else {
+    <p class="details__hint">
+      Click any service to see its state, where it's reached, and what it talks to.
+    </p>
+  }
+</aside>
