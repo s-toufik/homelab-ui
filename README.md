@@ -32,28 +32,31 @@ Today opens with the date, a greeting and a short summary, for example _"Kitchen
 
 ## Finding your way
 
-- **Computer and iPad:** a sidebar with Today, Assistant, Map (admins), your pages grouped into Observe, Operate and Automate (each group folds), then People (admins), Appearance and your account. The button at its top, or **[**, folds it to icons; the choice is remembered.
+- **Computer and iPad:** a sidebar with Today, Assistant, Map (admins), your pages grouped into Observe, Operate and Automate (each group folds), then People (admins), Appearance and your account. The button at its top, or **[**, folds it to icons. Folded, it opens over the page while the pointer is on it and closes when the pointer leaves; click the button again to keep it open. The choice is remembered.
+- **Side panels** work the same way everywhere: the sidebar, the conversations on Assistant and a page's settings appear while you hover their button or edge, stay when you click, and go away at the next click. Drag a panel's inner edge to resize it (double-click resets it); the width is remembered.
 - **Phone:** a slim top bar with the menu, the page's title and one action (search, or a new conversation on Assistant). The menu slides in from the left, or swipe right from the edge: search, a new conversation, your recent conversations, then every page. The page stays visible on the right; tap it or swipe left to go back.
 - **⌘K** (or **/**, or the search field at the top) finds any page or conversation, or asks an assistant directly: type _"what's for dinner"_ and pick **Ask Kitchen**. Arrow keys move, Enter opens, Esc closes.
 
-| Shortcut      | Does                                |
-| ------------- | ----------------------------------- |
-| **⌘K** or `/` | Search or ask                       |
-| `[`           | Fold or unfold the sidebar          |
-| `n`           | New conversation, on Assistant      |
-| **Esc**       | Close the palette, panel or details |
+| Shortcut      | Does                              |
+| ------------- | --------------------------------- |
+| **⌘K** or `/` | Search or ask                     |
+| `[`           | Keep the sidebar open, or fold it |
+| `n`           | New conversation, on Assistant    |
+| **Esc**       | Close the palette or a panel      |
 
 A person sees only the pages they were given. Opening any other page's address brings them back to Today, and the gateway refuses that page's data.
 
 <img src="docs/screenshots/command-palette.webp" alt="The ⌘K palette with 'what's for dinner' typed and the choices Ask Assistant, Ask Kitchen, Ask Travel and Ask Observation" />
+
+<img src="docs/screenshots/sidebar-peek.webp" alt="The folded sidebar opened over the Map while the pointer is on it" />
 
 ## Assistant
 
 Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did caddy restart?"_, _"Which tables are the largest?"_.
 
 - **Conversations** are listed by day (Today, This week, Earlier) next to the one that is open. Each conversation is with one assistant, picked when you start it with **+ New**. The first message opens the conversation and its answer streams in at once.
-- **Delete:** hover a conversation and click the bin, then click again to confirm. **Delete all** at the bottom of the list removes every conversation after a confirmation.
-- **Details column** (wide screens): the assistant, the number of messages and when the conversation started, the plan's steps, the last answer's model, time and tokens, **Copy as text** and **Delete**.
+- **Delete:** hover a conversation and click the bin, then click again to confirm. **Delete all** at the top of the list removes every conversation after a confirmation.
+- **On a phone** it works like the ChatGPT and Claude apps: the assistant's name is the title, tap it to pick another assistant (admins also find **Model and settings** there). Suggestions sit just above the message box, which stays at the bottom of the screen.
 - **Answers stream in** word by word. A small swarm of dots shows the assistant at work: calm while it thinks, faster while it runs a tool, red if something went wrong.
 - **Plans:** when a request needs real work (reading files, querying data, saving a report), the assistant first proposes a plan. A card under it offers **Approve and run**, **Change it** and **Dismiss**; nothing runs until you approve. A waiting plan also appears on Today and as a number next to Assistant.
 - **Answer details:** under each answer, the time it took and the tokens used, for example _(21s · ↑ 9.9k · ↓ 642 tokens)_. Open the details for the model, the tools used and the steps taken.
@@ -61,8 +64,6 @@ Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did c
 - **Beside any tool page:** the assistant button at the top right opens it in a panel next to the page, for example to ask about an error on the Logs page. Drag its edge to resize it; **Esc** closes it.
 
 <img src="docs/screenshots/assistant.webp" alt="Assistant: the conversations by day, and Kitchen's plan of three steps with Approve and run, Change it and Dismiss" />
-
-<img src="docs/screenshots/assistant-wide.webp" alt="Assistant on a wide screen: the conversations, an answer from Observation, and the details column with the assistant, the conversation, the last answer and Copy as text" />
 
 <table>
   <tr>
@@ -136,26 +137,37 @@ Each page is a Keycloak realm role (`agent:kitchen`, `app:tasker`, `page:metrics
 
 ## Appearance
 
-Eight themes, or **Match my device**, which uses Light by day and Navy at night:
+Ten themes, or **Match my device**, which uses Light by day and Navy at night.
 
-| Theme              | Look                                               | Headings              |
-| ------------------ | -------------------------------------------------- | --------------------- |
-| **Navy** (default) | Deep blue, dark                                    | Geist                 |
-| **Light**          | White and grey                                     | Geist                 |
-| **Contrast**       | Black on white                                     | Atkinson Hyperlegible |
-| **Blossom**        | Soft pink, raspberry buttons                       | Quicksand             |
-| **Lilac**          | Lavender and violet                                | Quicksand             |
-| **Forest**         | Moss and cream, green buttons                      | Fraunces              |
-| **Dragon Rider**   | Obsidian, ember and gold, after _Fourth Wing_      | Cinzel                |
-| **Wizarding**      | Burgundy, gold and parchment, after _Harry Potter_ | IM Fell English       |
+**Everyday** themes change colours and fonts:
 
-The choice is saved on your account, so it is the same on every device. Text meets the WCAG AA contrast ratio in every theme, and touch screens get larger tap targets.
+| Theme              | Look                          | Headings              |
+| ------------------ | ----------------------------- | --------------------- |
+| **Navy** (default) | Deep blue, dark               | Geist                 |
+| **Light**          | White and grey                | Geist                 |
+| **Contrast**       | Black on white                | Atkinson Hyperlegible |
+| **Blossom**        | Soft pink, raspberry buttons  | Quicksand             |
+| **Lilac**          | Lavender and violet           | Quicksand             |
+| **Forest**         | Moss and cream, green buttons | Fraunces              |
 
-<img src="docs/screenshots/themes.webp" alt="Today in four themes: Blossom, Dragon Rider, Wizarding and Forest" />
+**Storybook** themes change the whole appearance: textures, card frames, button shapes, the sidebar, ornaments under titles and the fonts of text, headings and labels.
+
+| Theme            | After           | What you see                                                                                                                                                     |
+| ---------------- | --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Wizarding**    | _Harry Potter_  | Parchment pages and cards with a double ruled frame, a leather sidebar with a gold rule, ink-brown Garamond text, an illuminated first letter, a wax-seal avatar |
+| **Dragon Rider** | _Fourth Wing_   | Obsidian with a faint scale pattern and an ember glow, armour-plate cards with cut corners, Cinzel headings in gold fading to ember, ember buttons               |
+| **Demigod**      | _Percy Jackson_ | Marble, bronze and Aegean blue, a Greek key under titles, a deep-sea sidebar, cards capped in bronze, Marcellus headings, a bronze-coin avatar                   |
+| **Regency**      | _Bridgerton_    | Wedgwood blue with a small floral damask, gilt double frames, script titles with a gold flourish, pill buttons, Garamond text, a cameo avatar                    |
+
+The choice is saved on your account, so it is the same on every device. Text meets the WCAG AA contrast ratio in every theme, the sidebars included, and touch screens get larger tap targets.
+
+<img src="docs/screenshots/themes.webp" alt="Today in the four storybook themes: Wizarding, Dragon Rider, Demigod and Regency" />
+
+<img src="docs/screenshots/wizarding-status.webp" alt="The Status page in the Wizarding theme: parchment cards, small-capital labels and a leather sidebar" />
 
 <table>
   <tr>
-    <td><img src="docs/screenshots/appearance.webp" alt="Appearance: a preview, Match my device, and the Navy, Light and Contrast themes" /></td>
+    <td><img src="docs/screenshots/appearance.webp" alt="Appearance: a preview, Match my device, and the Everyday themes" /></td>
     <td><img src="docs/screenshots/today-light.webp" alt="Today in the Light theme" /></td>
   </tr>
 </table>
@@ -169,6 +181,10 @@ Open the homelab in Safari, then **Share › Add to Home Screen**. It opens full
     <td><img src="docs/screenshots/phone-today.webp" width="200" alt="Today on a phone, with the top bar: menu, Today, search" /></td>
     <td><img src="docs/screenshots/phone-drawer.webp" width="200" alt="The menu open on a phone: search, Today, Assistant, Map, recent conversations and the pages, with the conversation still visible on the right" /></td>
     <td><img src="docs/screenshots/phone-assistant.webp" width="200" alt="Kitchen's plan on a phone, with Approve and run" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/phone-assistant-new.webp" width="200" alt="A new conversation on a phone: Kitchen as the title, suggestions above the rounded message box" /></td>
+    <td><img src="docs/screenshots/phone-picker.webp" width="200" alt="The assistant picker on a phone, a sheet listing every assistant and Model and settings" /></td>
     <td><img src="docs/screenshots/phone-map.webp" width="200" alt="The map on a phone: networks, legend and ports" /></td>
   </tr>
 </table>

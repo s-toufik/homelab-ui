@@ -13,13 +13,13 @@ src/app/
 │
 ├── shell/                       -- app chrome; knows the feature contract, never a feature
 │   ├── layout/                  -- sidebar + menu drawer + phone bar + toolbar + <router-outlet> + right panel + assistant drawer + palette
-│   ├── sidebar/                 -- ≥ 768 px: Today, Assistant, Map, the pages by section (Observe, Operate, Automate); folds to icons with [
+│   ├── sidebar/                 -- ≥ 768 px: Today, Assistant, Map, the pages by section (Observe, Operate, Automate); folds to icons with [; folded, it opens over the page on hover (LayoutStore.sidebar)
 │   ├── toolbar/                 -- the ⌘K field; the page's settings and assistant buttons
 │   ├── command-palette/         -- ⌘K or /: pages, conversations, ask an assistant (COMMAND_SOURCES)
 │   ├── phone-bar/               -- < 768 px: menu, the page's title (PageChromeStore), search or new conversation
 │   ├── drawer/                  -- < 768 px: the menu sliding from the left; recent conversations (ASSISTANT_PANEL.recent) and every page
 │   ├── appearance/              -- the eight themes and "Match my device" (settings modal and /appearance)
-│   ├── page-panel/              -- generic right sidebar host
+│   ├── page-panel/              -- the page's settings, in a right side-pane (LayoutStore.panel)
 │   ├── assistant-drawer/        -- the assistant beside any page; its content comes from ASSISTANT_PANEL
 │   ├── feature-icon/            -- draws the icon a feature hands over
 │   ├── application/
@@ -35,7 +35,7 @@ src/app/
 │   │   ├── feature-status.store.ts  -- runs each feature's health check
 │   │   ├── homelab-resources.ts -- HOMELAB_RESOURCES + provideHomelabResource()
 │   │   ├── resource-status.store.ts -- runs each resource's status check
-│   │   ├── layout.store.ts      -- open/closed state of the right sidebar, the assistant, the phone menu and the folded sidebar
+│   │   ├── layout.store.ts      -- open/closed state of the right sidebar, the assistant, the phone menu and the sidebar (PaneState each)
 │   │   └── page-chrome.store.ts -- whatever the current page registered for the right panel, and its phone title
 │   ├── directives/              -- [appPagePanelContent], how a page fills the right panel
 │   └── domain/
@@ -83,7 +83,9 @@ src/app/
     ├── pipes/ utils/
 ```
 
-**Themes.** `scripts/themes.mjs` (`npm run themes`) holds the three themes' tokens (Navy, Light, Contrast) and writes `src/styles/_themes.scss` and `theme-catalog.json`; it refuses any text colour below 4.5:1. Each theme sets `--surface`, `--surface-side`, `--surface-raised`, `--surface-hover`, `--text`, `--text-muted`, `--border`, `--card-border`, `--accent`, `--mono` (addresses), `--font-sans`, `--font-mono`, and per app colour (`orange`, `teal`, `indigo`, `purple`, `blue`, `green`, `rose`, `amber`, `slate`) `--hue-<name>` and `--hue-<name>-soft`. Put `class="hue-<name>"` on an element to use `--h` and `--h-soft` inside it; `.hl-cap` (coloured capitals), `.hl-list`/`.hl-list__row`, `.hl-dot` and `.hl-addr` are the shared pieces. `--row` and `--control` are 2 rem with a mouse and 2.75 rem on touch (`pointer: coarse`). Fonts are bundled from `@fontsource` (Geist, Geist Mono, Atkinson Hyperlegible).
+**Side panels.** `shared/ui/side-pane/` has `PaneState` (pinned, peeking, width, saved under `<key>.pinned` and `<key>.width`; `hover(true|false)` opens after 90 ms and closes 320 ms after the pointer leaves) and `<app-side-pane side="left|right" [state]>`, which draws the panel, the hover edge, the resize grip (drag, arrow keys, double-click to reset) and, on a phone, an overlay with a shade. The sidebar, the page settings and the Assistant's conversations all use it. On the phone, a page can set `PageChromeStore.titleMenu` to make the top bar's title a menu button (Assistant uses it for the assistant picker).
+
+**Themes.** `scripts/themes.mjs` (`npm run themes`) holds the ten themes' tokens (six Everyday, four Storybook) and writes `src/styles/_themes.scss` and `theme-catalog.json`; it refuses any text colour below 4.5:1. Each theme sets `--surface`, `--surface-side`, `--surface-raised`, `--surface-hover`, `--text`, `--text-muted`, `--border`, `--card-border`, `--accent`, `--mono` (addresses), `--font-sans`, `--font-mono`, and per app colour (`orange`, `teal`, `indigo`, `purple`, `blue`, `green`, `rose`, `amber`, `slate`) `--hue-<name>` and `--hue-<name>-soft`. Put `class="hue-<name>"` on an element to use `--h` and `--h-soft` inside it; `.hl-cap` (coloured capitals), `.hl-list`/`.hl-list__row`, `.hl-dot` and `.hl-addr` are the shared pieces. `--row` and `--control` are 2 rem with a mouse and 2.75 rem on touch (`pointer: coarse`). Storybook themes also set skin tokens: `--page-texture`, `--card-texture`, `--card-frame`, `--side-texture`, `--side-*` colours for the sidebar and menu, `--font-display` (`.hl-display`), `--font-caps`, `--cap-*` (`.hl-cap`), `--flourish` (`.hl-flourish`, the ornament under titles), `--btn-*` and `--radius-card`; every theme writes them all, so a nested `data-theme` never inherits another theme's skin. The shapes tokens cannot express (cut corners, wax seal, gilt sidebar line) are in `src/styles/_skins.scss`. Fonts are bundled from `@fontsource` (Geist, Geist Mono, Atkinson Hyperlegible, Quicksand, Fraunces, Cinzel, Cinzel Decorative, IM Fell English, EB Garamond, Cormorant Garamond, Pinyon Script, Marcellus).
 
 Global classes for tool pages live in `src/styles.scss` under `.hl-*`: `hl-page`, `hl-card`, `hl-grid`, `hl-row`, `hl-btn` (`--primary`, `--danger`, `--small`), `hl-input`, `hl-field`, `hl-tabs`/`hl-tab`, `hl-table`, `hl-badge` (`--ok`, `--warn`, `--bad`, `--muted`), `hl-pre`, `hl-error`, `hl-empty`, `hl-stat`. Chart colours are `--chart-1` … `--chart-8` .
 
@@ -256,7 +258,7 @@ Lazy (`loadComponent`) keeps each page its own bundle chunk — a new page never
 
 ### 4. Register the feature
 
-The sidebar, the More page and ⌘K list registered features. Add a registration next to the page:
+The sidebar, the phone menu and ⌘K list registered features. Add a registration next to the page:
 
 ```ts
 // features/metrics/metrics.feature.ts

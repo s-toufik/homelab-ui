@@ -4,15 +4,36 @@
 
 @media (min-width: 768px) {
   :host {
+    position: relative;
+    z-index: 3;
     display: block;
-    width: calc(15rem + var(--safe-left));
+    width: calc(3.6rem + var(--safe-left));
     flex-shrink: 0;
     transition: width 0.2s ease;
   }
 
-  :host:has(.side--collapsed) {
+  :host(.sidebar--pinned) {
+    width: calc(15rem + var(--safe-left));
+  }
+}
+
+.side--peek {
+  position: absolute;
+  inset-block: 0;
+  left: 0;
+  width: calc(15rem + var(--safe-left));
+  box-shadow: var(--shadow-float);
+  animation: side-peek 0.18s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@keyframes side-peek {
+  from {
     width: calc(3.6rem + var(--safe-left));
   }
+}
+
+.side__collapse--pin {
+  color: var(--accent);
 }
 
 .side__head {
@@ -85,13 +106,23 @@
 }
 
 .side {
+  --surface: var(--side-bg);
+  --surface-side: var(--side-bg);
+  --surface-raised: var(--side-active);
+  --surface-hover: var(--side-hover);
+  --text: var(--side-text);
+  --text-muted: var(--side-muted);
+  --border: var(--side-border);
+  --accent: var(--side-accent);
+  --on-accent: var(--side-on-accent);
+
   display: flex;
   flex-direction: column;
   gap: 1px;
   height: 100%;
   padding: calc(0.75rem + var(--safe-top)) 0.6rem 0.6rem calc(0.6rem + var(--safe-left));
   border-right: var(--border-width) solid var(--border);
-  background: var(--surface-side);
+  background: var(--side-texture, none) var(--side-bg);
 }
 
 .side__brand {

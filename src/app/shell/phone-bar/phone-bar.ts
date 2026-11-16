@@ -44,7 +44,26 @@ const TITLES: Readonly<Record<string, string>> = {
           <span class="bar__badge" aria-hidden="true"></span>
         }
       </button>
-      <span class="bar__title">{{ title() }}</span>
+      @if (chrome.titleMenu(); as openMenu) {
+        <button type="button" class="bar__title bar__title--menu" (click)="openMenu()">
+          <span>{{ title() }}</span>
+          <svg
+            viewBox="0 0 24 24"
+            width="14"
+            height="14"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.4"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+      } @else {
+        <span class="bar__title">{{ title() }}</span>
+      }
       <span class="bar__end">
         <ng-content />
         @if (onAssistant()) {
@@ -138,6 +157,38 @@ const TITLES: Readonly<Record<string, string>> = {
       text-overflow: ellipsis;
       white-space: nowrap;
     }
+    .bar__title--menu {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      justify-self: center;
+      max-width: 100%;
+      min-height: 2.25rem;
+      padding: 0 0.8rem;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+
+      span {
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      svg {
+        flex-shrink: 0;
+        color: var(--text-muted);
+      }
+
+      &:active {
+        background: var(--surface-hover);
+      }
+    }
     .bar__end {
       display: flex;
       align-items: center;
@@ -154,7 +205,7 @@ const TITLES: Readonly<Record<string, string>> = {
 export class PhoneBar {
   protected readonly ui = inject(LayoutStore);
   protected readonly palette = inject(CommandPaletteStore);
-  private readonly chrome = inject(PageChromeStore);
+  protected readonly chrome = inject(PageChromeStore);
   private readonly router = inject(Router);
   private readonly features = inject(HOMELAB_FEATURES, { optional: true }) ?? [];
   private readonly assistant = inject(ASSISTANT_PANEL, { optional: true });

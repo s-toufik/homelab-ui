@@ -9,15 +9,18 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
+import { PaneState } from '@shared/ui/side-pane/pane-state';
+import { SidePane } from '@shared/ui/side-pane/side-pane';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccessStore } from '@shell/application/access.store';
+import { LayoutStore } from '@shell/application/layout.store';
 import { PageChromeStore } from '@shell/application/page-chrome.store';
 import { PagePanelContentDirective } from '@shell/directives/page-panel-content.directive';
 import { AgentStore } from '../../application/agent.store';
 import { Composer } from '../../components/composer/composer';
 import { Conversation } from '../../components/conversation/conversation';
-import { ConversationInfo } from '../../components/conversation-info/conversation-info';
 import { SettingsPanel } from '../../components/settings-panel/settings-panel';
 import { isWaiting, type Conversation as ConversationEntry } from '../../domain/agent-conversation';
 import { agentLook } from '../../domain/agent-looks';
@@ -37,13 +40,21 @@ function when(at: number, now = Date.now()): string {
 
 @Component({
   selector: 'app-assistant-page',
-  imports: [PagePanelContentDirective, SettingsPanel, Conversation, Composer, ConversationInfo],
+  imports: [
+    NgTemplateOutlet,
+    PagePanelContentDirective,
+    SettingsPanel,
+    Conversation,
+    Composer,
+    SidePane,
+  ],
   templateUrl: './assistant-page.html',
   styleUrl: './assistant-page.scss',
 })
 export class AssistantPage {
   protected readonly store = inject(AgentStore);
   protected readonly access = inject(AccessStore);
+  private readonly layout = inject(LayoutStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly composer = viewChild(Composer);
@@ -54,6 +65,13 @@ export class AssistantPage {
     initialValue: this.route.snapshot.queryParamMap,
   });
 
+  protected readonly history = new PaneState({
+    key: 'homelab-ui.assistant.history',
+    width: 296,
+    min: 220,
+    max: 480,
+    pinned: true,
+  });
   protected readonly changing = signal(false);
   protected readonly picking = signal(false);
   protected readonly confirming = signal<string | null>(null);
@@ -87,8 +105,21 @@ export class AssistantPage {
 
   constructor() {
     const chrome = inject(PageChromeStore);
-    effect(() => chrome.title.set(this.store.conversation()?.title ?? 'New conversation'));
-    inject(DestroyRef).onDestroy(() => chrome.title.set(null));
+    const openPicker = (): void => this.picking.set(true);
+    effect(() => {
+      const empty = this.empty();
+      const title = empty
+        ? this.look(this.store.agentName()).label
+        : (this.store.conversation()?.title ?? 'New conversation');
+      untracked(() => {
+        chrome.title.set(title);
+        chrome.titleMenu.set(empty || this.access.isAdmin() ? openPicker : null);
+      });
+    });
+    inject(DestroyRef).onDestroy(() => {
+      chrome.title.set(null);
+      chrome.titleMenu.set(null);
+    });
     void this.store.loadDirectory();
     effect(() => {
       const id = this.routeId();
@@ -159,10 +190,9 @@ export class AssistantPage {
     }
   }
 
-  protected removeCurrent(): void {
-    const id = this.store.sessionId();
-    this.store.deleteConversation(id);
-    void this.router.navigate(['/assistant']);
+  protected openSettings(): void {
+    this.picking.set(false);
+    this.layout.togglePanel();
   }
 
   protected remove(conversation: ConversationEntry): void {

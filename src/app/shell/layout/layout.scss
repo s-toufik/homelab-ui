@@ -21,7 +21,8 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
-  background: var(--surface);
+  background-color: var(--surface);
+  background-image: var(--page-texture, none);
 }
 
 .layout__shade {
@@ -57,6 +58,11 @@
   .layout__main {
     min-height: 100dvh;
     transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .layout:not(.layout--drawer) app-drawer {
+    visibility: hidden;
+    transition: visibility 0s linear 0.28s;
   }
 
   .layout--drawer {

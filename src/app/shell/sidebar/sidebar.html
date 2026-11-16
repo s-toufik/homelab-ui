@@ -1,14 +1,23 @@
-<nav class="side" [class.side--collapsed]="ui.sidebarCollapsed()" aria-label="Main">
+<nav
+  class="side"
+  [class.side--collapsed]="rail()"
+  [class.side--peek]="ui.sidebar.peeking()"
+  aria-label="Main"
+  (mouseenter)="ui.sidebar.hover(true)"
+  (mouseleave)="ui.sidebar.hover(false)"
+>
   <div class="side__head">
-    <a class="side__brand" routerLink="/" [title]="ui.sidebarCollapsed() ? 'Homelab' : ''">
+    <a class="side__brand" routerLink="/" [title]="rail() ? 'Homelab' : ''">
       <span class="side__logo" aria-hidden="true"><i></i></span
       ><span class="side__label">Homelab</span>
     </a>
     <button
       type="button"
       class="side__collapse"
-      [attr.aria-label]="ui.sidebarCollapsed() ? 'Expand the sidebar' : 'Collapse the sidebar'"
-      [title]="(ui.sidebarCollapsed() ? 'Expand' : 'Collapse') + ' the sidebar  ['"
+      [class.side__collapse--pin]="ui.sidebar.peeking()"
+      [attr.aria-pressed]="ui.sidebar.pinned()"
+      [attr.aria-label]="ui.sidebar.pinned() ? 'Fold the sidebar' : 'Keep the sidebar open'"
+      [title]="(ui.sidebar.pinned() ? 'Fold the sidebar' : 'Keep the sidebar open') + '  ['"
       (click)="ui.toggleSidebar()"
     >
       <svg
@@ -53,7 +62,7 @@
 
   <div class="side__scroll">
     @for (entry of nav.sections(); track entry.section) {
-      @let closed = nav.collapsed().has(entry.section) && !ui.sidebarCollapsed();
+      @let closed = nav.collapsed().has(entry.section) && !rail();
       <button
         type="button"
         class="side__group"

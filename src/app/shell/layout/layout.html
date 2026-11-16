@@ -19,7 +19,7 @@
       ></button>
     }
     <app-phone-bar>
-      @if (chrome.rightPanel()) {
+      @if (chrome.rightPanel() && !chrome.titleMenu()) {
         <button
           type="button"
           class="layout__tool layout__tool--phone"

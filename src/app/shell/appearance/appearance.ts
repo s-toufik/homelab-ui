@@ -17,7 +17,10 @@ import {
 export class Appearance {
   protected readonly theme = inject(ThemeStore);
   private readonly session = inject(GatewaySession);
-  protected readonly themes = THEMES;
+  protected readonly groups = [
+    { title: 'Everyday', themes: THEMES.filter((option) => !option.storybook) },
+    { title: 'Storybook', themes: THEMES.filter((option) => option.storybook) },
+  ];
   protected readonly auto = computed(() => this.theme.choice() === 'auto');
   protected readonly activeName = computed(() => themeOption(this.theme.active()).name);
   protected readonly name = computed(() => {
