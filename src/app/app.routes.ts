@@ -5,6 +5,10 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
+    loadComponent: () => import('./shell/center/center-page').then((m) => m.CenterPage),
+  },
+  {
+    path: 'today',
     loadComponent: () =>
       import('./features/today/pages/today-page/today-page').then((m) => m.TodayPage),
   },

@@ -10,6 +10,11 @@ export function navSection(feature: Pick<HomelabFeature, 'category'>): NavSectio
 }
 
 export const SHELL_ICONS = {
+  center: [
+    'M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18Z',
+    'M7 9.5l3.5 1.5 3-3.5 3.5 6',
+    'M3.6 15c4.5-1.5 11.5-1.5 16.8 0',
+  ],
   today: ['M4 5h16v15H4z', 'M4 9h16', 'M9 3v4M15 3v4'],
   assistant: ['M5 5h14v10H9l-4 4z'],
   agents: [

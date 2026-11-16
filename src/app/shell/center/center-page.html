@@ -1,0 +1,92 @@
+<canvas
+  #sky
+  class="center__sky"
+  tabindex="0"
+  role="img"
+  aria-label="The homelab as a sky of constellations. Drag to turn it, scroll or pinch to zoom, click a star to see it, double-click to open it. Arrow keys turn it, plus and minus zoom, 0 resets."
+  (pointerdown)="onDown($event)"
+  (pointermove)="onMove($event)"
+  (pointerup)="onUp($event)"
+  (pointercancel)="onUp($event)"
+  (pointerleave)="hovered.set(null)"
+  (wheel)="onWheel($event)"
+  (dblclick)="onDoubleClick($event)"
+  (contextmenu)="$event.preventDefault()"
+  (keydown)="onKey($event)"
+></canvas>
+
+<header class="center__head">
+  <h1 class="center__title">Center</h1>
+  <p class="center__hint">
+    Drag to turn · scroll or pinch to zoom · shift-drag to move · click a star
+  </p>
+</header>
+
+<nav class="center__constellations" aria-label="Constellations">
+  @for (constellation of constellations(); track constellation.id) {
+    <button
+      type="button"
+      class="center__chip"
+      [class]="'center__chip hue-' + constellation.hue"
+      (click)="fly(constellation)"
+    >
+      <span class="hl-dot"></span>{{ constellation.name }}
+      <small>{{ constellation.stars.length }}</small>
+    </button>
+  }
+</nav>
+
+<div class="center__zoom" role="group" aria-label="Zoom">
+  <button type="button" aria-label="Zoom in" title="Zoom in (+)" (click)="zoomBy(1.35)">+</button>
+  <button type="button" aria-label="Zoom out" title="Zoom out (−)" (click)="zoomBy(0.74)">−</button>
+  <button type="button" aria-label="Show the whole sky" title="Whole sky (0)" (click)="reset()">
+    <svg
+      viewBox="0 0 24 24"
+      width="15"
+      height="15"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="8" />
+      <path d="M4 12h16M12 4c3 3 3 13 0 16M12 4c-3 3-3 13 0 16" />
+    </svg>
+  </button>
+</div>
+
+@if (selected(); as star) {
+  <aside class="center__card" [class]="'center__card hue-' + star.hue" aria-live="polite">
+    <span class="center__card-kicker"
+      ><span class="hl-dot"></span>{{ constellationName(star.constellation) }}</span
+    >
+    <h2>{{ star.label }}</h2>
+    <p>{{ star.description }}</p>
+    <div class="center__card-actions">
+      <button type="button" class="hl-btn hl-btn--primary" (click)="open(star)">Open</button>
+      <button type="button" class="hl-btn hl-btn--ghost" (click)="selected.set(null)">Close</button>
+    </div>
+  </aside>
+} @else if (hovered(); as star) {
+  <aside
+    class="center__card center__card--peek"
+    [class]="'center__card center__card--peek hue-' + star.hue"
+  >
+    <h2>{{ star.label }}</h2>
+    <p>{{ star.description }}</p>
+  </aside>
+}
+
+<nav class="center__list" aria-label="Every page">
+  @for (constellation of constellations(); track constellation.id) {
+    <h2>{{ constellation.name }}</h2>
+    <ul>
+      @for (star of constellation.stars; track star.id) {
+        <li>
+          <a [routerLink]="star.path.split('?')[0]">{{ star.label }}</a>
+        </li>
+      }
+    </ul>
+  }
+</nav>

@@ -86,3 +86,12 @@ export function phraseOf(agent: string, mood: AgentMood): string {
     trouble: 'The last answer failed',
   }[mood];
 }
+
+export const SUPERVISOR = 'supervisor';
+
+export function delegations(moods: Readonly<Record<string, AgentMood>>): string[] {
+  if (moods[SUPERVISOR] !== 'working') return [];
+  return Object.entries(moods)
+    .filter(([name, mood]) => name !== SUPERVISOR && mood === 'working')
+    .map(([name]) => name);
+}

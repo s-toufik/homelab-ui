@@ -72,12 +72,13 @@ describe('PeopleStore', () => {
 
   it('creates a person with a temporary password and the chosen pages', async () => {
     const store = setup();
-    const password = await store.create(
+    const { password, pagesError } = await store.create(
       { username: 'mia', firstName: 'Mia', lastName: '', email: '' },
       ['agent:kitchen'],
     );
     const mia = store.people().find((p) => p.username === 'mia')!;
     expect(password).toMatch(/^[A-Za-z2-9-]{23}$/);
+    expect(pagesError).toBeNull();
     expect(mia.roles).toEqual(['agent:kitchen']);
     expect(mia.mustSetPassword).toBe(true);
   });

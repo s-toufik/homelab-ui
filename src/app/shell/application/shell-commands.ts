@@ -23,7 +23,8 @@ export function provideShellCommands(): Provider {
     return {
       commands(query: string): Command[] {
         const pages: Command[] = [
-          go('today', 'Today', '/', 'home briefing'),
+          go('center', 'Center', '/', 'home sky globe constellations map of pages'),
+          go('today', 'Today', '/today', 'briefing day'),
           go('assistant', 'Assistant', '/assistant', 'chat conversations'),
           go('agents', 'Agents', '/agents', 'who is working animation kitchen travel'),
           ...(access.isAdmin()

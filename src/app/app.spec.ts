@@ -17,7 +17,7 @@ describe('App', () => {
     expect(fixture.componentInstance).toBeTruthy();
   });
 
-  it('renders the sidebar, the toolbar and the Today briefing at the root route', async () => {
+  it('opens on the Center sky, with the Today briefing at /today', async () => {
     const router = TestBed.inject(Router);
     const fixture = TestBed.createComponent(App);
     fixture.detectChanges();
@@ -29,6 +29,11 @@ describe('App', () => {
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('app-sidebar')).toBeTruthy();
     expect(compiled.querySelector('app-toolbar')).toBeTruthy();
+    expect(compiled.querySelector('app-center-page')).toBeTruthy();
+
+    await router.navigateByUrl('/today');
+    fixture.detectChanges();
+    await fixture.whenStable();
     expect(compiled.querySelector('app-today-page')).toBeTruthy();
   });
 

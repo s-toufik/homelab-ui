@@ -42,8 +42,11 @@
     routerLink="/"
     routerLinkActive="side__item--on"
     [routerLinkActiveOptions]="{ exact: true }"
-    title="Today"
+    title="Center"
   >
+    <app-feature-icon [paths]="icons.center" [size]="16" /><span class="side__label">Center</span>
+  </a>
+  <a class="side__item" routerLink="/today" routerLinkActive="side__item--on" title="Today">
     <app-feature-icon [paths]="icons.today" [size]="16" /><span class="side__label">Today</span>
   </a>
   <a class="side__item" routerLink="/assistant" routerLinkActive="side__item--on" title="Assistant">

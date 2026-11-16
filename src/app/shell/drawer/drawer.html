@@ -38,6 +38,14 @@
       [routerLinkActiveOptions]="{ exact: true }"
       (click)="close()"
     >
+      <app-feature-icon [paths]="icons.center" [size]="17" />Center
+    </a>
+    <a
+      class="drawer__item"
+      routerLink="/today"
+      routerLinkActive="drawer__item--on"
+      (click)="close()"
+    >
       <app-feature-icon [paths]="icons.today" [size]="17" />Today
     </a>
     <a

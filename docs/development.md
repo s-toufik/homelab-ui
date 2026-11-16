@@ -13,6 +13,7 @@ src/app/
 │
 ├── shell/                       -- app chrome; knows the feature contract, never a feature
 │   ├── layout/                  -- sidebar + menu drawer + phone bar + toolbar + <router-outlet> + right panel + assistant drawer + palette
+│   ├── center/                  -- / : the sky globe (sky.ts: projection, zoom, layout of constellations; center-page: canvas, pointer, keys)
 │   ├── sidebar/                 -- ≥ 768 px: Today, Assistant, Map, the pages by section (Observe, Operate, Automate); folds to icons with [; folded, it opens over the page on hover (LayoutStore.sidebar)
 │   ├── toolbar/                 -- the ⌘K field; the page's settings and assistant buttons
 │   ├── command-palette/         -- ⌘K or /: pages, conversations, ask an assistant (COMMAND_SOURCES)
@@ -51,7 +52,7 @@ src/app/
 │   ├── control-center/          -- the store behind Today's homelab numbers: alerts, gauges, warnings
 │   ├── people/                  -- /people, /people/new: accounts and page roles through /api/people (admins)
 │   ├── status/                  -- /status: every homelab-infra container, its state, links, connection
-│   ├── agent/                   -- /assistant: conversations (each with its agent), plans, commands, the drawer; /agents: a scene per agent (components/agent-scene, domain/agent-activity)
+│   ├── agent/                   -- /assistant: conversations (each with its agent), plans, commands, the drawer; /agents: the agents map (pages/agents-page: layout and links; components/agent-scene; domain/agent-activity: moods, delegations)
 │   ├── tasker/                  -- block canvas, split panes, groups; workflows and favorites via PostgREST
 │   ├── grafana/                 -- /dashboards/:id: Grafana's dashboards as panel lists (domain/dashboards.ts)
 │   ├── prometheus/              -- /metrics: PromQL, targets, rules

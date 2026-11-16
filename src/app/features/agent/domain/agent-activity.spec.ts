@@ -1,4 +1,4 @@
-import { activeByAgent, moodOf, phraseOf } from './agent-activity';
+import { activeByAgent, delegations, moodOf, phraseOf } from './agent-activity';
 
 describe('agent activity', () => {
   it('works while this browser streams or the server is busy, then waits, then rests', () => {
@@ -24,5 +24,12 @@ describe('agent activity', () => {
   it('describes each agent in its own words', () => {
     expect(phraseOf('kitchen', 'working')).toBe('Cooking up an answer');
     expect(phraseOf('unknown', 'idle')).toBe('Resting');
+  });
+
+  it('links the supervisor to the agents working while it works', () => {
+    expect(delegations({ supervisor: 'working', kitchen: 'working', travel: 'idle' })).toEqual([
+      'kitchen',
+    ]);
+    expect(delegations({ supervisor: 'idle', kitchen: 'working' })).toEqual([]);
   });
 });

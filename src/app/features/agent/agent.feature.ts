@@ -114,7 +114,7 @@ export function provideAgentFeature(): Provider[] {
       const access = inject(AccessStore);
       return {
         load: () => import('./components/assistant/assistant').then((m) => m.Assistant),
-        hiddenOn: ['/assistant', '/agents', '/', '/people', '/appearance'],
+        hiddenOn: ['/assistant', '/agents', '/', '/today', '/people', '/appearance'],
         phase: store.phase,
         waiting: computed(() => store.waiting().filter((c) => access.canUseAgent(c.agent)).length),
         recent: computed(() =>
