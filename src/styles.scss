@@ -532,11 +532,24 @@ textarea.hl-input {
 }
 
 @media (max-width: 767px) {
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: auto;
+  }
+
   .hl-page {
-    padding: 1.25rem 1rem calc(1.5rem + var(--safe-bottom));
+    flex: none;
+    gap: 1rem;
+    padding: 1rem 0.9rem calc(1.25rem + var(--safe-bottom));
+    overflow: visible;
   }
 
   .hl-card {
-    padding: 0.95rem;
+    padding: 0.85rem;
+  }
+
+  .hl-list__row {
+    min-height: 2.75rem;
+    padding: 0.5rem 0.8rem;
   }
 }

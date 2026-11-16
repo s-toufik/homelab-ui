@@ -40,6 +40,54 @@
   color: var(--text-muted);
 }
 
+.assistant__head-actions {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.assistant__entry {
+  position: relative;
+
+  &:hover .assistant__delete,
+  &:focus-within .assistant__delete {
+    opacity: 1;
+  }
+}
+
+.assistant__delete {
+  position: absolute;
+  right: 0.35rem;
+  bottom: 0.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.6rem;
+  height: 1.6rem;
+  padding: 0 0.35rem;
+  border: 0;
+  border-radius: 0.35rem;
+  background: var(--surface-hover);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  opacity: 0;
+  cursor: pointer;
+
+  &:hover {
+    color: var(--danger);
+  }
+
+  @media (pointer: coarse) {
+    opacity: 1;
+  }
+}
+
+.assistant__delete--confirm {
+  opacity: 1;
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
 .assistant__item {
   display: flex;
   flex-direction: column;
@@ -116,14 +164,6 @@
   min-height: 3.25rem;
   padding: 0 1.5rem;
   border-bottom: var(--border-width) solid var(--border);
-}
-
-.assistant__back {
-  display: none;
-  font-size: 1.6rem;
-  line-height: 1;
-  color: var(--accent);
-  text-decoration: none;
 }
 
 .assistant__title {
@@ -268,31 +308,52 @@
   flex: 1;
 }
 
+.assistant__info {
+  display: none;
+  width: 18rem;
+  flex-shrink: 0;
+  border-left: var(--border-width) solid var(--border);
+  background: var(--surface-side);
+}
+
+@media (min-width: 1400px) {
+  .assistant__info {
+    display: block;
+  }
+}
+
 @media (max-width: 767px) {
-  .assistant__list {
-    width: 100%;
-    border-right: 0;
+  :host,
+  .assistant,
+  .assistant__thread {
+    display: block;
+    min-height: 0;
   }
 
-  .assistant__thread {
+  .assistant__list {
     display: none;
   }
 
-  .assistant--thread {
-    .assistant__list {
-      display: none;
-    }
-
-    .assistant__thread {
-      display: flex;
-    }
-  }
-
-  .assistant__back {
-    display: block;
-  }
-
   .assistant__head {
+    justify-content: center;
+    min-height: 2.6rem;
     padding: 0 1rem;
+    border-bottom: 0;
+  }
+
+  .assistant__title {
+    display: none;
+  }
+
+  .assistant__welcome {
+    min-height: 60dvh;
+    width: calc(100% - 2rem);
+  }
+
+  .assistant__plan {
+    position: sticky;
+    bottom: calc(0.5rem + var(--safe-bottom));
+    margin-bottom: calc(0.5rem + var(--safe-bottom));
+    box-shadow: var(--shadow-float);
   }
 }

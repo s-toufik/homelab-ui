@@ -4,7 +4,7 @@ import { RouterLink } from '@angular/router';
 import { PageHeader } from '@shared/ui/page-header/page-header';
 import { copyText } from '@shared/utils/clipboard';
 import { PeopleStore } from '../../application/people.store';
-import { PAGE_GROUPS, USERNAME_PATTERN } from '../../domain/person';
+import { PAGE_GROUPS, USERNAME_PATTERN, isEmail, peopleError } from '../../domain/person';
 
 type Step = 1 | 2 | 3;
 
@@ -31,8 +31,15 @@ export class NewPersonPage {
     this.store.people().some((person) => person.username === this.username().trim()),
   );
   protected readonly usernameValid = computed(() => USERNAME_PATTERN.test(this.username().trim()));
+  protected readonly emailValid = computed(
+    () => this.email().trim() === '' || isEmail(this.email()),
+  );
   protected readonly canContinue = computed(
-    () => this.usernameValid() && !this.usernameTaken() && this.firstName().trim() !== '',
+    () =>
+      this.usernameValid() &&
+      !this.usernameTaken() &&
+      this.firstName().trim() !== '' &&
+      this.emailValid(),
   );
   protected readonly name = computed(() => this.firstName().trim() || this.username().trim());
   protected readonly groups = computed(() =>
@@ -83,7 +90,7 @@ export class NewPersonPage {
       );
       this.step.set(3);
     } catch (error) {
-      this.failure.set(`Couldn't create the account: ${(error as Error).message}`);
+      this.failure.set(peopleError(error, 'create the account'));
     } finally {
       this.saving.set(false);
     }

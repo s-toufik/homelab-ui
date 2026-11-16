@@ -1,8 +1,8 @@
 # Developing homelab-ui
 
-The homelab's app for everyone at home: a Today briefing, a receding sidebar on iPad and computer and a tab bar on the phone, a ⌘K command palette, a right sidebar for whatever the current page's settings are, an assistant drawer on every page but the Agent's, and one page per homelab component, each calling its tool's API through the gateway.
+The homelab's app for everyone at home: a Today briefing, a sidebar that folds to icons on iPad and computer, a top bar and a sliding menu on the phone, a ⌘K command palette, a right sidebar for whatever the current page's settings are, an assistant drawer on every page but the Agent's, and one page per homelab component, each calling its tool's API through the gateway.
 
-Built with Angular 21 (standalone components, signals, zoneless) using a feature-first, layered structure: each page under `features/` owns its `domain` (types), `application` (state/orchestration), `infrastructure` (API clients), and `components`/`pages` (UI), and never reaches into another feature. Cross-cutting app chrome — the sidebar, toolbar, tab bar, command palette, right sidebar, access, themes — lives in `shell/`; what several features use lives in `shared/`.
+Built with Angular 21 (standalone components, signals, zoneless) using a feature-first, layered structure: each page under `features/` owns its `domain` (types), `application` (state/orchestration), `infrastructure` (API clients), and `components`/`pages` (UI), and never reaches into another feature. Cross-cutting app chrome — the sidebar, toolbar, phone bar, menu drawer, command palette, right sidebar, access, themes — lives in `shell/`; what several features use lives in `shared/`.
 
 ## Project structure
 
@@ -12,12 +12,13 @@ src/app/
 ├── app.config.ts                -- the only place that lists the features (provideXxxFeature())
 │
 ├── shell/                       -- app chrome; knows the feature contract, never a feature
-│   ├── layout/                  -- sidebar + toolbar + <router-outlet> + tab bar + right panel + drawer + palette
-│   ├── sidebar/                 -- ≥ 768 px: Today, Assistant, Map, the pages by section (Observe, Operate, Automate)
+│   ├── layout/                  -- sidebar + menu drawer + phone bar + toolbar + <router-outlet> + right panel + assistant drawer + palette
+│   ├── sidebar/                 -- ≥ 768 px: Today, Assistant, Map, the pages by section (Observe, Operate, Automate); folds to icons with [
 │   ├── toolbar/                 -- the ⌘K field; the page's settings and assistant buttons
 │   ├── command-palette/         -- ⌘K or /: pages, conversations, ask an assistant (COMMAND_SOURCES)
-│   ├── tab-bar/ browse/         -- phone: Today, Assistant, More (the More page lists the rest)
-│   ├── appearance/              -- the five themes and "Match my device" (settings modal and /appearance)
+│   ├── phone-bar/               -- < 768 px: menu, the page's title (PageChromeStore), search or new conversation
+│   ├── drawer/                  -- < 768 px: the menu sliding from the left; recent conversations (ASSISTANT_PANEL.recent) and every page
+│   ├── appearance/              -- the eight themes and "Match my device" (settings modal and /appearance)
 │   ├── page-panel/              -- generic right sidebar host
 │   ├── assistant-drawer/        -- the assistant beside any page; its content comes from ASSISTANT_PANEL
 │   ├── feature-icon/            -- draws the icon a feature hands over
@@ -34,8 +35,8 @@ src/app/
 │   │   ├── feature-status.store.ts  -- runs each feature's health check
 │   │   ├── homelab-resources.ts -- HOMELAB_RESOURCES + provideHomelabResource()
 │   │   ├── resource-status.store.ts -- runs each resource's status check
-│   │   ├── layout.store.ts      -- open/closed state of the right sidebar and the assistant
-│   │   └── page-chrome.store.ts -- whatever the current page registered for the right panel
+│   │   ├── layout.store.ts      -- open/closed state of the right sidebar, the assistant, the phone menu and the folded sidebar
+│   │   └── page-chrome.store.ts -- whatever the current page registered for the right panel, and its phone title
 │   ├── directives/              -- [appPagePanelContent], how a page fills the right panel
 │   └── domain/
 │       ├── homelab-feature.ts   -- HomelabFeature (a page the shell lists; hue, access, adminOnly), HUES

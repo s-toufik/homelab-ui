@@ -6,6 +6,7 @@ import { provideAssistantPanel } from '@shell/application/assistant-panel';
 import { matches, provideCommandSource, type Command } from '@shell/application/commands';
 import { provideHomelabFeature } from '@shell/application/homelab-features';
 import { AgentStore } from './application/agent.store';
+import { isWaiting } from './domain/agent-conversation';
 import { agentLook } from './domain/agent-looks';
 import { AgentHealthService } from './infrastructure/api/agent-health.service';
 
@@ -113,9 +114,22 @@ export function provideAgentFeature(): Provider[] {
       const access = inject(AccessStore);
       return {
         load: () => import('./components/assistant/assistant').then((m) => m.Assistant),
-        hiddenOn: ['/assistant', '/', '/people', '/appearance', '/more'],
+        hiddenOn: ['/assistant', '/', '/people', '/appearance'],
         phase: store.phase,
         waiting: computed(() => store.waiting().filter((c) => access.canUseAgent(c.agent)).length),
+        recent: computed(() =>
+          store
+            .conversations()
+            .filter((c) => access.canUseAgent(c.agent))
+            .map((c) => ({
+              id: c.id,
+              label: c.title,
+              hint: agentLook(c.agent).label,
+              path: ['/assistant', c.id],
+              waiting: isWaiting(c),
+              color: `var(--hue-${agentLook(c.agent).hue})`,
+            })),
+        ),
       };
     }),
   ];

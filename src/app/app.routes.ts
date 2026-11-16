@@ -25,10 +25,7 @@ export const routes: Routes = [
     canMatch: [requireAdmin],
     loadComponent: () => import('./features/map/pages/map-page/map-page').then((m) => m.MapPage),
   },
-  {
-    path: 'more',
-    loadComponent: () => import('./shell/browse/more-page').then((m) => m.MorePage),
-  },
+  { path: 'more', redirectTo: '' },
   {
     path: 'people',
     canMatch: [requireAdmin],

@@ -14,6 +14,16 @@ export const LAYOUT_STORAGE = new InjectionToken<Storage | null>('LAYOUT_STORAGE
   },
 });
 
+export const SIDEBAR_KEY = 'homelab-ui.sidebar-collapsed';
+
+function readFlag(storage: Storage | null, key: string): boolean {
+  try {
+    return storage?.getItem(key) === 'true';
+  } catch {
+    return false;
+  }
+}
+
 function readWidth(storage: Storage | null): number {
   try {
     const saved = Number(storage?.getItem(ASSISTANT_WIDTH_KEY));
@@ -36,6 +46,9 @@ export class LayoutStore {
   readonly panelPinned = this.panelPinnedState.asReadonly();
   readonly panelOpen = computed(() => this.panelPinnedState() || this.panelHoveringState());
 
+  readonly drawerOpen = signal(false);
+  readonly sidebarCollapsed = signal(readFlag(this.storage, SIDEBAR_KEY));
+
   private readonly assistantOpenState = signal(false);
   readonly assistantOpen = this.assistantOpenState.asReadonly();
   private readonly assistantWidthState = signal(readWidth(this.storage));
@@ -43,6 +56,15 @@ export class LayoutStore {
     clampAssistantWidth(this.assistantWidthState(), globalThis.innerWidth ?? 1440),
   );
   readonly resizing = signal(false);
+
+  toggleSidebar(): void {
+    this.sidebarCollapsed.update((collapsed) => !collapsed);
+    try {
+      this.storage?.setItem(SIDEBAR_KEY, String(this.sidebarCollapsed()));
+    } catch {
+      return;
+    }
+  }
 
   togglePanel(): void {
     this.panelPinnedState.update((pinned) => !pinned);

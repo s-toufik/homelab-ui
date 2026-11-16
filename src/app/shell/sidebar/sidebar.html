@@ -1,46 +1,81 @@
-<nav class="side" aria-label="Main">
-  <a class="side__brand" routerLink="/">
-    <span class="side__logo" aria-hidden="true"><i></i></span>Homelab
-  </a>
+<nav class="side" [class.side--collapsed]="ui.sidebarCollapsed()" aria-label="Main">
+  <div class="side__head">
+    <a class="side__brand" routerLink="/" [title]="ui.sidebarCollapsed() ? 'Homelab' : ''">
+      <span class="side__logo" aria-hidden="true"><i></i></span
+      ><span class="side__label">Homelab</span>
+    </a>
+    <button
+      type="button"
+      class="side__collapse"
+      [attr.aria-label]="ui.sidebarCollapsed() ? 'Expand the sidebar' : 'Collapse the sidebar'"
+      [title]="(ui.sidebarCollapsed() ? 'Expand' : 'Collapse') + ' the sidebar  ['"
+      (click)="ui.toggleSidebar()"
+    >
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <rect x="3" y="4" width="18" height="16" rx="2" />
+        <path d="M9 4v16" />
+      </svg>
+    </button>
+  </div>
 
   <a
     class="side__item"
     routerLink="/"
     routerLinkActive="side__item--on"
     [routerLinkActiveOptions]="{ exact: true }"
+    title="Today"
   >
-    <app-feature-icon [paths]="icons.today" [size]="16" />Today
+    <app-feature-icon [paths]="icons.today" [size]="16" /><span class="side__label">Today</span>
   </a>
-  <a class="side__item" routerLink="/assistant" routerLinkActive="side__item--on">
-    <app-feature-icon [paths]="icons.assistant" [size]="16" />Assistant
+  <a class="side__item" routerLink="/assistant" routerLinkActive="side__item--on" title="Assistant">
+    <app-feature-icon [paths]="icons.assistant" [size]="16" /><span class="side__label"
+      >Assistant</span
+    >
     @if (waiting()) {
       <span class="side__count" [attr.aria-label]="waiting() + ' waiting'">{{ waiting() }}</span>
     }
   </a>
   @if (access.isAdmin()) {
-    <a class="side__item" routerLink="/map" routerLinkActive="side__item--on">
-      <app-feature-icon [paths]="icons.map" [size]="16" />Map
+    <a class="side__item" routerLink="/map" routerLinkActive="side__item--on" title="Map">
+      <app-feature-icon [paths]="icons.map" [size]="16" /><span class="side__label">Map</span>
     </a>
   }
 
   <div class="side__scroll">
     @for (entry of nav.sections(); track entry.section) {
-      @let closed = nav.collapsed().has(entry.section);
+      @let closed = nav.collapsed().has(entry.section) && !ui.sidebarCollapsed();
       <button
         type="button"
         class="side__group"
         [attr.aria-expanded]="!closed"
         (click)="nav.toggle(entry.section)"
       >
-        {{ entry.section }}
+        <span class="side__label">{{ entry.section }}</span>
         <span class="side__chevron" [class.side__chevron--closed]="closed">
           <app-feature-icon [paths]="icons.chevron" [size]="12" />
         </span>
       </button>
       @if (!closed) {
         @for (page of entry.pages; track page.id) {
-          <a class="side__item" [routerLink]="page.path" routerLinkActive="side__item--on">
-            <app-feature-icon [paths]="page.icon" [size]="16" />{{ page.label }}
+          <a
+            class="side__item"
+            [routerLink]="page.path"
+            routerLinkActive="side__item--on"
+            [title]="page.label"
+          >
+            <app-feature-icon [paths]="page.icon" [size]="16" /><span class="side__label">{{
+              page.label
+            }}</span>
           </a>
         }
       }
@@ -48,12 +83,19 @@
   </div>
 
   @if (access.isAdmin()) {
-    <a class="side__item" routerLink="/people" routerLinkActive="side__item--on">
-      <app-feature-icon [paths]="icons.people" [size]="16" />People
+    <a class="side__item" routerLink="/people" routerLinkActive="side__item--on" title="People">
+      <app-feature-icon [paths]="icons.people" [size]="16" /><span class="side__label">People</span>
     </a>
   }
-  <a class="side__item" routerLink="/appearance" routerLinkActive="side__item--on">
-    <app-feature-icon [paths]="icons.settings" [size]="16" />Appearance
+  <a
+    class="side__item"
+    routerLink="/appearance"
+    routerLinkActive="side__item--on"
+    title="Appearance"
+  >
+    <app-feature-icon [paths]="icons.settings" [size]="16" /><span class="side__label"
+      >Appearance</span
+    >
   </a>
 
   <div class="side__account">
@@ -62,10 +104,11 @@
       class="side__me"
       aria-haspopup="menu"
       [attr.aria-expanded]="menuOpen()"
+      [title]="name()"
       (click)="menuOpen.set(!menuOpen())"
     >
       <span class="side__avatar" aria-hidden="true">{{ name().charAt(0).toUpperCase() }}</span>
-      {{ name() }}
+      <span class="side__label">{{ name() }}</span>
     </button>
     @if (menuOpen()) {
       <div class="side__backdrop" (click)="menuOpen.set(false)"></div>

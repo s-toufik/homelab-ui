@@ -25,7 +25,9 @@
         </span>
       </button>
     } @empty {
-      <p class="people__note">{{ store.loading() ? 'Loading…' : 'Nobody yet.' }}</p>
+      @if (!store.error()) {
+        <p class="people__empty-list">{{ store.loading() ? 'Loading…' : 'Nobody yet.' }}</p>
+      }
     }
   </aside>
 

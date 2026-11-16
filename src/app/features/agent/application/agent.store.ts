@@ -143,6 +143,18 @@ export class AgentStore {
     this.newConversation();
   }
 
+  deleteConversation(id: string): void {
+    if (id === this.sessionId()) this.newConversation();
+    this.all.update((all) => all.filter((conversation) => conversation.id !== id));
+  }
+
+  deleteAll(agents?: (agent: string) => boolean): void {
+    this.newConversation();
+    this.all.update((all) =>
+      agents ? all.filter((conversation) => !agents(conversation.agent)) : [],
+    );
+  }
+
   async ask(agent: string, text: string): Promise<void> {
     this.newConversation(agent);
     await this.loadModels();

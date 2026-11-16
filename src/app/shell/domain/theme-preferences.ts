@@ -1,6 +1,15 @@
 import CATALOG from './theme-catalog.json';
 
-export const THEME_IDS = ['navy', 'light', 'contrast'] as const;
+export const THEME_IDS = [
+  'navy',
+  'light',
+  'contrast',
+  'blossom',
+  'lilac',
+  'forest',
+  'dragon',
+  'wizarding',
+] as const;
 export type ThemeId = (typeof THEME_IDS)[number];
 export type ThemeChoice = ThemeId | 'auto';
 

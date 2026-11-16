@@ -25,3 +25,11 @@
   color: var(--text-muted);
   text-align: center;
 }
+
+@media (max-width: 767px) {
+  .conversation:not(.conversation--compact) {
+    overflow: visible;
+    width: calc(100% - 1.5rem);
+    padding-block: 0.75rem 1rem;
+  }
+}

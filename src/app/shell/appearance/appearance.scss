@@ -29,6 +29,7 @@
 }
 
 .appearance__hello {
+  font-family: var(--font-head);
   font-size: 1.25rem;
   font-weight: 650;
   letter-spacing: -0.02em;
@@ -95,7 +96,7 @@
   padding: 0;
   border: 0;
   border-radius: 1rem;
-  background: var(--surface-hover);
+  background: color-mix(in srgb, var(--text-muted) 40%, transparent);
   cursor: pointer;
 
   &::after {
@@ -183,7 +184,8 @@
 }
 
 .appearance__name {
-  font-family: var(--font-sans);
+  font-family: var(--font-head);
+  font-size: 1rem;
   color: inherit;
   font-weight: 600;
 }

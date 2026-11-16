@@ -174,8 +174,19 @@
 }
 
 @media (max-width: 767px) {
+  :host,
+  .map {
+    display: block;
+  }
+
   .map__main {
-    padding: 1.25rem 1rem calc(2rem + var(--safe-bottom));
+    gap: 1.25rem;
+    padding: 1rem 0.9rem calc(2rem + var(--safe-bottom));
+    overflow: visible;
+  }
+
+  .map__head h1 {
+    font-size: 1.4rem;
   }
 
   .server {

@@ -20,29 +20,75 @@
   <aside class="assistant__list" aria-label="Conversations">
     <div class="assistant__list-head">
       <h1>Conversations</h1>
-      <button type="button" class="hl-btn hl-btn--small" (click)="newConversation()">+ New</button>
+      <span class="assistant__head-actions">
+        @if (visibleCount()) {
+          <button
+            type="button"
+            class="hl-btn hl-btn--small hl-btn--ghost"
+            [class.hl-btn--danger]="confirming() === 'all'"
+            (click)="removeAll()"
+            (blur)="confirming.set(null)"
+          >
+            {{ confirming() === 'all' ? 'Delete all ' + visibleCount() + '?' : 'Delete all' }}
+          </button>
+        }
+        <button type="button" class="hl-btn hl-btn--small" (click)="newConversation()">
+          + New
+        </button>
+      </span>
     </div>
     @for (group of groups(); track group.title) {
       <span class="assistant__group">{{ group.title }}</span>
       @for (c of group.items; track c.id) {
-        <button
-          type="button"
-          class="assistant__item"
-          [class.assistant__item--on]="c.id === store.sessionId()"
-          [attr.aria-current]="c.id === store.sessionId()"
-          (click)="open(c)"
-        >
-          <span class="assistant__item-top">
-            <span class="assistant__item-title">{{ c.title }}</span>
-            <span class="assistant__when">{{ when(c.updatedAt) }}</span>
-          </span>
-          <span class="assistant__agent" [class]="'hue-' + look(c.agent).hue">
-            <span class="hl-dot"></span>{{ look(c.agent).label }}
-            @if (isWaiting(c)) {
-              <span class="assistant__waiting">· plan waiting</span>
+        <div class="assistant__entry">
+          <button
+            type="button"
+            class="assistant__item"
+            [class.assistant__item--on]="c.id === store.sessionId()"
+            [attr.aria-current]="c.id === store.sessionId()"
+            (click)="open(c)"
+          >
+            <span class="assistant__item-top">
+              <span class="assistant__item-title">{{ c.title }}</span>
+              <span class="assistant__when">{{ when(c.updatedAt) }}</span>
+            </span>
+            <span class="assistant__agent" [class]="'hue-' + look(c.agent).hue">
+              <span class="hl-dot"></span>{{ look(c.agent).label }}
+              @if (isWaiting(c)) {
+                <span class="assistant__waiting">· plan waiting</span>
+              }
+            </span>
+          </button>
+          <button
+            type="button"
+            class="assistant__delete"
+            [class.assistant__delete--confirm]="confirming() === c.id"
+            [attr.aria-label]="
+              confirming() === c.id ? 'Confirm: delete ' + c.title : 'Delete ' + c.title
+            "
+            [title]="confirming() === c.id ? 'Click again to delete' : 'Delete'"
+            (click)="remove(c)"
+            (blur)="confirming.set(null)"
+          >
+            @if (confirming() === c.id) {
+              Delete?
+            } @else {
+              <svg
+                viewBox="0 0 24 24"
+                width="14"
+                height="14"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                aria-hidden="true"
+              >
+                <path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3" />
+              </svg>
             }
-          </span>
-        </button>
+          </button>
+        </div>
       }
     } @empty {
       <p class="assistant__none">Your conversations will appear here.</p>
@@ -51,7 +97,6 @@
 
   <section class="assistant__thread">
     <header class="assistant__head">
-      <a class="assistant__back" routerLink="/assistant" aria-label="Back to conversations">‹</a>
       <span class="assistant__title">{{ title() }}</span>
       <span class="assistant__chip-wrap">
         <button
@@ -144,4 +189,5 @@
       />
     }
   </section>
+  <app-conversation-info class="assistant__info" (remove)="removeCurrent()" />
 </div>

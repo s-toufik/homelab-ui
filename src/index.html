@@ -18,7 +18,17 @@
         try {
           var saved =
             JSON.parse(localStorage.getItem('homelab-ui.theme-preferences') || 'null') || {};
-          var themes = ['auto', 'navy', 'light', 'contrast'];
+          var themes = [
+            'auto',
+            'navy',
+            'light',
+            'contrast',
+            'blossom',
+            'lilac',
+            'forest',
+            'dragon',
+            'wizarding',
+          ];
           var theme = themes.indexOf(saved.theme) >= 0 ? saved.theme : 'auto';
           document.documentElement.setAttribute('data-theme', theme);
         } catch (e) {}

@@ -1,11 +1,23 @@
-import { Component, computed, effect, inject, signal, viewChild } from '@angular/core';
+import {
+  Component,
+  DestroyRef,
+  HostListener,
+  computed,
+  effect,
+  inject,
+  signal,
+  untracked,
+  viewChild,
+} from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AccessStore } from '@shell/application/access.store';
+import { PageChromeStore } from '@shell/application/page-chrome.store';
 import { PagePanelContentDirective } from '@shell/directives/page-panel-content.directive';
 import { AgentStore } from '../../application/agent.store';
 import { Composer } from '../../components/composer/composer';
 import { Conversation } from '../../components/conversation/conversation';
+import { ConversationInfo } from '../../components/conversation-info/conversation-info';
 import { SettingsPanel } from '../../components/settings-panel/settings-panel';
 import { isWaiting, type Conversation as ConversationEntry } from '../../domain/agent-conversation';
 import { agentLook } from '../../domain/agent-looks';
@@ -25,7 +37,7 @@ function when(at: number, now = Date.now()): string {
 
 @Component({
   selector: 'app-assistant-page',
-  imports: [PagePanelContentDirective, SettingsPanel, Conversation, Composer, RouterLink],
+  imports: [PagePanelContentDirective, SettingsPanel, Conversation, Composer, ConversationInfo],
   templateUrl: './assistant-page.html',
   styleUrl: './assistant-page.scss',
 })
@@ -44,6 +56,7 @@ export class AssistantPage {
 
   protected readonly changing = signal(false);
   protected readonly picking = signal(false);
+  protected readonly confirming = signal<string | null>(null);
   protected readonly look = agentLook;
   protected readonly when = when;
   protected readonly isWaiting = isWaiting;
@@ -73,16 +86,30 @@ export class AssistantPage {
   protected readonly empty = computed(() => this.store.messages().length === 0);
 
   constructor() {
+    const chrome = inject(PageChromeStore);
+    effect(() => chrome.title.set(this.store.conversation()?.title ?? 'New conversation'));
+    inject(DestroyRef).onDestroy(() => chrome.title.set(null));
     void this.store.loadDirectory();
     effect(() => {
       const id = this.routeId();
       const agent = this.query().get('agent');
-      if (id === 'new' || (!id && agent)) {
-        this.startNew(agent ?? this.store.agentName());
-      } else if (id && id !== this.store.sessionId()) {
-        void this.store.openConversation(id);
-      } else if (!id) {
-        void this.store.loadModels();
+      untracked(() => {
+        if (id === 'new' || (!id && agent)) {
+          this.startNew(agent ?? this.store.agentName());
+        } else if (id && id !== this.store.sessionId()) {
+          void this.store.openConversation(id);
+        } else if (!id) {
+          void this.store.loadModels();
+        }
+      });
+    });
+    effect(() => {
+      const conversation = this.store.conversation();
+      const id = this.routeId();
+      if (conversation && id === 'new') {
+        untracked(
+          () => void this.router.navigate(['/assistant', conversation.id], { replaceUrl: true }),
+        );
       }
     });
     effect(() => {
@@ -115,6 +142,48 @@ export class AssistantPage {
 
   protected open(conversation: ConversationEntry): void {
     void this.router.navigate(['/assistant', conversation.id]);
+  }
+
+  protected readonly visibleCount = computed(
+    () => this.store.conversations().filter((c) => this.access.canUseAgent(c.agent)).length,
+  );
+
+  @HostListener('document:keydown', ['$event'])
+  protected onKey(event: KeyboardEvent): void {
+    const target = event.target as HTMLElement | null;
+    if (target && (/^(INPUT|TEXTAREA|SELECT)$/.test(target.tagName) || target.isContentEditable))
+      return;
+    if (event.key === 'n' && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      event.preventDefault();
+      this.newConversation();
+    }
+  }
+
+  protected removeCurrent(): void {
+    const id = this.store.sessionId();
+    this.store.deleteConversation(id);
+    void this.router.navigate(['/assistant']);
+  }
+
+  protected remove(conversation: ConversationEntry): void {
+    if (this.confirming() !== conversation.id) {
+      this.confirming.set(conversation.id);
+      return;
+    }
+    this.confirming.set(null);
+    const open = conversation.id === this.store.sessionId();
+    this.store.deleteConversation(conversation.id);
+    if (open || this.routeId() === conversation.id) void this.router.navigate(['/assistant']);
+  }
+
+  protected removeAll(): void {
+    if (this.confirming() !== 'all') {
+      this.confirming.set('all');
+      return;
+    }
+    this.confirming.set(null);
+    this.store.deleteAll((agent) => this.access.canUseAgent(agent));
+    void this.router.navigate(['/assistant']);
   }
 
   protected changePlan(): void {

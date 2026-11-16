@@ -10,7 +10,8 @@ import { ThemeStore } from '../application/theme.store';
 import { AssistantDrawer } from '../assistant-drawer/assistant-drawer';
 import { CommandPalette } from '../command-palette/command-palette';
 import { Sidebar } from '../sidebar/sidebar';
-import { TabBar } from '../tab-bar/tab-bar';
+import { Drawer } from '../drawer/drawer';
+import { PhoneBar } from '../phone-bar/phone-bar';
 import { Toolbar } from '../toolbar/toolbar';
 import { PagePanel } from '../page-panel/page-panel';
 import { SettingsModal } from '../settings-modal/settings-modal';
@@ -21,7 +22,8 @@ import { SettingsModal } from '../settings-modal/settings-modal';
     RouterOutlet,
     Sidebar,
     Toolbar,
-    TabBar,
+    Drawer,
+    PhoneBar,
     CommandPalette,
     PagePanel,
     AssistantDrawer,
@@ -59,9 +61,32 @@ export class Layout {
     return phase !== 'idle' && phase !== 'error';
   });
 
+  private touch: { x: number; y: number } | null = null;
+
   constructor() {
     effect(() => {
       if (!this.assistantAvailable()) this.ui.closeAssistant();
     });
+    effect(() => {
+      this.path();
+      this.ui.drawerOpen.set(false);
+    });
+  }
+
+  protected touchStart(event: TouchEvent): void {
+    const point = event.touches[0];
+    this.touch = point ? { x: point.clientX, y: point.clientY } : null;
+  }
+
+  protected touchEnd(event: TouchEvent): void {
+    const start = this.touch;
+    const point = event.changedTouches[0];
+    this.touch = null;
+    if (!start || !point || globalThis.innerWidth >= 768) return;
+    const dx = point.clientX - start.x;
+    const dy = Math.abs(point.clientY - start.y);
+    if (dy > 60 || Math.abs(dx) < 70) return;
+    if (dx > 0 && start.x < 28 && !this.ui.drawerOpen()) this.ui.drawerOpen.set(true);
+    if (dx < 0 && this.ui.drawerOpen()) this.ui.drawerOpen.set(false);
   }
 }
