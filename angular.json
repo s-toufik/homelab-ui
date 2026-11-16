@@ -29,7 +29,17 @@
                 "input": "public"
               }
             ],
-            "styles": ["src/styles.scss"]
+            "styles": [
+              "node_modules/@fontsource/geist-sans/400.css",
+              "node_modules/@fontsource/geist-sans/500.css",
+              "node_modules/@fontsource/geist-sans/600.css",
+              "node_modules/@fontsource/geist-sans/700.css",
+              "node_modules/@fontsource/geist-mono/400.css",
+              "node_modules/@fontsource/geist-mono/500.css",
+              "node_modules/@fontsource/atkinson-hyperlegible/400.css",
+              "node_modules/@fontsource/atkinson-hyperlegible/700.css",
+              "src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {

@@ -1,3 +1,4 @@
+import { RouterLink } from '@angular/router';
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { WorkspaceStore } from '../../application/workspace.store';
@@ -21,7 +22,7 @@ function readStoredWidth(): number {
 
 @Component({
   selector: 'app-tasker-page',
-  imports: [FormsModule, BlockPalette, PaneLayout, BlockInspector, WorkflowList],
+  imports: [FormsModule, RouterLink, BlockPalette, PaneLayout, BlockInspector, WorkflowList],
   templateUrl: './tasker-page.html',
   styleUrl: './tasker-page.scss',
   host: { '(document:keydown)': 'onKeydown($event)' },

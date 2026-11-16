@@ -8,10 +8,9 @@ import { ConnectionSettingsStorage } from '@shared/infrastructure/connection-set
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
 import { FeatureStatusStore } from '../application/feature-status.store';
 import { SettingsModalStore } from '../application/settings-modal.store';
-import { ThemeStore } from '../application/theme.store';
 import { CONNECTABLE_SERVICES } from '../domain/connectable-services';
 import { SETTINGS_TABS, type SettingsTab } from '../domain/settings-tab';
-import { CREATIVE_THEMES, type ThemePaletteId } from '../domain/theme-preferences';
+import { Appearance } from '../appearance/appearance';
 
 interface ServiceDraft {
   readonly key: string;
@@ -35,13 +34,12 @@ function normalizeHost(value: string): string {
 
 @Component({
   selector: 'app-settings-modal',
-  imports: [FormsModule],
+  imports: [FormsModule, Appearance],
   templateUrl: './settings-modal.html',
   styleUrl: './settings-modal.scss',
 })
 export class SettingsModal {
   protected readonly store = inject(SettingsModalStore);
-  private readonly theme = inject(ThemeStore);
   private readonly connectionStorage = inject(ConnectionSettingsStorage);
   private readonly server = inject(HomelabServer);
   private readonly status = inject(FeatureStatusStore);
@@ -55,9 +53,6 @@ export class SettingsModal {
     const summary = this.status.summary();
     return summary ? `${summary.online} of ${summary.total} reachable` : 'Checking…';
   });
-
-  protected readonly creativeThemes = CREATIVE_THEMES;
-  protected readonly palette = this.theme.palette;
 
   protected readonly connectionHost = signal(
     this.savedConnections.host ?? this.server.url({ port: null, subpath: null }),
@@ -90,10 +85,6 @@ export class SettingsModal {
 
   refreshStatus(): void {
     void this.status.refresh();
-  }
-
-  setPalette(id: ThemePaletteId): void {
-    this.theme.palette.set(id);
   }
 
   updateConnectionHost(value: string): void {

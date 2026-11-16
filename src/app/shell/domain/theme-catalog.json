@@ -1,0 +1,23 @@
+[
+  {
+    "id": "navy",
+    "name": "Navy",
+    "tagline": "Deep blue, easy on the eyes",
+    "dark": true,
+    "surface": "#0A0F15"
+  },
+  {
+    "id": "light",
+    "name": "Light",
+    "tagline": "The same layout, on white",
+    "dark": false,
+    "surface": "#F4F6F9"
+  },
+  {
+    "id": "contrast",
+    "name": "Contrast",
+    "tagline": "Black on white, largest and clearest",
+    "dark": false,
+    "surface": "#FFFFFF"
+  }
+]

@@ -1,0 +1,266 @@
+:host {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.people {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+.people__list {
+  width: 18.5rem;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 1rem 0.6rem;
+  border-right: var(--border-width) solid var(--border);
+  overflow-y: auto;
+}
+
+.people__list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 0.3rem 0.6rem;
+
+  h1 {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 650;
+  }
+}
+
+.people__note {
+  margin: 0 0.3rem 0.5rem;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.45rem;
+  background: var(--hue-amber-soft);
+  color: var(--hue-amber);
+  font-size: 0.78rem;
+}
+
+.people__item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.6rem;
+  border: 0;
+  border-radius: 0.5rem;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.people__item--on {
+  background: var(--surface-raised);
+  box-shadow: 0 0 0 var(--border-width) var(--border);
+}
+
+.people__item--off {
+  opacity: 0.55;
+}
+
+.people__item-text {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    font-weight: 500;
+  }
+
+  span {
+    overflow: hidden;
+    font-size: 0.78rem;
+    color: var(--text-muted);
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+.people__avatar {
+  width: 1.7rem;
+  height: 1.7rem;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: var(--text);
+  color: var(--surface);
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.people__avatar--big {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.2rem;
+}
+
+.people__detail {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 46rem;
+  padding: 2rem 2rem calc(2rem + var(--safe-bottom));
+  overflow-y: auto;
+}
+
+.people__back {
+  display: none;
+  align-self: flex-start;
+  border: 0;
+  background: none;
+  color: var(--accent);
+  font: inherit;
+  cursor: pointer;
+}
+
+.people__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.people__who {
+  flex: 1;
+  min-width: 12rem;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    font-size: 1.6rem;
+    font-weight: 650;
+    letter-spacing: -0.02em;
+  }
+
+  span {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+}
+
+.people__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.people__password {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.75rem 0.9rem;
+  border: var(--card-border);
+  border-radius: var(--radius-card);
+  background: var(--surface-raised);
+  font-size: 0.85rem;
+
+  code {
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    color: var(--mono);
+    user-select: all;
+  }
+}
+
+.people__option {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+
+  strong {
+    font-weight: 500;
+  }
+}
+
+.people__switch {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.3rem;
+  height: 1.35rem;
+  padding: 0;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--surface-hover);
+  cursor: pointer;
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0.15rem;
+    left: 0.15rem;
+    width: 1.05rem;
+    height: 1.05rem;
+    border-radius: 50%;
+    background: #ffffff;
+    box-shadow: 0 1px 2px rgb(0 0 0 / 30%);
+    transition: transform 0.15s;
+  }
+
+  &[aria-checked='true'] {
+    background: var(--accent);
+
+    &::after {
+      transform: translateX(0.95rem);
+    }
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: default;
+  }
+}
+
+.people__muted {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.people__empty {
+  margin: auto;
+}
+
+@media (max-width: 767px) {
+  .people__list {
+    width: 100%;
+    border-right: 0;
+  }
+
+  .people__detail {
+    display: none;
+    padding: 1.25rem 1rem;
+  }
+
+  .people--detail {
+    .people__list {
+      display: none;
+    }
+
+    .people__detail {
+      display: flex;
+    }
+  }
+
+  .people__back {
+    display: block;
+  }
+}

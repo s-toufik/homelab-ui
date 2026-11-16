@@ -8,6 +8,8 @@ export function provideTempoFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'tempo',
+      hue: 'teal',
+      access: 'page:traces',
       label: 'Traces',
       description: 'Find a request and follow it span by span (Tempo).',
       category: 'Observability',

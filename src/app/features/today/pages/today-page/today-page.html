@@ -1,0 +1,108 @@
+<div class="today">
+  <div class="today__column">
+    <header>
+      <span class="today__date">{{ date }}</span>
+      <h1 class="today__hello">{{ hello() }}</h1>
+      <p class="today__brief">
+        @for (sentence of sentences(); track $index) {
+          <span [class.today__soft]="$index > 0 && sentence.startsWith('One thing')"
+            >{{ sentence }}
+          </span>
+        }
+      </p>
+    </header>
+
+    @if (
+      waiting().length ||
+      (access.isAdmin() && (homelab.alerts().length || homelab.warnings().length))
+    ) {
+      <section class="hue-orange">
+        <h2 class="hl-cap">Waiting for you</h2>
+        <div class="hl-list">
+          @for (c of waiting(); track c.id) {
+            <div class="hl-list__row">
+              <span class="today__icon today__icon--plan" aria-hidden="true">≡</span>
+              <span class="today__text">
+                <span class="today__title">{{ c.title }}</span>
+                <span class="today__meta" [class]="'hue-' + look(c.agent).hue"
+                  ><span class="hl-dot"></span>{{ look(c.agent).label }} · a plan waiting since
+                  {{ c.updatedAt | date: 'HH:mm' }}</span
+                >
+              </span>
+              <a class="hl-btn hl-btn--primary" [routerLink]="['/assistant', c.id]">Review plan</a>
+            </div>
+          }
+          @if (access.isAdmin()) {
+            @for (alert of homelab.alerts(); track $index) {
+              <div class="hl-list__row">
+                <span class="today__icon today__icon--warn" aria-hidden="true">!</span>
+                <span class="today__text">
+                  <span class="today__title">{{ alert.labels['alertname'] }}</span>
+                  <span class="today__meta"
+                    ><span class="hl-addr">{{
+                      alert.labels['pod'] || alert.labels['job'] || 'alert'
+                    }}</span>
+                    · firing</span
+                  >
+                </span>
+                <a class="hl-btn" routerLink="/metrics">Open in Metrics</a>
+              </div>
+            }
+            @for (warning of homelab.warnings(); track warning) {
+              <div class="hl-list__row">
+                <span class="today__icon today__icon--warn" aria-hidden="true">!</span>
+                <span class="today__text"
+                  ><span class="today__title">{{ warning }}</span></span
+                >
+                <a class="hl-btn" routerLink="/map">Open the map</a>
+              </div>
+            }
+          }
+        </div>
+      </section>
+    }
+
+    @if (access.isAdmin()) {
+      <section class="hue-green">
+        <h2 class="hl-cap">Homelab</h2>
+        <div class="hl-list today__stats">
+          <a class="today__stat" routerLink="/status">
+            <small>Apps</small>
+            <b [class.today__ok]="online() && online()!.online === online()!.total">
+              {{ online() ? online()!.online + ' / ' + online()!.total : '…' }}
+            </b>
+            <small>answering</small>
+          </a>
+          @for (gauge of gauges(); track gauge.label) {
+            @let value = gauge.value;
+            <a class="today__stat" routerLink="/dashboards">
+              <small>{{ gauge.label }}</small>
+              <b>{{
+                value === null || value === undefined ? '…' : (value | number: '1.0-0') + '%'
+              }}</b>
+              <span class="today__bar"><i [style.width.%]="value ?? 0"></i></span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+
+    @if (recent().length) {
+      <section class="hue-blue">
+        <h2 class="hl-cap">Pick up where you left off</h2>
+        <div class="hl-list">
+          @for (c of recent(); track c.id) {
+            <a class="hl-list__row" [routerLink]="['/assistant', c.id]">
+              <span class="today__text">
+                <span class="today__title">{{ c.title }}</span>
+                <span class="today__meta" [class]="'hue-' + look(c.agent).hue"
+                  ><span class="hl-dot"></span>{{ look(c.agent).label }}</span
+                >
+              </span>
+            </a>
+          }
+        </div>
+      </section>
+    }
+  </div>
+</div>

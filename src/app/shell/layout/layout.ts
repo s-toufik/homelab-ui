@@ -8,13 +8,26 @@ import { LayoutStore } from '../application/layout.store';
 import { PageChromeStore } from '../application/page-chrome.store';
 import { ThemeStore } from '../application/theme.store';
 import { AssistantDrawer } from '../assistant-drawer/assistant-drawer';
-import { NavSidebar } from '../nav-sidebar/nav-sidebar';
+import { CommandPalette } from '../command-palette/command-palette';
+import { Sidebar } from '../sidebar/sidebar';
+import { TabBar } from '../tab-bar/tab-bar';
+import { Toolbar } from '../toolbar/toolbar';
 import { PagePanel } from '../page-panel/page-panel';
 import { SettingsModal } from '../settings-modal/settings-modal';
 
 @Component({
   selector: 'app-layout',
-  imports: [RouterOutlet, NavSidebar, PagePanel, AssistantDrawer, SettingsModal, SwarmAvatar],
+  imports: [
+    RouterOutlet,
+    Sidebar,
+    Toolbar,
+    TabBar,
+    CommandPalette,
+    PagePanel,
+    AssistantDrawer,
+    SettingsModal,
+    SwarmAvatar,
+  ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',
 })

@@ -25,7 +25,7 @@
   width: 100%;
   padding: 10px;
   margin-bottom: 8px;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-raised);
   color: var(--text);
@@ -71,7 +71,7 @@
   flex: 0 0 auto;
   width: 26px;
   height: 26px;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: transparent;
   color: var(--text-muted);
@@ -98,7 +98,7 @@
 .block-palette__retry {
   align-self: flex-start;
   padding: 4px 10px;
-  border: 1px solid var(--border);
+  border: var(--border-width) solid var(--border);
   border-radius: var(--radius);
   background: var(--surface-raised);
   color: var(--text);

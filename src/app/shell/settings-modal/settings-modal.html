@@ -124,20 +124,7 @@
         }
 
         @case ('appearance') {
-          <h3 class="settings-modal__label">Creative themes</h3>
-          <section class="settings-modal__group settings-modal__group--grid">
-            @for (option of creativeThemes; track option.id) {
-              <button
-                type="button"
-                class="settings-modal__theme"
-                [class.settings-modal__theme--active]="palette() === option.id"
-                (click)="setPalette(option.id)"
-              >
-                <span class="settings-modal__theme-dot" [style.background]="option.swatch"></span>
-                {{ option.label }}
-              </button>
-            }
-          </section>
+          <app-appearance />
         }
 
         @case ('about') {

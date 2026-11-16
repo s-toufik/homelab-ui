@@ -1,0 +1,137 @@
+<div class="people" [class.people--detail]="selected()">
+  <aside class="people__list" aria-label="People">
+    <div class="people__list-head">
+      <h1>People</h1>
+      <a class="hl-btn hl-btn--small" routerLink="/people/new">+ Add</a>
+    </div>
+    @if (store.preview) {
+      <p class="people__note">
+        Preview data: open the homelab through its gateway to manage real accounts.
+      </p>
+    }
+    @for (person of store.people(); track person.id) {
+      <button
+        type="button"
+        class="people__item"
+        [class.people__item--on]="person.id === selectedId()"
+        [class.people__item--off]="!person.enabled"
+        [attr.aria-current]="person.id === selectedId()"
+        (click)="select(person)"
+      >
+        <span class="people__avatar">{{ displayName(person).charAt(0).toUpperCase() }}</span>
+        <span class="people__item-text">
+          <strong>{{ displayName(person) }}</strong>
+          <span>{{ summary(person) }}</span>
+        </span>
+      </button>
+    } @empty {
+      <p class="people__note">{{ store.loading() ? 'Loading…' : 'Nobody yet.' }}</p>
+    }
+  </aside>
+
+  <section class="people__detail">
+    @if (store.error()) {
+      <p class="hl-error" role="alert">{{ store.error() }}</p>
+    }
+    @if (selected(); as person) {
+      <button type="button" class="people__back" (click)="selectedId.set(null)">‹ People</button>
+      <header class="people__head">
+        <span class="people__avatar people__avatar--big">{{
+          displayName(person).charAt(0).toUpperCase()
+        }}</span>
+        <span class="people__who">
+          <strong>{{ displayName(person) }}</strong>
+          <span>
+            <span class="hl-addr">{{ person.username }}</span>
+            @if (person.createdAt) {
+              · since {{ person.createdAt | date: 'MMMM y' }}
+            }
+            @if (person.mustSetPassword) {
+              · sets a password at next sign-in
+            }
+          </span>
+        </span>
+        @if (person.username !== store.me()) {
+          <span class="people__actions">
+            <button
+              type="button"
+              class="hl-btn"
+              [disabled]="store.isBusy(person.id)"
+              (click)="newPassword(person)"
+            >
+              New password
+            </button>
+            <button
+              type="button"
+              class="hl-btn"
+              [disabled]="store.isBusy(person.id)"
+              (click)="store.signOut(person)"
+            >
+              Sign out
+            </button>
+            <button
+              type="button"
+              class="hl-btn"
+              [class.hl-btn--danger]="person.enabled"
+              [disabled]="store.isBusy(person.id)"
+              (click)="store.setEnabled(person, !person.enabled)"
+            >
+              {{ person.enabled ? 'Disable' : 'Enable' }}
+            </button>
+          </span>
+        }
+      </header>
+
+      @if (revealed()?.id === person.id) {
+        <div class="people__password">
+          <span>New temporary password, shown once:</span>
+          <code>{{ revealed()!.password }}</code>
+          <button type="button" class="hl-btn hl-btn--small" (click)="copy(revealed()!.password)">
+            {{ copied() ? 'Copied' : 'Copy' }}
+          </button>
+        </div>
+      }
+
+      @if (isAdmin(person)) {
+        <p class="people__muted">
+          Admins can open everything, People included. Give or take the admin role on the server:
+          <span class="hl-addr">make user-admin ACCOUNT={{ person.username }}</span
+          >.
+        </p>
+      } @else {
+        @for (entry of groups(); track entry.group) {
+          <section [class]="'hue-' + entry.hue">
+            <h2 class="hl-cap">{{ entry.group }} {{ displayName(person) }} can open</h2>
+            <div class="hl-list">
+              @for (option of entry.options; track option.role) {
+                @let on = has(person, option);
+                <div class="hl-list__row">
+                  <span class="hl-dot" [class]="'hue-' + option.hue"></span>
+                  <span class="people__option"
+                    ><strong>{{ option.label }}</strong
+                    ><span class="hl-addr">{{ option.role }}</span></span
+                  >
+                  <button
+                    type="button"
+                    role="switch"
+                    class="people__switch"
+                    [attr.aria-checked]="on"
+                    [attr.aria-label]="option.label + ' for ' + displayName(person)"
+                    [disabled]="!person.enabled || store.isBusy(person.id + ':' + option.role)"
+                    (click)="store.toggle(person, option.role)"
+                  ></button>
+                </div>
+              }
+            </div>
+          </section>
+        }
+        <p class="people__muted">
+          Changes count from {{ displayName(person) }}'s next session refresh, within 4 minutes. The
+          gateway refuses whatever isn't switched on.
+        </p>
+      }
+    } @else {
+      <p class="people__muted people__empty">Pick someone to see what they can open.</p>
+    }
+  </section>
+</div>

@@ -1,0 +1,6 @@
+{
+  "key": "keycloak",
+  "port": 8443,
+  "subpath": "admin/realms/homelab",
+  "api": "/api/people"
+}

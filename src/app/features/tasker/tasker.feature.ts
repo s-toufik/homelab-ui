@@ -9,6 +9,8 @@ export function provideTaskerFeature(): Provider[] {
   return [
     provideHomelabFeature(() => ({
       id: 'tasker',
+      hue: 'purple',
+      access: 'app:tasker',
       label: 'Tasker',
       description: 'Build automations by connecting blocks.',
       category: 'Automation',

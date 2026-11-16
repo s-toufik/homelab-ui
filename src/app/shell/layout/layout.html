@@ -3,77 +3,60 @@
   [class.layout--resizing]="ui.resizing()"
   [style.--assistant-width]="ui.assistantWidth() + 'px'"
 >
-  <button
-    type="button"
-    class="layout__nav-toggle"
-    title="Menu"
-    aria-label="Open navigation"
-    (mouseenter)="ui.hoverNav(true)"
-    (mouseleave)="ui.hoverNav(false)"
-    (click)="ui.toggleNav()"
-  >
-    <svg
-      viewBox="0 0 24 24"
-      width="20"
-      height="20"
-      fill="none"
-      stroke="currentColor"
-      stroke-width="1.8"
+  <app-sidebar />
+
+  <div class="layout__main">
+    <app-toolbar>
+      @if (assistantAvailable() && !ui.assistantOpen()) {
+        <button
+          type="button"
+          class="layout__tool"
+          [class.layout__tool--working]="assistantWorking()"
+          [title]="assistantWorking() ? 'Assistant (working…)' : 'Ask about this page'"
+          aria-label="Open the assistant beside this page"
+          (click)="ui.toggleAssistant()"
+        >
+          <app-swarm-avatar [size]="20" [live]="assistantWorking()" [phase]="assistantPhase()" />
+        </button>
+      }
+      @if (chrome.rightPanel()) {
+        <button
+          type="button"
+          class="layout__tool"
+          title="Page settings"
+          aria-label="Open page settings"
+          (mouseenter)="ui.hoverPanel(true)"
+          (mouseleave)="ui.hoverPanel(false)"
+          (click)="ui.togglePanel()"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            width="17"
+            height="17"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            aria-hidden="true"
+          >
+            <path d="M4 6h16M4 12h16M4 18h16" />
+            <circle cx="9" cy="6" r="2" fill="var(--surface)" />
+            <circle cx="15" cy="12" r="2" fill="var(--surface)" />
+            <circle cx="9" cy="18" r="2" fill="var(--surface)" />
+          </svg>
+        </button>
+      }
+    </app-toolbar>
+
+    <main
+      class="layout__content"
+      [class.layout__content--beside-assistant]="assistantAvailable() && ui.assistantOpen()"
     >
-      <path d="M4 6h16M4 12h16M4 18h16" stroke-linecap="round" />
-    </svg>
-  </button>
+      <router-outlet />
+    </main>
 
-  @if (chrome.rightPanel()) {
-    <button
-      type="button"
-      class="layout__panel-toggle"
-      title="Settings"
-      aria-label="Open page settings"
-      (mouseenter)="ui.hoverPanel(true)"
-      (mouseleave)="ui.hoverPanel(false)"
-      (click)="ui.togglePanel()"
-    >
-      <svg
-        viewBox="0 0 24 24"
-        width="20"
-        height="20"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="1.8"
-      >
-        <line x1="4" y1="6" x2="20" y2="6" stroke-linecap="round" />
-        <circle cx="9" cy="6" r="2" />
-        <line x1="4" y1="12" x2="20" y2="12" stroke-linecap="round" />
-        <circle cx="15" cy="12" r="2" />
-        <line x1="4" y1="18" x2="20" y2="18" stroke-linecap="round" />
-        <circle cx="9" cy="18" r="2" />
-      </svg>
-    </button>
-  }
-
-  @if (assistantAvailable() && !ui.assistantOpen()) {
-    <button
-      type="button"
-      class="layout__assistant-toggle"
-      [class.layout__assistant-toggle--beside-settings]="chrome.rightPanel()"
-      [class.layout__assistant-toggle--working]="assistantWorking()"
-      [title]="assistantWorking() ? 'Assistant (working…)' : 'Assistant'"
-      aria-label="Open the assistant"
-      (click)="ui.toggleAssistant()"
-    >
-      <app-swarm-avatar [size]="24" [live]="assistantWorking()" [phase]="assistantPhase()" />
-    </button>
-  }
-
-  <app-nav-sidebar />
-
-  <main
-    class="layout__content"
-    [class.layout__content--beside-assistant]="assistantAvailable() && ui.assistantOpen()"
-  >
-    <router-outlet />
-  </main>
+    <app-tab-bar />
+  </div>
 
   @if (chrome.rightPanel()) {
     <app-page-panel />
@@ -84,4 +67,5 @@
   }
 
   <app-settings-modal />
+  <app-command-palette />
 </div>

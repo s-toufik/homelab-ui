@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { GatewaySession } from './gateway-session';
+import { GatewaySession, PREVIEW_GROUPS } from './gateway-session';
 import { API_ROUTING, type ApiRouting } from './homelab-server';
 
 function session(routing: ApiRouting): GatewaySession {
@@ -68,5 +68,16 @@ describe('GatewaySession', () => {
 
     expect(signIn).toHaveBeenCalledOnce();
     expect(current.user()).toBeNull();
+  });
+
+  it('outside the gateway, previews a non-admin with the groups saved for it', () => {
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: API_ROUTING, useValue: 'direct' },
+        { provide: PREVIEW_GROUPS, useValue: ['role:agent:kitchen'] },
+      ],
+    });
+    const current = TestBed.inject(GatewaySession);
+    expect([current.isAdmin(), current.groups()]).toEqual([false, ['role:agent:kitchen']]);
   });
 });

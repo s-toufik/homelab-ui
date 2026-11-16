@@ -31,11 +31,6 @@ export function clampAssistantWidth(width: number, viewport: number): number {
 @Injectable({ providedIn: 'root' })
 export class LayoutStore {
   private readonly storage = inject(LAYOUT_STORAGE);
-  private readonly navPinnedState = signal(false);
-  private readonly navHoveringState = signal(false);
-  readonly navPinned = this.navPinnedState.asReadonly();
-  readonly navOpen = computed(() => this.navPinnedState() || this.navHoveringState());
-
   private readonly panelPinnedState = signal(false);
   private readonly panelHoveringState = signal(false);
   readonly panelPinned = this.panelPinnedState.asReadonly();
@@ -48,23 +43,6 @@ export class LayoutStore {
     clampAssistantWidth(this.assistantWidthState(), globalThis.innerWidth ?? 1440),
   );
   readonly resizing = signal(false);
-
-  toggleNav(): void {
-    this.navPinnedState.update((pinned) => !pinned);
-  }
-
-  closeNav(): void {
-    this.navPinnedState.set(false);
-    this.navHoveringState.set(false);
-  }
-
-  hoverNav(hovering: boolean): void {
-    this.navHoveringState.set(hovering);
-  }
-
-  collapseNavPeek(): void {
-    this.navHoveringState.set(false);
-  }
 
   togglePanel(): void {
     this.panelPinnedState.update((pinned) => !pinned);

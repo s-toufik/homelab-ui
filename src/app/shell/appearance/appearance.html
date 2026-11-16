@@ -1,0 +1,69 @@
+<div class="appearance">
+  <div class="appearance__preview" [attr.data-theme]="theme.active()" aria-hidden="true">
+    <span class="appearance__date">SUNDAY 15 NOVEMBER</span>
+    <span class="appearance__hello">Good evening{{ name() ? ', ' + name() : '' }}.</span>
+    <span class="appearance__brief"
+      >Kitchen has <span class="appearance__link">a plan waiting for you</span>.</span
+    >
+    <span class="appearance__cap">Waiting for you</span>
+    <span class="appearance__row"
+      ><span>Five dinners for the week</span><span class="appearance__button">Review</span></span
+    >
+  </div>
+
+  <div class="appearance__switch-row">
+    <span class="appearance__text">
+      <strong>Match my device</strong>
+      <span class="appearance__muted">
+        {{ dayName }} by day, {{ nightName }} at night.
+        @if (auto()) {
+          Now: {{ activeName() }}
+        }
+      </span>
+    </span>
+    <button
+      type="button"
+      role="switch"
+      class="appearance__switch"
+      [attr.aria-checked]="auto()"
+      aria-label="Match my device"
+      (click)="toggleAuto()"
+    ></button>
+  </div>
+
+  <div class="appearance__list" role="radiogroup" aria-label="Theme">
+    <span class="hl-cap">Theme</span>
+    @for (option of themes; track option.id) {
+      <button
+        type="button"
+        role="radio"
+        class="appearance__option"
+        [attr.aria-checked]="theme.active() === option.id"
+        (click)="theme.choose(option.id)"
+      >
+        <span class="appearance__swatch" [attr.data-theme]="option.id"><i></i><b></b></span>
+        <span class="appearance__text">
+          <strong [attr.data-theme]="option.id" class="appearance__name">{{ option.name }}</strong>
+          <span class="appearance__muted">{{ tagline(option.id, option.tagline) }}</span>
+        </span>
+        @if (theme.active() === option.id) {
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.6"
+            aria-hidden="true"
+          >
+            <path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        }
+      </button>
+    }
+  </div>
+
+  <p class="appearance__muted">
+    Saved to your account: the same on your phone, tablet and computer.
+  </p>
+</div>

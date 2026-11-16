@@ -11,7 +11,7 @@ const NEAR_BOTTOM_PX = 80;
   styleUrl: './conversation.scss',
 })
 export class Conversation {
-  readonly messages = input.required<ChatMessage[]>();
+  readonly messages = input.required<readonly ChatMessage[]>();
   readonly compact = input(false);
   readonly resend = output<string>();
   private readonly scrollAnchor = viewChild<ElementRef<HTMLElement>>('scrollAnchor');

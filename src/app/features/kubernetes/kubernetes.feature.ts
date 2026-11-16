@@ -8,6 +8,7 @@ export function provideKubernetesFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'kubernetes',
+      hue: 'blue',
       label: 'Kubernetes',
       description: 'Pods, workloads, logs, shells and every object of the cluster (admins).',
       category: 'Platform',

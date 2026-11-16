@@ -8,6 +8,8 @@ export function provideLlmFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'llm',
+      hue: 'orange',
+      access: 'page:models',
       label: 'Models',
       description: 'Load and unload models, follow their logs, try a prompt.',
       category: 'AI',

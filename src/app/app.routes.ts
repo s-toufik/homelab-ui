@@ -1,45 +1,85 @@
 import { Routes } from '@angular/router';
+import { requireAccess, requireAdmin } from '@shell/application/access.guard';
 
 export const routes: Routes = [
   {
     path: '',
+    pathMatch: 'full',
     loadComponent: () =>
-      import('./features/control-center/pages/control-center-page/control-center-page').then(
-        (m) => m.ControlCenterPage,
+      import('./features/today/pages/today-page/today-page').then((m) => m.TodayPage),
+  },
+  {
+    path: 'assistant',
+    loadComponent: () =>
+      import('./features/agent/pages/assistant-page/assistant-page').then((m) => m.AssistantPage),
+  },
+  {
+    path: 'assistant/:id',
+    loadComponent: () =>
+      import('./features/agent/pages/assistant-page/assistant-page').then((m) => m.AssistantPage),
+  },
+  { path: 'agent', redirectTo: 'assistant' },
+  { path: 'agent/:name', redirectTo: ({ params }) => `/assistant?agent=${params['name']}` },
+  {
+    path: 'map',
+    canMatch: [requireAdmin],
+    loadComponent: () => import('./features/map/pages/map-page/map-page').then((m) => m.MapPage),
+  },
+  {
+    path: 'more',
+    loadComponent: () => import('./shell/browse/more-page').then((m) => m.MorePage),
+  },
+  {
+    path: 'people',
+    canMatch: [requireAdmin],
+    loadComponent: () =>
+      import('./features/people/pages/people-page/people-page').then((m) => m.PeoplePage),
+  },
+  {
+    path: 'people/new',
+    canMatch: [requireAdmin],
+    loadComponent: () =>
+      import('./features/people/pages/new-person-page/new-person-page').then(
+        (m) => m.NewPersonPage,
       ),
   },
   {
-    path: 'agent',
-    loadComponent: () =>
-      import('./features/agent/pages/agent-page/agent-page').then((m) => m.AgentPage),
+    path: 'appearance',
+    loadComponent: () => import('./shell/appearance/appearance-page').then((m) => m.AppearancePage),
   },
   {
     path: 'status',
+    canMatch: [requireAccess('page:status')],
     loadComponent: () =>
       import('./features/status/pages/status-page/status-page').then((m) => m.StatusPage),
   },
   {
     path: 'tasker',
+    canMatch: [requireAccess('app:tasker')],
     loadComponent: () =>
       import('./features/tasker/pages/tasker-page/tasker-page').then((m) => m.TaskerPage),
   },
   {
     path: 'metrics',
+    canMatch: [requireAccess('page:metrics')],
     loadComponent: () =>
       import('./features/prometheus/pages/metrics-page/metrics-page').then((m) => m.MetricsPage),
   },
   {
     path: 'logs',
+    canMatch: [requireAccess('page:logs')],
     loadComponent: () =>
       import('./features/loki/pages/logs-page/logs-page').then((m) => m.LogsPage),
   },
   {
     path: 'traces',
+    canMatch: [requireAccess('page:traces')],
     loadComponent: () =>
       import('./features/tempo/pages/traces-page/traces-page').then((m) => m.TracesPage),
   },
   {
     path: 'dashboards',
+    canMatch: [requireAccess('page:dashboards')],
     loadComponent: () =>
       import('./features/grafana/pages/dashboards-page/dashboards-page').then(
         (m) => m.DashboardsPage,
@@ -47,6 +87,7 @@ export const routes: Routes = [
   },
   {
     path: 'dashboards/:id',
+    canMatch: [requireAccess('page:dashboards')],
     loadComponent: () =>
       import('./features/grafana/pages/dashboards-page/dashboards-page').then(
         (m) => m.DashboardsPage,
@@ -54,21 +95,25 @@ export const routes: Routes = [
   },
   {
     path: 'kafka',
+    canMatch: [requireAccess('page:kafka')],
     loadComponent: () =>
       import('./features/kafka-ui/pages/kafka-page/kafka-page').then((m) => m.KafkaPage),
   },
   {
     path: 'pipeline',
+    canMatch: [requireAccess('page:pipeline')],
     loadComponent: () =>
       import('./features/alloy/pages/pipeline-page/pipeline-page').then((m) => m.PipelinePage),
   },
   {
     path: 'models',
+    canMatch: [requireAccess('page:models')],
     loadComponent: () =>
       import('./features/llm/pages/models-page/models-page').then((m) => m.ModelsPage),
   },
   {
     path: 'tools',
+    canMatch: [requireAccess('page:tools')],
     loadComponent: () =>
       import('./features/mcp-inspector/pages/tools-page/tools-page').then((m) => m.ToolsPage),
   },
@@ -79,6 +124,7 @@ export const routes: Routes = [
   },
   {
     path: 'kubernetes',
+    canMatch: [requireAdmin],
     loadComponent: () =>
       import('./features/kubernetes/pages/kubernetes-page/kubernetes-page').then(
         (m) => m.KubernetesPage,
@@ -86,9 +132,11 @@ export const routes: Routes = [
   },
   {
     path: 'tool-uis',
+    canMatch: [requireAccess('page:tool-uis')],
     loadComponent: () =>
       import('./features/tool-links/pages/tool-links-page/tool-links-page').then(
         (m) => m.ToolLinksPage,
       ),
   },
+  { path: '**', redirectTo: '' },
 ];

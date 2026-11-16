@@ -1,0 +1,55 @@
+<div class="map" [class.map--open]="store.selected()">
+  <div class="map__main">
+    <header class="map__head">
+      <div>
+        <span class="map__live">{{
+          (store.updatedAt() | date: 'EEEE d MMMM · HH:mm') ?? 'Reading the cluster…'
+        }}</span>
+        <h1>Homelab map</h1>
+      </div>
+      <span class="map__summary">
+        k3s · namespace <span class="hl-addr">homelab</span> · {{ store.summary().pods }} pods ·
+        {{ store.summary().ready }} ready
+        @if (store.summary().failed) {
+          · <span class="map__bad">{{ store.summary().failed }} failing</span>
+        }
+      </span>
+    </header>
+
+    @if (store.error()) {
+      <p class="hl-error" role="alert">{{ store.error() }}</p>
+    }
+
+    <app-map-overview />
+
+    <section class="server">
+      <span class="server__tab">sirius <small>· server · k3s</small></span>
+      <div class="server__node hue-orange">
+        <h3 class="hl-cap">Node</h3>
+        @for (stat of stats(); track stat.key) {
+          <div class="server__stat">
+            <span>{{ stat.key }}</span>
+            <strong>{{
+              stat.value === null || stat.value === undefined
+                ? '…'
+                : (stat.value | number: '1.0-0') + '%'
+            }}</strong>
+            <span class="server__bar"><i [style.width.%]="stat.value ?? 0"></i></span>
+          </div>
+        }
+        <div class="server__stat">
+          <span>Pods</span>
+          <strong>{{ store.summary().ready }} / {{ store.summary().pods }}</strong>
+          <span class="server__muted">ready</span>
+        </div>
+      </div>
+      <div class="server__services">
+        <p class="server__note">
+          One release per service, reached through caddy. Click a service to follow it.
+        </p>
+        <app-map-services />
+      </div>
+    </section>
+  </div>
+  <app-map-details class="map__details" />
+</div>

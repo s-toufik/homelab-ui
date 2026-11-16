@@ -8,6 +8,8 @@ export function provideLokiFeature(): Provider {
     const server = inject(HomelabServer);
     return {
       id: 'loki',
+      hue: 'slate',
+      access: 'page:logs',
       label: 'Logs',
       description: "Search every container's logs (Loki).",
       category: 'Observability',

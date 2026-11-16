@@ -1,0 +1,62 @@
+@if (store.isOpen()) {
+  <div class="palette__backdrop" (click)="store.close()"></div>
+  <div class="palette" role="dialog" aria-modal="true" aria-label="Search or ask">
+    <div class="palette__field">
+      <svg
+        viewBox="0 0 24 24"
+        width="17"
+        height="17"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.9"
+        stroke-linecap="round"
+        aria-hidden="true"
+      >
+        <path d="M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Z" />
+        <path d="M20 20l-4-4" />
+      </svg>
+      <input
+        #input
+        type="text"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-controls="palette-results"
+        aria-label="Search or ask anything"
+        placeholder="Search a page, a conversation, or ask"
+        autocomplete="off"
+        spellcheck="false"
+        [ngModel]="store.query()"
+        (ngModelChange)="store.query.set($event)"
+        (keydown)="onInputKey($event)"
+      />
+      <kbd>esc</kbd>
+    </div>
+    <div class="palette__results" id="palette-results" role="listbox">
+      @for (entry of groups(); track entry.group) {
+        <span class="palette__group">{{ entry.group }}</span>
+        @for (command of entry.items; track command.id) {
+          <button
+            type="button"
+            role="option"
+            class="palette__item"
+            [class.palette__item--on]="index(command) === active()"
+            [attr.aria-selected]="index(command) === active()"
+            (mouseenter)="active.set(index(command))"
+            (click)="run(command)"
+          >
+            <span class="palette__label">{{ command.label }}</span>
+            @if (command.hint) {
+              <span class="palette__hint">{{ command.hint }}</span>
+            }
+          </button>
+        }
+      } @empty {
+        <p class="palette__empty">Nothing matches. Try a page name, or ask a question.</p>
+      }
+    </div>
+    <div class="palette__keys">
+      <span><kbd>↑</kbd> <kbd>↓</kbd> move</span><span><kbd>↵</kbd> open</span
+      ><span><kbd>⌘K</kbd> close</span>
+    </div>
+  </div>
+}
