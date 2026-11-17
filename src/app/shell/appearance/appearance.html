@@ -67,6 +67,91 @@
     </div>
   }
 
+  <section class="appearance__cast" aria-labelledby="appearance-cast">
+    <span class="appearance__group" id="appearance-cast">Agents</span>
+    <p class="appearance__muted">
+      The characters on the Agents page and in answers. Any cast goes with any theme.
+    </p>
+    <div class="appearance__stage" aria-label="{{ activeCastName() }} cast, working">
+      @for (agent of actors; track agent.name) {
+        <figure class="appearance__actor">
+          <app-agent-scene [agent]="agent.name" mood="working" [label]="agent.label" />
+          <figcaption>{{ agent.label }}</figcaption>
+        </figure>
+      }
+    </div>
+    <div class="appearance__list" role="radiogroup" aria-label="Agent casts">
+      <button
+        type="button"
+        role="radio"
+        class="appearance__option"
+        [attr.aria-checked]="cast.choice() === 'theme'"
+        (click)="cast.choose('theme')"
+      >
+        <app-agent-scene
+          class="appearance__thumb"
+          agent="kitchen"
+          mood="working"
+          [cast]="themeCast()"
+          label=""
+          aria-hidden="true"
+        />
+        <span class="appearance__text">
+          <strong class="appearance__name">Match my theme</strong>
+          <span class="appearance__muted">Now: {{ themeCastName() }}</span>
+        </span>
+        @if (cast.choice() === 'theme') {
+          <svg
+            viewBox="0 0 24 24"
+            width="18"
+            height="18"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.6"
+            aria-hidden="true"
+          >
+            <path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round" />
+          </svg>
+        }
+      </button>
+      @for (option of casts; track option.id) {
+        <button
+          type="button"
+          role="radio"
+          class="appearance__option"
+          [attr.aria-checked]="cast.choice() === option.id"
+          (click)="cast.choose(option.id)"
+        >
+          <app-agent-scene
+            class="appearance__thumb"
+            agent="kitchen"
+            mood="working"
+            [cast]="option.id"
+            label=""
+            aria-hidden="true"
+          />
+          <span class="appearance__text">
+            <strong class="appearance__name">{{ option.name }}</strong>
+            <span class="appearance__muted">{{ option.description }}</span>
+          </span>
+          @if (cast.choice() === option.id) {
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.6"
+              aria-hidden="true"
+            >
+              <path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          }
+        </button>
+      }
+    </div>
+  </section>
+
   <p class="appearance__muted">
     Saved to your account: the same on your phone, tablet and computer.
   </p>

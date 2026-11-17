@@ -1,13 +1,16 @@
 import { Provider, inject } from '@angular/core';
+import { CAST_ACCOUNT } from '@shell/application/cast-account';
 import { THEME_ACCOUNT } from '@shell/application/theme-account';
 import { provideHomelabFeature } from '@shell/application/homelab-features';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
+import { AccountCastAdapter } from './infrastructure/api/account-cast.adapter';
 import { AccountThemeAdapter } from './infrastructure/api/account-theme.adapter';
 import ACCOUNT from './infrastructure/account-api.json';
 
 export function provideAccountFeature(): Provider[] {
   return [
     { provide: THEME_ACCOUNT, useExisting: AccountThemeAdapter },
+    { provide: CAST_ACCOUNT, useExisting: AccountCastAdapter },
     provideHomelabFeature(() => {
       const server = inject(HomelabServer);
       return {

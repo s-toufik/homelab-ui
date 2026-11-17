@@ -22,7 +22,7 @@
 | **People**     | Admins                                       | Accounts, and the pages each person may open                                                                                                      |
 | **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker                                           |
 | **Account**    | Everyone                                     | Profile, password, devices and sessions, deleting your account                                                                                    |
-| **Appearance** | Everyone                                     | Theme                                                                                                                                             |
+| **Appearance** | Everyone                                     | Theme and agent cast                                                                                                                              |
 
 ## Center
 
@@ -136,7 +136,7 @@ Deleting a conversation here removes it from this browser. The server copies exp
 | **Coding**      | The Hacker Cat     | Curled up on the desk          | Types in bursts, code scrolling, tail flicking           | A bug crawls across the screen          |
 | **Security**    | The Gate Bulldog   | Snores by the castle gate      | Sniffs each letter and stamps it, the gate lamp green    | Barks, a refused letter, the lamp red   |
 
-The scenes are drawn pixel by pixel into a small frame buffer (`agent-scene/pixel-frame.ts`, `pixel-scenes.ts`) and put on a canvas scaled with sharp pixels; one shared clock animates the scenes on screen. An agent without its own scene gets the Maestro.
+That is the **Homelab** cast; Appearance offers seven more (see [Agent casts](#agent-casts)). The scenes are drawn pixel by pixel into a small frame buffer (`agent-scene/pixel-frame.ts`, one file per cast in `agent-scene/casts/`, sharing the figures, props and marks of `kit.ts`) and put on a canvas scaled with sharp pixels; one shared clock animates the scenes on screen. An agent without its own scene gets the cast's Assistant.
 
 While the Assistant waits on a task it handed to an agent, the line between them lights up and flows (_"asking Kitchen…"_; on a phone the card says _"asked by Assistant"_). Click an agent for what it is doing, **Ask** and its last conversation or waiting plan.
 
@@ -239,6 +239,47 @@ The choice is saved on your account, so it is the same on every device. Text mee
 <img src="docs/screenshots/themes.webp" alt="Today in the four storybook themes: Wizarding, Dragon Rider, Demigod and Regency" />
 
 <img src="docs/screenshots/wizarding-status.webp" alt="The Status page in the Wizarding theme: parchment cards, small-capital labels and a leather sidebar" />
+
+### Agent casts
+
+**Appearance › Agents** chooses who plays the agents, apart from the theme: any cast goes with any theme. **Match my theme** (the default) gives the storybook themes their own cast and the others the Homelab one; once you pick a cast it stays when you change the theme. A preview shows all seven agents at work, and the choice is saved on your account (`homelabCast`) like the theme.
+
+| Cast                 | Assistant                                          | Kitchen               | Travel                  | Observation          | Analysis                              | Coding                    | Security                 |
+| -------------------- | -------------------------------------------------- | --------------------- | ----------------------- | -------------------- | ------------------------------------- | ------------------------- | ------------------------ |
+| **Homelab**          | The Maestro                                        | Chef Basile           | Pip the Navigator       | The Night Owl        | Professor Tortoise                    | The Hacker Cat            | The Gate Bulldog         |
+| **Wizarding**        | An archmage                                        | A potioneer           | A broom courier         | A stargazer          | An archivist                          | A rune scribe             | A gate warden            |
+| **Dragon Rider**     | A wing leader                                      | A camp cook           | A rider on her dragon   | A scout on watch     | A quartermaster                       | A smith                   | A gate guard             |
+| **Demigod**          | An oracle                                          | A satyr cook          | A winged messenger      | A centaur archer     | A philosopher                         | An automaton maker        | A hoplite                |
+| **Regency**          | A hostess                                          | A cook                | A coachman              | A lady at the window | An accountant                         | A letter writer           | A butler                 |
+| **Pocket monsters**  | Chorumble, a bee                                   | Simmercrab            | Kitekin, a kite         | Lumoth, a moth       | Sproutgraph                           | Circuitoad                | Bastionail, a snail      |
+| **Digital monsters** | Bytedrake                                          | Chefbit               | Pathpix                 | Scanbug              | Graphrex                              | Codekit                   | Firewyrm                 |
+| **Machines**         | A dispatch robot sending data cubes down two belts | A kettle bot whisking | A rover on a red planet | A searchlight drone  | A tape-reel computer printing a chart | A many-armed typist robot | A tank-tread vault guard |
+
+The pocket and digital monsters and the machines are original characters, made for this homelab. The digital monsters live on an old four-shade LCD screen and glitch when in trouble; the machines work in a riveted factory with hazard stripes, steam pipes and status lights (the rover drives across a red planet). Only the Homelab cast is in the main bundle: each other cast loads the first time it is shown.
+
+**Your own sprites:** put one PNG per agent in `public/sprites/`, named after the agent (`supervisor.png` for the Assistant, `kitchen.png`, `travel.png`, `observation.png`, `analysis.png`, `coding.png`, `security.png`), then release homelab-ui. Each image has four rows, top to bottom: resting, working, waiting, in trouble. A row holds as many frames as you like, each 1.5 times as wide as the row is tall (96 × 64 like the drawn scenes, or any size), played at 8 frames a second with sharp pixels. An agent without an image keeps its Homelab scene.
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/agents-wizarding.webp" alt="The Agents map in the Wizarding theme and cast: the archmage conducting owls, the potioneer at the cauldron, the stargazer at his telescope" /></td>
+    <td><img src="docs/screenshots/agents-dragon.webp" alt="The Agents map in the Dragon Rider theme and cast: the wing leader at the war table, the rider on her dragon, the smith at the forge" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/agents-pocket.webp" alt="The Regency theme with the pocket monsters: the bee conducting, the crab cooking, the moth asked by the Assistant" /></td>
+    <td><img src="docs/screenshots/agents-digital.webp" alt="The Navy theme with the digital monsters on their LCD screens" /></td>
+  </tr>
+  <tr>
+    <td><img src="docs/screenshots/agents-machines.webp" alt="The Forest theme with the machines: the dispatch robot sorting data cubes, the kettle bot, the searchlight drone asked by the Assistant, the rover resting" /></td>
+    <td></td>
+  </tr>
+</table>
+
+<table>
+  <tr>
+    <td><img src="docs/screenshots/appearance-cast.webp" alt="Appearance › Agents in the Blossom theme: the pocket monsters at work, and the list of casts with Match my theme" /></td>
+    <td><img src="docs/screenshots/phone-appearance-cast.webp" width="260" alt="Appearance › Agents on a phone in the Lilac theme with the digital monsters" /></td>
+  </tr>
+</table>
 
 <table>
   <tr>
