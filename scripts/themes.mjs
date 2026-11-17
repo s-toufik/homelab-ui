@@ -216,6 +216,7 @@ const THEMES = [
   },
   {
     id: 'contrast',
+    night: ['#000000', '#000000', '#000000'],
     name: 'Contrast',
     tagline: 'Black on white, largest and clearest',
     dark: false,
@@ -245,6 +246,7 @@ const THEMES = [
   },
   {
     id: 'blossom',
+    night: ['#3B2140', '#1E1124', '#0B060E'],
     name: 'Blossom',
     tagline: 'Soft pink, rounded letters',
     dark: false,
@@ -275,6 +277,7 @@ const THEMES = [
   },
   {
     id: 'lilac',
+    night: ['#2A2350', '#141030', '#07050F'],
     name: 'Lilac',
     tagline: 'Lavender and violet, light and airy',
     dark: false,
@@ -305,6 +308,7 @@ const THEMES = [
   },
   {
     id: 'forest',
+    night: ['#16302A', '#0B1A16', '#030907'],
     name: 'Forest',
     tagline: 'Moss, bark and morning light',
     dark: false,
@@ -335,6 +339,7 @@ const THEMES = [
   },
   {
     id: 'wizarding',
+    night: ['#2B1E3F', '#150E22', '#07040C'],
     name: 'Wizarding',
     tagline: 'Parchment, ink and a leather-bound spine, after Harry Potter',
     storybook: true,
@@ -399,6 +404,7 @@ const THEMES = [
   },
   {
     id: 'dragon',
+    night: ['#2A120C', '#120705', '#040101'],
     name: 'Dragon Rider',
     tagline: 'Obsidian scales, ember and riders’ steel, after Fourth Wing',
     storybook: true,
@@ -462,6 +468,7 @@ const THEMES = [
   },
   {
     id: 'demigod',
+    night: ['#0E3550', '#071D2E', '#020A12'],
     name: 'Demigod',
     tagline: 'Marble, bronze and the Aegean, after Percy Jackson',
     storybook: true,
@@ -523,6 +530,7 @@ const THEMES = [
   },
   {
     id: 'regency',
+    night: ['#2C3F66', '#16223D', '#080D18'],
     name: 'Regency',
     tagline: 'Wedgwood blue, gilt frames and florals, after Bridgerton',
     storybook: true,
@@ -586,6 +594,8 @@ const THEMES = [
     },
   },
 ];
+
+const NIGHT = ['#1A2550', '#0B1230', '#03060F'];
 
 const SKIN_DEFAULTS = {
   '--body-size': '14px',
@@ -682,6 +692,9 @@ function block(theme) {
     `--shadow-card: ${theme.shadowCard};`,
     `--shadow-float: ${theme.shadowFloat};`,
     `--backdrop-glow: none;`,
+    ...(theme.night ?? NIGHT).map(
+      (color, index) => `--sky-${['high', 'mid', 'deep'][index]}: ${color};`,
+    ),
     `color-scheme: ${theme.dark ? 'dark' : 'light'};`,
   ];
   for (const hue of HUES) {

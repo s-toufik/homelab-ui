@@ -328,12 +328,14 @@
 }
 
 .assistant__error {
+  flex-shrink: 0;
   width: calc(100% - 2rem);
   max-width: 44rem;
   margin: 0 auto 0.75rem;
 }
 
 .assistant__plan {
+  flex-shrink: 0;
   width: calc(100% - 2rem);
   max-width: 44rem;
   margin: 0 auto 1rem;

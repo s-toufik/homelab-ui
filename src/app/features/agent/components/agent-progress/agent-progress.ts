@@ -7,6 +7,7 @@ import {
   visibleTools,
   type AgentRunState,
   type ProgressNode,
+  type StepState,
 } from '../../domain/agent-progress';
 import { AgentScene } from '../agent-scene/agent-scene';
 
@@ -17,6 +18,14 @@ const STATE_TEXT: Readonly<Record<AgentRunState, string>> = {
   refused: 'refused',
   failed: 'failed',
   unreachable: 'unreachable',
+  stopped: 'stopped',
+};
+
+const STEP_LABELS: Readonly<Record<StepState, string>> = {
+  done: 'Done: ',
+  current: 'Now: ',
+  todo: 'Next: ',
+  stopped: 'Stopped at: ',
 };
 
 const MOODS: Readonly<Record<AgentRunState, AgentMood>> = {
@@ -26,6 +35,7 @@ const MOODS: Readonly<Record<AgentRunState, AgentMood>> = {
   refused: 'trouble',
   failed: 'trouble',
   unreachable: 'trouble',
+  stopped: 'idle',
 };
 
 @Component({
@@ -39,6 +49,8 @@ export class AgentProgress {
   readonly streaming = input(false);
   readonly showPlan = input(true);
 
+  protected readonly STEP_LABELS = STEP_LABELS;
+
   private readonly choice = signal<boolean | null>(null);
 
   protected readonly look = computed(() => agentLook(this.node().agent ?? 'supervisor'));
@@ -46,6 +58,7 @@ export class AgentProgress {
   protected readonly steps = computed(() => (this.showPlan() ? this.node().steps : []));
   protected readonly count = computed(() => stepCount(this.node()));
   protected readonly working = computed(() => this.node().state === 'working');
+  protected readonly stopped = computed(() => this.node().state === 'stopped');
   protected readonly mood = computed<AgentMood>(() => MOODS[this.node().state ?? 'answered']);
   protected readonly stateText = computed(() => STATE_TEXT[this.node().state ?? 'answered']);
   protected readonly open = computed(() => this.choice() ?? this.working());

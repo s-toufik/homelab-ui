@@ -26,7 +26,7 @@
 
 ## Center
 
-The homelab opens on **Center** (`/`): a globe of the night sky where each page is a star and each group of pages a constellation.
+The homelab opens on **Center** (`/`): a globe of the night sky where each page is a star and each group of pages a constellation. It is drawn like an observatory's sky: the Milky Way with its dark dust lane, stars coloured by temperature, faint constellation lines and lettering in the theme's capitals, inside a graduated ring that turns with the globe. Each theme tints the night (`--sky-high`, `--sky-mid`, `--sky-deep`, set per theme in `scripts/themes.mjs`): violet under Wizarding, ember under Dragon Rider, Aegean under Demigod.
 
 | Constellation                          | Stars                                                                  |
 | -------------------------------------- | ---------------------------------------------------------------------- |
@@ -122,23 +122,25 @@ Deleting a conversation here removes it from this browser. The server copies exp
 
 ### Agents
 
-**Agents** (`/agents`, next to Assistant) is a live map: the **Assistant** (the supervisor that hands work out) in the middle, the other assistants around it, each as a small animated scene that gets busy while it works.
+**Agents** (`/agents`, next to Assistant) is a live map: the **Assistant** (the supervisor that hands work out) in the middle, the other assistants around it. Each assistant is a character in a small pixel-art scene (96 × 64 pixels, 8 frames a second), with a pose for each state: resting, working, waiting for you (a **?** bubble) and in trouble (a red **!**).
 
-| Agent           | Scene                                                                                           |
-| --------------- | ----------------------------------------------------------------------------------------------- |
-| **Assistant**   | A conductor at a podium, baton waving, notes flying to the other agents orbiting                |
-| **Kitchen**     | A chef tossing a pan over the flames, the pot lid rattling, a knife chopping, utensils swinging |
-| **Travel**      | A plane circling the globe with a contrail, pins popping, the suitcase hopping                  |
-| **Observation** | A radar sweeping with a trail and blips, a server rack blinking                                 |
-| **Analysis**    | Bars and a trend line drawing themselves, a pie turning, numbers rising under a magnifier       |
-| **Coding**      | An editor typing in colour, a terminal scrolling, hands on the keyboard, coffee steaming        |
-| **Security**    | A camera sweeping, a scan line over a shield, the padlock opening and closing                   |
+| Agent           | Character          | Resting                        | Working                                                  | Trouble                                 |
+| --------------- | ------------------ | ------------------------------ | -------------------------------------------------------- | --------------------------------------- |
+| **Assistant**   | The Maestro        | Polishes his baton, humming    | Conducts on a stage, task cards flying out to the sides  | Baton snapped, sheet music on the floor |
+| **Kitchen**     | Chef Basile        | Dozes, blue pilot light        | Stirs the pot, steam and bubbles, a bead of sweat        | The pot boils over in smoke             |
+| **Travel**      | Pip the Navigator  | Sits on the backpack, hat down | Map flapping, compass spinning, a paper plane overhead   | Map upside down, the plane crashed      |
+| **Observation** | The Night Owl      | Dozes in the watchtower        | Head turning, telescope sweeping, the log scroll unrolls | Feathers ruffled, the lantern red       |
+| **Analysis**    | Professor Tortoise | Reads by a green lamp          | Draws the bars and the trend line on the chalkboard      | Chalk broken, an eraser cloud           |
+| **Coding**      | The Hacker Cat     | Curled up on the desk          | Types in bursts, code scrolling, tail flicking           | A bug crawls across the screen          |
+| **Security**    | The Gate Bulldog   | Snores by the castle gate      | Sniffs each letter and stamps it, the gate lamp green    | Barks, a refused letter, the lamp red   |
+
+The scenes are drawn pixel by pixel into a small frame buffer (`agent-scene/pixel-frame.ts`, `pixel-scenes.ts`) and put on a canvas scaled with sharp pixels; one shared clock animates the scenes on screen. An agent without its own scene gets the Maestro.
 
 While the Assistant waits on a task it handed to an agent, the line between them lights up and flows (_"asking Kitchen…"_; on a phone the card says _"asked by Assistant"_). Click an agent for what it is doing, **Ask** and its last conversation or waiting plan.
 
-An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 5 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. Lines are exact: agent-runtime counts each task it is waiting on (`agent_delegations_active` by `peer`), and the answer streaming in this browser says which agents it asked. Animations stop when the device asks for reduced motion.
+An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 5 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. Lines are exact: agent-runtime counts each task it is waiting on (`agent_delegations_active` by `peer`), and the answer streaming in this browser says which agents it asked. Scenes hold still when the device asks for reduced motion.
 
-<img src="docs/screenshots/agents.webp" alt="The Agents map: the Assistant conducting in the middle, lines flowing to Kitchen (a chef at work) and Observation (a radar sweeping), Security, Travel, Coding and Analysis resting around it" />
+<img src="docs/screenshots/agents.webp" alt="The Agents map in pixel art: the Maestro conducting in the middle, Chef Basile stirring in the Kitchen, the Night Owl asked by the Assistant, the Bulldog, the Cat, Pip and the Tortoise resting around it" />
 
 ## Map
 

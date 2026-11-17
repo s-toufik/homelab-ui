@@ -20,6 +20,11 @@ svg path {
   stroke-linejoin: round;
 }
 
+svg .stop {
+  fill: currentColor;
+  stroke: none;
+}
+
 .spinner {
   display: inline-block;
   width: 0.75rem;
@@ -60,6 +65,10 @@ svg path {
 
 .own__check {
   color: var(--success);
+}
+
+.own__stop {
+  color: var(--text-muted);
 }
 
 .own__title {
@@ -234,6 +243,20 @@ svg path {
   font-weight: 600;
 }
 
+.step--stopped .step__mark,
+.tool--stopped .tool__mark {
+  background: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+.step--stopped .step__text {
+  color: var(--text-muted);
+}
+
+.card--stopped {
+  border-left-color: var(--border);
+}
+
 .step--todo .step__text {
   color: var(--text-muted);
 }
@@ -284,6 +307,11 @@ svg path {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  svg .stop {
+    fill: currentColor;
+    stroke: none;
+  }
+
   .spinner {
     animation-duration: 3s;
   }

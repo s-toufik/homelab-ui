@@ -1,4 +1,10 @@
-import { applyProgress, emptyProgress, parseProgress, settle } from '../domain/agent-progress';
+import {
+  applyProgress,
+  emptyProgress,
+  parseProgress,
+  settle,
+  type RunEnd,
+} from '../domain/agent-progress';
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 import { newId } from '@shared/utils/uuid';
@@ -260,10 +266,11 @@ export class AgentStore {
         }
       }
     } catch (error) {
-      if ((error as Error).name !== 'AbortError') {
+      const aborted = (error as Error).name === 'AbortError';
+      if (!aborted) {
         this.requestError.set((error as Error).message);
       }
-      this.setAssistantStreaming(assistantId, false);
+      this.setAssistantStreaming(assistantId, false, aborted ? 'stopped' : 'answered');
     } finally {
       this.isStreaming.set(false);
       this.abortController = null;
@@ -307,15 +314,19 @@ export class AgentStore {
       error,
       status: undefined,
       streaming: false,
+      progress: message.progress ? settle(message.progress, 'stopped') : undefined,
     }));
   }
 
-  private setAssistantStreaming(id: string, streaming: boolean): void {
+  private setAssistantStreaming(id: string, streaming: boolean, end: RunEnd = 'answered'): void {
     this.updateMessage(id, (message) => ({
       ...message,
       streaming,
       status: streaming ? message.status : undefined,
-      progress: !streaming && message.progress ? settle(message.progress) : message.progress,
+      progress:
+        !streaming && message.progress && message.streaming
+          ? settle(message.progress, end)
+          : message.progress,
     }));
   }
 
