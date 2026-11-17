@@ -4,6 +4,13 @@
   [class.message--assistant]="message().role === 'assistant'"
 >
   <div class="message__bubble">
+    @if (progress(); as progress) {
+      <app-agent-progress
+        [node]="progress"
+        [streaming]="message().streaming"
+        [showPlan]="message().metadata?.['outcome'] !== 'awaiting_approval'"
+      />
+    }
     @if (message().streaming && (message().status || !message().content)) {
       <p class="message__status" role="status">
         <app-swarm-avatar [size]="22" [live]="true" [phase]="phase()" />

@@ -86,6 +86,8 @@ src/app/
 
 **Side panels.** `shared/ui/side-pane/` has `PaneState` (pinned, peeking, width, saved under `<key>.pinned` and `<key>.width`; `hover(true|false)` opens after 90 ms and closes 320 ms after the pointer leaves) and `<app-side-pane side="left|right" [state]>`, which draws the panel, the hover edge, the resize grip (drag, arrow keys, double-click to reset) and, on a phone, an overlay with a shade. The sidebar, the page settings and the Assistant's conversations all use it. On the phone, a page can set `PageChromeStore.titleMenu` to make the top bar's title a menu button (Assistant uses it for the assistant picker).
 
+**Agent progress.** agent-runtime's stream has a `progress` event whose content is JSON (`kind` plan, tool or agent; `path` of the agents between the one asked and the one working; plan `steps`; tool `callId`, `name`, `state`, `detail`). `features/agent/domain/agent-progress.ts` folds them into a tree per answer (`applyProgress`, `settle` when the answer ends), kept with the message; `components/agent-progress` draws it recursively: the agent's own plan and tools, then a card per agent it delegated to.
+
 **Charts.** `shared/ui/charts/time-series-chart` draws SVG and handles its own zoom: a `view` signal (`x0`, `x1`, optional `y0`, `y1`) overrides the data bounds; drag in the plot brushes a box, the axis gutters zoom (wheel) and pan (drag), ⌘/Ctrl + wheel or a pinch zooms time, double-click resets. Lines are clipped to the plot.
 
 **Delete buttons.** `shared/ui/delete-button` is the bin (or double bin with `[all]`) that turns red with a ✓ on the first tap and emits `confirmed` on the second; its host gets `delete-button-host--confirm` while it waits.

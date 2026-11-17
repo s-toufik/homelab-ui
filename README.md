@@ -92,11 +92,14 @@ Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did c
 - **Conversations** are listed by day (Today, This week, Earlier) next to the one that is open. Each conversation is with one assistant, picked when you start it with **+ New**. The first message opens the conversation and its answer streams in at once.
 - **Delete:** the bin next to a conversation deletes it, the double bin at the top of the list deletes them all (on a phone, both are in the menu). The first tap turns the button red with a ✓; tap again to confirm.
 - **On a phone** it works like the ChatGPT and Claude apps: the assistant's name is the title, tap it to pick another assistant (admins also find **Model and settings** there). Suggestions sit just above the message box, which stays at the bottom of the screen.
+- **Watch the work:** while an assistant works, its answer shows what it is doing, the way Claude shows its sub-agents. Its plan lists every step as done ✓, current (spinning) or still to come ○, with the tool each step uses, and every tool call with its arguments. When the Assistant hands tasks to other agents, each one gets a card with its live scene, the task it was given, its own plan steps and tool calls in a section that folds away once it has answered, and the agents it asked in turn. Agents working at the same time sit side by side. This comes from agent-runtime's `progress` events.
 - **Answers stream in** word by word. A small swarm of dots shows the assistant at work: calm while it thinks, faster while it runs a tool, red if something went wrong.
 - **Plans:** when a request needs real work (reading files, querying data, saving a report), the assistant first proposes a plan. A card under it offers **Approve and run**, **Change it** and **Dismiss**; nothing runs until you approve. A waiting plan also appears on Today and as a number next to Assistant.
 - **Answer details:** under each answer, the time it took and the tokens used, for example _(21s · ↑ 9.9k · ↓ 642 tokens)_. Open the details for the model, the tools used and the steps taken.
 - **Settings** (admins, button at the top right): the model, **Auto-approve plans**, the conversation id to pick up an old conversation, and the steps whose model is fixed by the server.
 - **Beside any tool page:** the assistant button at the top right opens it in a panel next to the page, for example to ask about an error on the Logs page. Drag its edge to resize it; **Esc** closes it.
+
+<img src="docs/screenshots/assistant-progress.webp" alt="The Assistant answering &quot;What do the logs of caddy say?&quot;: its plan on top, then Observation and Security working side by side, each with its plan steps (done, current, to come) and its tool calls" />
 
 <img src="docs/screenshots/assistant.webp" alt="Assistant: the conversations by day, and Kitchen's plan of three steps with Approve and run, Change it and Dismiss" />
 

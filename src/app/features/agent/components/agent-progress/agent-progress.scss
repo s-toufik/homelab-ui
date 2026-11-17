@@ -1,0 +1,290 @@
+:host {
+  display: block;
+  min-width: 0;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+svg path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.spinner {
+  display: inline-block;
+  width: 0.75rem;
+  height: 0.75rem;
+  border: 2px solid color-mix(in srgb, var(--h, var(--accent)) 30%, transparent);
+  border-top-color: var(--h, var(--accent));
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.root {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.own {
+  border: var(--border-width) solid var(--border);
+  border-radius: 0.7rem;
+  background: var(--surface-raised);
+}
+
+.own__head,
+.card__head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  width: 100%;
+  padding: 0.5rem 0.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.own__check {
+  color: var(--success);
+}
+
+.own__title {
+  font-weight: 600;
+  font-size: 0.88rem;
+}
+
+.own__summary {
+  margin-left: auto;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+}
+
+.own__body {
+  padding: 0 0.75rem 0.65rem;
+}
+
+.card__chevron {
+  flex-shrink: 0;
+  color: var(--text-muted);
+  transition: transform 0.15s;
+}
+
+[aria-expanded='false'] .card__chevron {
+  transform: rotate(-90deg);
+}
+
+.agents {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.agents--many {
+  grid-template-columns: repeat(auto-fit, minmax(min(17rem, 100%), 1fr));
+  align-items: start;
+}
+
+.card {
+  border: var(--border-width) solid var(--border);
+  border-left: 3px solid var(--h);
+  border-radius: 0.7rem;
+  background: var(--surface-raised);
+  overflow: hidden;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
+}
+
+.card--working {
+  border-color: var(--h);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--h) 14%, transparent);
+}
+
+.card--failed,
+.card--refused,
+.card--unreachable {
+  border-left-color: var(--danger);
+}
+
+.card__scene {
+  flex-shrink: 0;
+  width: 4.6rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+}
+
+.card__who {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.card__name {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  font-weight: 650;
+  font-size: 0.92rem;
+}
+
+.card__state {
+  padding: 0.05rem 0.45rem;
+  border-radius: 999px;
+  background: var(--surface-hover);
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 600;
+}
+
+.card--working .card__state {
+  background: var(--h-soft);
+  color: var(--h);
+}
+
+.card--failed .card__state,
+.card--refused .card__state,
+.card--unreachable .card__state {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.card__task {
+  overflow: hidden;
+  color: var(--text);
+  font-size: 0.82rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.card__summary {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.card__body {
+  padding: 0.1rem 0.75rem 0.7rem;
+  border-top: var(--border-width) solid var(--border);
+}
+
+.nested {
+  display: grid;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.steps,
+.tools {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  margin: 0.55rem 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step,
+.tool {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 1.6rem;
+  font-size: 0.84rem;
+}
+
+.step__mark,
+.tool__mark {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+}
+
+.step--done .step__mark,
+.tool--done .tool__mark {
+  background: color-mix(in srgb, var(--success) 18%, transparent);
+  color: var(--success);
+}
+
+.step--todo .step__mark {
+  border: 1.5px solid var(--border);
+}
+
+.step--done .step__text {
+  color: var(--text-muted);
+}
+
+.step--current .step__text {
+  font-weight: 600;
+}
+
+.step--todo .step__text {
+  color: var(--text-muted);
+}
+
+.tool--failed .tool__mark {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+.step__tool,
+.tool__name {
+  flex-shrink: 0;
+  padding: 0.05rem 0.4rem;
+  border-radius: 0.35rem;
+  background: var(--code-surface);
+  color: var(--code-text);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.step__tool {
+  max-width: 45%;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.step__text {
+  flex: 1;
+  min-width: 0;
+}
+
+.tool__detail {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation-duration: 3s;
+  }
+}
