@@ -1,3 +1,4 @@
+import type { ProgressNode } from './agent-progress';
 import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 
 export type AgentMood = 'idle' | 'working' | 'waiting' | 'trouble';
@@ -89,9 +90,31 @@ export function phraseOf(agent: string, mood: AgentMood): string {
 
 export const SUPERVISOR = 'supervisor';
 
-export function delegations(moods: Readonly<Record<string, AgentMood>>): string[] {
-  if (moods[SUPERVISOR] !== 'working') return [];
-  return Object.entries(moods)
-    .filter(([name, mood]) => name !== SUPERVISOR && mood === 'working')
-    .map(([name]) => name);
+export interface Delegation {
+  readonly from: string;
+  readonly to: string;
+}
+
+export function delegationsFrom(
+  samples: readonly { labels: Record<string, string>; value: number }[],
+): Delegation[] {
+  const found: Delegation[] = [];
+  for (const sample of samples) {
+    const service = sample.labels['service_name'] ?? sample.labels['job'] ?? '';
+    const from = SERVICE.exec(service)?.[1];
+    const to = sample.labels['peer'];
+    if (!from || !to || !(sample.value > 0)) continue;
+    if (!found.some((d) => d.from === from && d.to === to)) found.push({ from, to });
+  }
+  return found;
+}
+
+export function delegationsInProgress(
+  agent: string | null,
+  progress: ProgressNode | undefined,
+): Delegation[] {
+  if (!agent || !progress) return [];
+  return progress.agents
+    .filter((child) => child.agent && child.state === 'working')
+    .map((child) => ({ from: agent, to: child.agent! }));
 }

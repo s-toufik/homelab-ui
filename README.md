@@ -134,9 +134,9 @@ Deleting a conversation here removes it from this browser. The server copies exp
 | **Coding**      | An editor typing in colour, a terminal scrolling, hands on the keyboard, coffee steaming        |
 | **Security**    | A camera sweeping, a scan line over a shield, the padlock opening and closing                   |
 
-When the Assistant works at the same time as another agent, the line between them lights up and flows (_"asking Kitchen…"_; on a phone the card says _"asked by Assistant"_). Click an agent for what it is doing, **Ask** and its last conversation or waiting plan.
+While the Assistant waits on a task it handed to an agent, the line between them lights up and flows (_"asking Kitchen…"_; on a phone the card says _"asked by Assistant"_). Click an agent for what it is doing, **Ask** and its last conversation or waiting plan.
 
-An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 5 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. The supervisor does not yet say which agent it is asking, so a line means "both busy at once", which is how it hands work out. Animations stop when the device asks for reduced motion.
+An agent works while it answers anyone: the page reads the agents' open requests from Prometheus every 5 seconds (`http_server_active_requests` by `agent-<name>`), for people who can open Metrics or Dashboards; for others it shows what their own browser is asking. Lines are exact: agent-runtime counts each task it is waiting on (`agent_delegations_active` by `peer`), and the answer streaming in this browser says which agents it asked. Animations stop when the device asks for reduced motion.
 
 <img src="docs/screenshots/agents.webp" alt="The Agents map: the Assistant conducting in the middle, lines flowing to Kitchen (a chef at work) and Observation (a radar sweeping), Security, Travel, Coding and Analysis resting around it" />
 
