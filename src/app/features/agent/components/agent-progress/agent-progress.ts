@@ -1,5 +1,5 @@
 import { NgTemplateOutlet } from '@angular/common';
-import { Component, computed, input, signal } from '@angular/core';
+import { Component, ElementRef, computed, input, signal, viewChild } from '@angular/core';
 import type { AgentMood } from '../../domain/agent-activity';
 import { agentLook } from '../../domain/agent-looks';
 import {
@@ -52,6 +52,8 @@ export class AgentProgress {
   protected readonly STEP_LABELS = STEP_LABELS;
 
   private readonly choice = signal<boolean | null>(null);
+  private readonly details = viewChild<ElementRef<HTMLDialogElement>>('details');
+  protected readonly detailsOpen = signal(false);
 
   protected readonly look = computed(() => agentLook(this.node().agent ?? 'supervisor'));
   protected readonly tools = computed(() => visibleTools(this.node()));
@@ -60,7 +62,11 @@ export class AgentProgress {
   protected readonly working = computed(() => this.node().state === 'working');
   protected readonly stopped = computed(() => this.node().state === 'stopped');
   protected readonly mood = computed<AgentMood>(() => MOODS[this.node().state ?? 'answered']);
-  protected readonly stateText = computed(() => STATE_TEXT[this.node().state ?? 'answered']);
+  protected readonly state = computed<AgentRunState>(() => this.node().state ?? 'answered');
+  protected readonly stateText = computed(() => STATE_TEXT[this.state()]);
+  protected readonly failedTools = computed(
+    () => this.tools().filter((tool) => tool.state === 'failed').length,
+  );
   protected readonly open = computed(() => this.choice() ?? this.working());
   protected readonly ownOpen = computed(() => this.choice() ?? this.streaming());
   protected readonly hasWork = computed(() => this.steps().length > 0 || this.tools().length > 0);
@@ -82,5 +88,30 @@ export class AgentProgress {
 
   protected toggleOwn(): void {
     this.choice.set(!this.ownOpen());
+  }
+
+  protected openDetails(): void {
+    const dialog = this.details()?.nativeElement;
+    this.detailsOpen.set(true);
+    if (dialog && !dialog.open) {
+      try {
+        dialog.showModal();
+      } catch {
+        dialog.setAttribute('open', '');
+      }
+    }
+  }
+
+  protected closeDetails(): void {
+    const dialog = this.details()?.nativeElement;
+    if (dialog?.open) {
+      if (typeof dialog.close === 'function') dialog.close();
+      else dialog.removeAttribute('open');
+    }
+    this.detailsOpen.set(false);
+  }
+
+  protected onDetailsClick(event: MouseEvent): void {
+    if (event.target === event.currentTarget) this.closeDetails();
   }
 }
