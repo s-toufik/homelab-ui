@@ -9,8 +9,10 @@ import { AgentScene } from '../../components/agent-scene/agent-scene';
 import {
   SUPERVISOR,
   activeByAgent,
-  delegations,
+  delegationsFrom,
+  delegationsInProgress,
   moodOf,
+  type Delegation,
   phraseOf,
   type AgentMood,
 } from '../../domain/agent-activity';
@@ -19,6 +21,7 @@ import { agentLook } from '../../domain/agent-looks';
 const POLL_MS = 5_000;
 const ACTIVE_QUERY =
   'sum by (job, service_name) (http_server_active_requests{job=~"(.+/)?agent-.+"})';
+const DELEGATIONS_QUERY = 'sum by (job, service_name, peer) (agent_delegations_active)';
 const NARROW = '(max-width: 767px)';
 
 export interface MapPoint {
@@ -73,7 +76,32 @@ export class AgentsPage {
   private readonly prometheus = inject(PrometheusQueryService);
 
   protected readonly server = signal<Record<string, number>>({});
+  protected readonly serverDelegations = signal<Delegation[]>([]);
   protected readonly serverKnown = signal(false);
+
+  private readonly delegationList = computed<Delegation[]>(() => {
+    const local = this.store.isStreaming()
+      ? delegationsInProgress(
+          this.store.agentName(),
+          [...this.store.messages()].reverse().find((m) => m.role === 'assistant')?.progress,
+        )
+      : [];
+    const all = [...this.serverDelegations()];
+    for (const delegation of local) {
+      if (!all.some((d) => d.from === delegation.from && d.to === delegation.to))
+        all.push(delegation);
+    }
+    return all;
+  });
+
+  protected readonly asking = computed(
+    () =>
+      new Set(
+        this.delegationList()
+          .filter((delegation) => delegation.from === SUPERVISOR)
+          .map((delegation) => delegation.to),
+      ),
+  );
   protected readonly narrow = signal(globalThis.matchMedia?.(NARROW).matches ?? false);
   protected readonly selectedName = signal<string | null>(null);
 
@@ -90,7 +118,9 @@ export class AgentsPage {
       const waitingPlans = this.store.waiting().filter((c) => c.agent === name).length;
       const mood: AgentMood = moodOf({
         localPhase: streaming === name ? this.store.phase() : null,
-        serverActive: this.server()[name] ?? 0,
+        serverActive:
+          (this.server()[name] ?? 0) +
+          this.delegationList().filter((delegation) => delegation.to === name).length,
         waitingPlans,
       });
       return {
@@ -107,13 +137,6 @@ export class AgentsPage {
 
   protected readonly hub = computed(() => this.agents().find((a) => a.name === SUPERVISOR) ?? null);
   protected readonly helpers = computed(() => this.agents().filter((a) => a.name !== SUPERVISOR));
-
-  protected readonly asking = computed(
-    () =>
-      new Set(
-        delegations(Object.fromEntries(this.agents().map((agent) => [agent.name, agent.mood]))),
-      ),
-  );
 
   protected readonly map = computed(() => {
     const { hub, spots } = mapLayout(this.helpers().length, this.narrow());
@@ -156,7 +179,7 @@ export class AgentsPage {
   }
 
   protected stateLabel(mood: AgentMood, asked = false): string {
-    if (asked) return 'asked by Assistant';
+    if (asked) return this.narrow() ? 'asked by Assistant' : 'asked';
     return {
       working: 'working',
       waiting: 'waiting for you',
@@ -166,11 +189,14 @@ export class AgentsPage {
   }
 
   private async poll(): Promise<void> {
-    try {
-      this.server.set(activeByAgent(await this.prometheus.vector(ACTIVE_QUERY)));
-      this.serverKnown.set(true);
-    } catch {
-      this.serverKnown.set(false);
-    }
+    const [active, delegated] = await Promise.allSettled([
+      this.prometheus.vector(ACTIVE_QUERY),
+      this.prometheus.vector(DELEGATIONS_QUERY),
+    ]);
+    if (active.status === 'fulfilled') this.server.set(activeByAgent(active.value));
+    this.serverDelegations.set(
+      delegated.status === 'fulfilled' ? delegationsFrom(delegated.value) : [],
+    );
+    this.serverKnown.set(active.status === 'fulfilled' || delegated.status === 'fulfilled');
   }
 }

@@ -1,4 +1,11 @@
-import { activeByAgent, delegations, moodOf, phraseOf } from './agent-activity';
+import {
+  activeByAgent,
+  delegationsFrom,
+  delegationsInProgress,
+  moodOf,
+  phraseOf,
+} from './agent-activity';
+import { applyProgress, emptyProgress } from './agent-progress';
 
 describe('agent activity', () => {
   it('works while this browser streams or the server is busy, then waits, then rests', () => {
@@ -26,10 +33,30 @@ describe('agent activity', () => {
     expect(phraseOf('unknown', 'idle')).toBe('Resting');
   });
 
-  it('links the supervisor to the agents working while it works', () => {
-    expect(delegations({ supervisor: 'working', kitchen: 'working', travel: 'idle' })).toEqual([
-      'kitchen',
+  it('reads which agent hands a task to which from the delegations metric', () => {
+    expect(
+      delegationsFrom([
+        { labels: { job: 'agent-supervisor', peer: 'observation' }, value: 1 },
+        { labels: { job: 'homelab/agent-supervisor', peer: 'observation' }, value: 1 },
+        { labels: { job: 'agent-supervisor', peer: 'security' }, value: 0 },
+        { labels: { job: 'agent-analysis', peer: 'coding' }, value: 2 },
+        { labels: { job: 'caddy' }, value: 1 },
+      ]),
+    ).toEqual([
+      { from: 'supervisor', to: 'observation' },
+      { from: 'analysis', to: 'coding' },
     ]);
-    expect(delegations({ supervisor: 'idle', kitchen: 'working' })).toEqual([]);
+  });
+
+  it('reads which agents this browser’s answer is waiting on', () => {
+    const progress = [
+      { kind: 'agent' as const, path: [], name: 'observation', state: 'working' },
+      { kind: 'agent' as const, path: [], name: 'security', state: 'answered' },
+    ].reduce(applyProgress, emptyProgress());
+
+    expect(delegationsInProgress('supervisor', progress)).toEqual([
+      { from: 'supervisor', to: 'observation' },
+    ]);
+    expect(delegationsInProgress(null, progress)).toEqual([]);
   });
 });
