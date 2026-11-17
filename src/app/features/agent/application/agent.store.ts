@@ -1,3 +1,4 @@
+import { applyProgress, emptyProgress, parseProgress, settle } from '../domain/agent-progress';
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import type { SwarmPhase } from '@shared/ui/swarm-avatar/swarm-avatar';
 import { newId } from '@shared/utils/uuid';
@@ -237,6 +238,9 @@ export class AgentStore {
           case 'status':
             this.setAssistantStatus(assistantId, event.content);
             break;
+          case 'progress':
+            this.addAssistantProgress(assistantId, event.content);
+            break;
           case 'final':
             this.setAssistantContent(
               assistantId,
@@ -311,6 +315,16 @@ export class AgentStore {
       ...message,
       streaming,
       status: streaming ? message.status : undefined,
+      progress: !streaming && message.progress ? settle(message.progress) : message.progress,
+    }));
+  }
+
+  private addAssistantProgress(id: string, content: string): void {
+    const event = parseProgress(content);
+    if (!event) return;
+    this.updateMessage(id, (message) => ({
+      ...message,
+      progress: applyProgress(message.progress ?? emptyProgress(), event),
     }));
   }
 

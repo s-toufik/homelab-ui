@@ -1,0 +1,137 @@
+<ng-template #work>
+  @if (steps().length) {
+    <ol class="steps" aria-label="Plan">
+      @for (step of steps(); track step.number) {
+        <li class="step" [class]="'step step--' + step.state">
+          <span class="step__mark" aria-hidden="true">
+            @switch (step.state) {
+              @case ('done') {
+                <svg viewBox="0 0 16 16" width="12" height="12">
+                  <path d="M3.5 8.5l3 3 6-7" />
+                </svg>
+              }
+              @case ('current') {
+                <span class="spinner"></span>
+              }
+            }
+          </span>
+          <span class="step__text">
+            <span class="sr-only">{{
+              step.state === 'done' ? 'Done: ' : step.state === 'current' ? 'Now: ' : 'Next: '
+            }}</span
+            >{{ step.action }}
+          </span>
+          @if (step.tool) {
+            <code class="step__tool">{{ step.tool }}</code>
+          }
+        </li>
+      }
+    </ol>
+  }
+  @if (tools().length) {
+    <ul class="tools" aria-label="Tool calls">
+      @for (tool of tools(); track tool.callId) {
+        <li class="tool" [class]="'tool tool--' + tool.state">
+          <span class="tool__mark" aria-hidden="true">
+            @switch (tool.state) {
+              @case ('running') {
+                <span class="spinner"></span>
+              }
+              @case ('done') {
+                <svg viewBox="0 0 16 16" width="12" height="12">
+                  <path d="M3.5 8.5l3 3 6-7" />
+                </svg>
+              }
+              @default {
+                <svg viewBox="0 0 16 16" width="12" height="12">
+                  <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" />
+                </svg>
+              }
+            }
+          </span>
+          <code class="tool__name">{{ tool.name }}</code>
+          @if (tool.detail) {
+            <span class="tool__detail" [title]="tool.detail">{{ tool.detail }}</span>
+          }
+        </li>
+      }
+    </ul>
+  }
+</ng-template>
+
+@if (node().agent; as name) {
+  <article
+    class="card"
+    [class]="'card hue-' + look().hue + ' card--' + (node().state ?? 'answered')"
+    [attr.aria-label]="look().label + ', ' + stateText()"
+  >
+    <button type="button" class="card__head" [attr.aria-expanded]="open()" (click)="toggle()">
+      <app-agent-scene class="card__scene" [agent]="name" [mood]="mood()" [label]="look().label" />
+      <span class="card__who">
+        <span class="card__name">
+          {{ look().label }}
+          <span class="card__state">{{ stateText() }}</span>
+        </span>
+        @if (node().task) {
+          <span class="card__task" [title]="node().task">{{ node().task }}</span>
+        }
+        @if (summary()) {
+          <span class="card__summary">{{ summary() }}</span>
+        }
+      </span>
+      <svg class="card__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+        <path d="M4 6l4 4 4-4" />
+      </svg>
+    </button>
+    @if (open() && (hasWork() || node().agents.length)) {
+      <div class="card__body">
+        <ng-container [ngTemplateOutlet]="work" />
+        @if (node().agents.length) {
+          <div class="nested">
+            @for (child of node().agents; track child.agent) {
+              <app-agent-progress [node]="child" [streaming]="streaming()" />
+            }
+          </div>
+        }
+      </div>
+    }
+  </article>
+} @else {
+  <div class="root">
+    @if (hasWork()) {
+      <div class="own" [class.own--open]="ownOpen()">
+        <button
+          type="button"
+          class="own__head"
+          [attr.aria-expanded]="ownOpen()"
+          (click)="toggleOwn()"
+        >
+          @if (streaming() && (count().done < count().total || tools().length)) {
+            <span class="spinner"></span>
+          } @else {
+            <svg class="own__check" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+              <path d="M3.5 8.5l3 3 6-7" />
+            </svg>
+          }
+          <span class="own__title">{{
+            steps().length ? 'Working through the plan' : 'Tools used'
+          }}</span>
+          <span class="own__summary">{{ summary() }}</span>
+          <svg class="card__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" />
+          </svg>
+        </button>
+        @if (ownOpen()) {
+          <div class="own__body"><ng-container [ngTemplateOutlet]="work" /></div>
+        }
+      </div>
+    }
+    @if (node().agents.length) {
+      <div class="agents" [class.agents--many]="node().agents.length > 1">
+        @for (child of node().agents; track child.agent) {
+          <app-agent-progress [node]="child" [streaming]="streaming()" />
+        }
+      </div>
+    }
+  </div>
+}

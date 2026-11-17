@@ -1,3 +1,4 @@
+import type { ProgressNode } from './agent-progress';
 import type { AnswerMetadata } from './answer-metadata';
 
 export type ChatRole = 'user' | 'assistant';
@@ -10,4 +11,5 @@ export interface ChatMessage {
   status?: string;
   error?: string;
   metadata?: AnswerMetadata;
+  progress?: ProgressNode;
 }

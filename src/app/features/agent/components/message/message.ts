@@ -4,11 +4,13 @@ import { MarkdownPipe } from '@shared/pipes/markdown.pipe';
 import { type SwarmPhase, SwarmAvatar } from '@shared/ui/swarm-avatar/swarm-avatar';
 import { copyText } from '@shared/utils/clipboard';
 import { metadataEntries, usageSummary } from '../../domain/answer-metadata';
+import { hasProgress } from '../../domain/agent-progress';
 import type { ChatMessage } from '../../domain/chat-message';
+import { AgentProgress } from '../agent-progress/agent-progress';
 
 @Component({
   selector: 'app-message',
-  imports: [MarkdownPipe, NgTemplateOutlet, SwarmAvatar],
+  imports: [MarkdownPipe, NgTemplateOutlet, SwarmAvatar, AgentProgress],
   templateUrl: './message.html',
   styleUrl: './message.scss',
 })
@@ -19,6 +21,10 @@ export class Message {
     return /execut|running|tool/i.test(status) ? 'executor' : 'thinking';
   });
   readonly resend = output<string>();
+  protected readonly progress = computed(() => {
+    const progress = this.message().progress;
+    return hasProgress(progress) ? progress : null;
+  });
 
   readonly copied = signal(false);
   readonly detailsOpen = signal(false);
