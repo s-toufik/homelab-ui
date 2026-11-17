@@ -1,6 +1,9 @@
-<ng-template #work>
+<ng-template #work let-full="full">
   @if (steps().length) {
-    <ol class="steps" aria-label="Plan">
+    @if (full) {
+      <h3 class="details__label">Plan · {{ count().done }} of {{ count().total }} steps</h3>
+    }
+    <ol class="steps" [class.steps--full]="full" aria-label="Plan">
       @for (step of steps(); track step.number) {
         <li class="step" [class]="'step step--' + step.state">
           <span class="step__mark" aria-hidden="true">
@@ -32,7 +35,13 @@
     </ol>
   }
   @if (tools().length) {
-    <ul class="tools" aria-label="Tool calls">
+    @if (full) {
+      <h3 class="details__label">
+        Tool calls · {{ tools().length
+        }}{{ failedTools() ? ' · ' + failedTools() + ' failed' : '' }}
+      </h3>
+    }
+    <ul class="tools" [class.tools--full]="full" aria-label="Tool calls">
       @for (tool of tools(); track tool.callId) {
         <li class="tool" [class]="'tool tool--' + tool.state">
           <span class="tool__mark" aria-hidden="true">
@@ -59,7 +68,9 @@
           </span>
           <code class="tool__name">{{ tool.name }}</code>
           @if (tool.detail) {
-            <span class="tool__detail" [title]="tool.detail">{{ tool.detail }}</span>
+            <span class="tool__detail" [attr.title]="full ? null : tool.detail">{{
+              tool.detail
+            }}</span>
           }
         </li>
       }
@@ -73,24 +84,52 @@
     [class]="'card hue-' + look().hue + ' card--' + (node().state ?? 'answered')"
     [attr.aria-label]="look().label + ', ' + stateText()"
   >
-    <button type="button" class="card__head" [attr.aria-expanded]="open()" (click)="toggle()">
-      <app-agent-scene class="card__scene" [agent]="name" [mood]="mood()" [label]="look().label" />
-      <span class="card__who">
-        <span class="card__name">
-          {{ look().label }}
-          <span class="card__state">{{ stateText() }}</span>
+    <div class="card__head">
+      <button type="button" class="card__toggle" [attr.aria-expanded]="open()" (click)="toggle()">
+        <app-agent-scene
+          class="card__scene"
+          [agent]="name"
+          [mood]="mood()"
+          [label]="look().label"
+        />
+        <span class="card__who">
+          <span class="card__name">
+            {{ look().label }}
+            <span [class]="'card__state card__state--' + state()">{{ stateText() }}</span>
+          </span>
+          @if (node().task) {
+            <span class="card__task" [title]="node().task">{{ node().task }}</span>
+          }
+          @if (summary()) {
+            <span class="card__summary">{{ summary() }}</span>
+          }
         </span>
-        @if (node().task) {
-          <span class="card__task" [title]="node().task">{{ node().task }}</span>
-        }
-        @if (summary()) {
-          <span class="card__summary">{{ summary() }}</span>
-        }
-      </span>
-      <svg class="card__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-        <path d="M4 6l4 4 4-4" />
-      </svg>
-    </button>
+      </button>
+      <button
+        type="button"
+        class="card__icon"
+        aria-haspopup="dialog"
+        [attr.aria-label]="'Open ' + look().label + '’s details'"
+        title="Open details"
+        (click)="openDetails()"
+      >
+        <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+          <path d="M3 6.5V3h3.5M9.5 3H13v3.5M13 9.5V13H9.5M6.5 13H3V9.5" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="card__icon"
+        [class.card__icon--folded]="!open()"
+        tabindex="-1"
+        aria-hidden="true"
+        (click)="toggle()"
+      >
+        <svg class="card__chevron" viewBox="0 0 16 16" width="14" height="14">
+          <path d="M4 6l4 4 4-4" />
+        </svg>
+      </button>
+    </div>
     @if (open() && (hasWork() || node().agents.length)) {
       <div class="card__body">
         <ng-container [ngTemplateOutlet]="work" />
@@ -103,6 +142,54 @@
         }
       </div>
     }
+    <dialog
+      #details
+      class="details"
+      [attr.aria-label]="look().label + ', ' + stateText()"
+      (close)="detailsOpen.set(false)"
+      (click)="onDetailsClick($event)"
+    >
+      @if (detailsOpen()) {
+        <div class="details__panel">
+          <header class="details__head">
+            <app-agent-scene
+              class="details__scene"
+              [agent]="name"
+              [mood]="mood()"
+              [label]="look().label"
+            />
+            <div class="details__who">
+              <h2 class="details__name">
+                {{ look().label }}
+                <span [class]="'card__state card__state--' + state()">{{ stateText() }}</span>
+              </h2>
+              @if (node().task) {
+                <p class="details__task">{{ node().task }}</p>
+              }
+            </div>
+            <button type="button" class="card__icon" aria-label="Close" (click)="closeDetails()">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" />
+              </svg>
+            </button>
+          </header>
+          <div class="details__body">
+            <ng-container [ngTemplateOutlet]="work" [ngTemplateOutletContext]="{ full: true }" />
+            @if (node().agents.length) {
+              <h3 class="details__label">Agents it asked</h3>
+              <div class="nested">
+                @for (child of node().agents; track child.agent) {
+                  <app-agent-progress [node]="child" [streaming]="streaming()" />
+                }
+              </div>
+            }
+            @if (!hasWork() && !node().agents.length) {
+              <p class="details__empty">Nothing to show yet: no plan or tool calls so far.</p>
+            }
+          </div>
+        </div>
+      }
+    </dialog>
   </article>
 } @else {
   <div class="root">
