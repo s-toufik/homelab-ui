@@ -8,6 +8,7 @@ import { provideRouter } from '@angular/router';
 import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { provideShellCommands } from '@shell/application/shell-commands';
 import { ThemeStore } from '@shell/application/theme.store';
+import { CastStore } from '@shell/application/cast.store';
 
 import { provideAccountFeature } from '@features/account/account.feature';
 import { provideAgentFeature } from '@features/agent/agent.feature';
@@ -34,8 +35,12 @@ export const appConfig: ApplicationConfig = {
     provideAppInitializer(() => {
       const session = inject(GatewaySession);
       const theme = inject(ThemeStore);
+      const cast = inject(CastStore);
       session.watch();
-      return session.load().then(() => void theme.loadFromAccount());
+      return session.load().then(() => {
+        void theme.loadFromAccount();
+        void cast.loadFromAccount();
+      });
     }),
     provideRouter(routes),
     provideShellCommands(),

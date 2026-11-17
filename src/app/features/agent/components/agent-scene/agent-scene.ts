@@ -3,15 +3,23 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
+  computed,
   effect,
   inject,
   input,
   untracked,
   viewChild,
 } from '@angular/core';
+import { CastStore } from '@shell/application/cast.store';
+import type { CastId } from '@shell/domain/agent-cast';
 import type { AgentMood } from '../../domain/agent-activity';
+import {
+  frameAt,
+  SpriteSheets,
+  type SpriteSheet,
+} from '../../infrastructure/sprites/sprite-sheets';
 import { FRAME_MS, HEIGHT, WIDTH } from './pixel-frame';
-import { paint } from './pixel-scenes';
+import { isDrawnCast, loadCast, paint, type DrawnCast } from './pixel-scenes';
 
 type Tick = (frame: number) => void;
 
@@ -35,26 +43,27 @@ function listen(tick: Tick): () => void {
   return () => ticks.delete(tick);
 }
 
+function drawn(cast: CastId): DrawnCast {
+  return isDrawnCast(cast) ? cast : 'homelab';
+}
+
 @Component({
   selector: 'app-agent-scene',
-  template: `<canvas
-    #canvas
-    [attr.width]="width"
-    [attr.height]="height"
-    role="img"
-    [attr.aria-label]="label()"
-  ></canvas>`,
+  template: `<canvas #canvas role="img" [attr.aria-label]="label()"></canvas>`,
   styleUrl: './agent-scene.scss',
 })
 export class AgentScene {
   readonly agent = input.required<string>();
   readonly mood = input<AgentMood>('idle');
   readonly label = input('');
+  readonly cast = input<CastId | null>(null);
 
-  protected readonly width = WIDTH;
-  protected readonly height = HEIGHT;
+  private readonly casts = inject(CastStore);
+  private readonly sprites = inject(SpriteSheets);
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('canvas');
+  private readonly activeCast = computed<CastId>(() => this.cast() ?? this.casts.active());
   private context: CanvasRenderingContext2D | null = null;
+  private sheet: SpriteSheet | null = null;
   private frame = 0;
   private visible = true;
 
@@ -62,8 +71,13 @@ export class AgentScene {
     const destroyRef = inject(DestroyRef);
     effect(() => {
       const agent = this.agent();
-      const mood = this.mood();
-      untracked(() => this.render(agent, mood));
+      const cast = this.activeCast();
+      untracked(() => this.loadSheet(agent, cast));
+    });
+    effect(() => {
+      this.mood();
+      this.activeCast();
+      untracked(() => this.render());
     });
     afterNextRender(() => {
       const element = this.canvas().nativeElement;
@@ -72,8 +86,8 @@ export class AgentScene {
       } catch {
         this.context = null;
       }
-      this.render(this.agent(), this.mood());
-      const still = matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
+      this.render();
+      const still = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
       if (still) return;
       let observer: IntersectionObserver | null = null;
       if (typeof IntersectionObserver === 'function') {
@@ -82,7 +96,7 @@ export class AgentScene {
       }
       const stop = listen((frame) => {
         this.frame = frame;
-        if (this.visible) this.render(this.agent(), this.mood());
+        if (this.visible) this.render();
       });
       destroyRef.onDestroy(() => {
         stop();
@@ -91,9 +105,38 @@ export class AgentScene {
     });
   }
 
-  private render(agent: string, mood: AgentMood): void {
-    if (!this.context) return;
-    const image = new ImageData(paint(agent, mood, this.frame).bytes(), WIDTH, HEIGHT);
-    this.context.putImageData(image, 0, 0);
+  private loadSheet(agent: string, cast: CastId): void {
+    this.sheet = null;
+    void loadCast(drawn(cast)).then(() => {
+      if (this.activeCast() === cast) this.render();
+    });
+    if (cast !== 'sprites') return;
+    void this.sprites.load(agent).then((sheet) => {
+      if (this.agent() !== agent || this.activeCast() !== 'sprites') return;
+      this.sheet = sheet;
+      this.render();
+    });
+  }
+
+  private render(): void {
+    const context = this.context;
+    if (!context) return;
+    const canvas = context.canvas;
+    const sheet = this.activeCast() === 'sprites' ? this.sheet : null;
+    const width = sheet?.frameWidth ?? WIDTH;
+    const height = sheet?.frameHeight ?? HEIGHT;
+    if (canvas.width !== width || canvas.height !== height) {
+      canvas.width = width;
+      canvas.height = height;
+    }
+    if (sheet) {
+      const { x, y } = frameAt(sheet, this.mood(), this.frame);
+      context.imageSmoothingEnabled = false;
+      context.clearRect(0, 0, width, height);
+      context.drawImage(sheet.image, x, y, width, height, 0, 0, width, height);
+      return;
+    }
+    const pixels = paint(this.agent(), this.mood(), this.frame, drawn(this.activeCast()));
+    context.putImageData(new ImageData(pixels.bytes(), WIDTH, HEIGHT), 0, 0);
   }
 }

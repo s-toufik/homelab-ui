@@ -1,6 +1,10 @@
 import { Component, computed, inject } from '@angular/core';
+import { AgentScene } from '@features/agent/components/agent-scene/agent-scene';
+import { agentLook } from '@features/agent/domain/agent-looks';
 import { GatewaySession } from '@shared/infrastructure/gateway-session';
+import { CastStore } from '../application/cast.store';
 import { ThemeStore } from '../application/theme.store';
+import { CASTS, castForTheme, castOption } from '../domain/agent-cast';
 import {
   DAY_THEME,
   NIGHT_THEME,
@@ -11,11 +15,26 @@ import {
 
 @Component({
   selector: 'app-appearance',
+  imports: [AgentScene],
   templateUrl: './appearance.html',
   styleUrl: './appearance.scss',
 })
 export class Appearance {
   protected readonly theme = inject(ThemeStore);
+  protected readonly cast = inject(CastStore);
+  protected readonly casts = CASTS;
+  protected readonly actors = [
+    'supervisor',
+    'kitchen',
+    'travel',
+    'observation',
+    'analysis',
+    'coding',
+    'security',
+  ].map((name) => ({ name, label: agentLook(name).label }));
+  protected readonly themeCast = computed(() => castForTheme(this.theme.active()));
+  protected readonly themeCastName = computed(() => castOption(this.themeCast()).name);
+  protected readonly activeCastName = computed(() => castOption(this.cast.active()).name);
   private readonly session = inject(GatewaySession);
   protected readonly groups = [
     { title: 'Everyday', themes: THEMES.filter((option) => !option.storybook) },

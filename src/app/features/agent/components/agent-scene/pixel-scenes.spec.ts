@@ -1,6 +1,6 @@
 import type { AgentMood } from '../../domain/agent-activity';
 import { HEIGHT, PixelFrame, WIDTH, color } from './pixel-frame';
-import { SCENES, paint, sceneFor } from './pixel-scenes';
+import { DRAWN_CASTS, SCENES, castScenes, loadCast, paint, sceneFor } from './pixel-scenes';
 
 const MOODS: readonly AgentMood[] = ['idle', 'working', 'waiting', 'trouble'];
 
@@ -8,25 +8,39 @@ function same(a: PixelFrame, b: PixelFrame): boolean {
   return a.pixels.every((value, index) => value === b.pixels[index]);
 }
 
-describe('pixel scenes', () => {
-  for (const agent of Object.keys(SCENES)) {
-    it(`paints every pixel of ${agent}'s scene in every mood`, () => {
-      for (const mood of MOODS)
-        for (const frame of [0, 7, 31])
-          expect(paint(agent, mood, frame).pixels.every((value) => value !== 0)).toBe(true);
-    });
+const AGENTS = Object.keys(SCENES);
 
-    it(`moves ${agent} while working and shows each mood differently`, () => {
-      const frames = [0, 3, 5, 9, 14].map((frame) => paint(agent, 'working', frame));
-      expect(frames.some((frame) => !same(frame, frames[0]))).toBe(true);
-      const moods = MOODS.map((mood) => paint(agent, mood, 1));
-      for (let i = 0; i < moods.length; i++)
-        for (let j = i + 1; j < moods.length; j++) expect(same(moods[i], moods[j])).toBe(false);
-    });
+describe('pixel scenes', () => {
+  beforeAll(async () => {
+    await Promise.all(DRAWN_CASTS.map((cast) => loadCast(cast)));
+  });
+
+  for (const cast of DRAWN_CASTS) {
+    for (const agent of AGENTS) {
+      it(`paints every pixel of ${cast}'s ${agent} in every mood`, () => {
+        for (const mood of MOODS)
+          for (const frame of [0, 7, 31])
+            expect(paint(agent, mood, frame, cast).pixels.every((value) => value !== 0)).toBe(true);
+      });
+
+      it(`moves ${cast}'s ${agent} while working and shows each mood differently`, () => {
+        const frames = [0, 3, 5, 9, 14].map((frame) => paint(agent, 'working', frame, cast));
+        expect(frames.some((frame) => !same(frame, frames[0]))).toBe(true);
+        const moods = MOODS.map((mood) => paint(agent, mood, 1, cast));
+        for (let i = 0; i < moods.length; i++)
+          for (let j = i + 1; j < moods.length; j++) expect(same(moods[i], moods[j])).toBe(false);
+      });
+    }
   }
 
-  it('gives unknown agents the Maestro', () => {
+  it('gives every cast all seven agents', () => {
+    for (const cast of DRAWN_CASTS)
+      expect(Object.keys(castScenes(cast) ?? {}).sort()).toEqual([...AGENTS].sort());
+  });
+
+  it('gives unknown agents the cast’s Assistant', () => {
     expect(sceneFor('supervisor')).toBe(SCENES['assistant']);
+    expect(sceneFor('supervisor', 'pocket')).toBe(castScenes('pocket')?.['assistant']);
   });
 });
 
