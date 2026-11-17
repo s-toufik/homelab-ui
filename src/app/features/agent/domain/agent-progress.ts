@@ -1,7 +1,8 @@
-export type StepState = 'done' | 'current' | 'todo';
-export type ToolState = 'running' | 'done' | 'failed';
+export type StepState = 'done' | 'current' | 'todo' | 'stopped';
+export type ToolState = 'running' | 'done' | 'failed' | 'stopped';
 export type AgentRunState =
-  'working' | 'answered' | 'needs_input' | 'refused' | 'failed' | 'unreachable';
+  'working' | 'answered' | 'needs_input' | 'refused' | 'failed' | 'unreachable' | 'stopped';
+export type RunEnd = 'answered' | 'stopped';
 
 export const DELEGATE_TOOL = 'delegate_tasks';
 
@@ -130,6 +131,7 @@ function agentState(value: string | undefined): AgentRunState {
     'refused',
     'failed',
     'unreachable',
+    'stopped',
   ];
   return known.includes(value as AgentRunState) ? (value as AgentRunState) : 'working';
 }
@@ -151,13 +153,18 @@ export function stepCount(node: ProgressNode): { done: number; total: number } {
   };
 }
 
-export function settle(node: ProgressNode): ProgressNode {
+export function settle(node: ProgressNode, end: RunEnd = 'answered'): ProgressNode {
+  const stopped = end === 'stopped';
+  const unfinished = node.state === 'working' || (node.state === null && stopped);
   return {
     ...node,
-    state: node.state === 'working' ? 'answered' : node.state,
-    tools: node.tools.map((tool) =>
-      tool.state === 'running' ? { ...tool, state: 'done' as const } : tool,
+    state: unfinished ? end : node.state,
+    steps: node.steps.map((step) =>
+      step.state === 'current' ? { ...step, state: stopped ? 'stopped' : 'done' } : step,
     ),
-    agents: node.agents.map(settle),
+    tools: node.tools.map((tool) =>
+      tool.state === 'running' ? { ...tool, state: stopped ? 'stopped' : 'done' } : tool,
+    ),
+    agents: node.agents.map((child) => settle(child, end)),
   };
 }

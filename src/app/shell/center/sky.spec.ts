@@ -5,7 +5,9 @@ import {
   project,
   rotate,
   shortestAngle,
+  galaxy,
   starField,
+  STAR_TONES,
   toVector,
   zoomAt,
   type View,
@@ -72,5 +74,18 @@ describe('sky globe', () => {
 
   it('builds the same star field every time', () => {
     expect(starField(50)).toEqual(starField(50));
+    expect(starField(50).every((star) => star.tone >= 0 && star.tone < STAR_TONES.length)).toBe(
+      true,
+    );
+  });
+
+  it('thickens the Milky Way and its glow towards the galactic core', () => {
+    const { clouds, dust } = galaxy(2000);
+    const bright = clouds.filter((cloud) => cloud.warm);
+    expect(clouds).toHaveLength(2000);
+    expect(dust.length).toBeGreaterThan(0);
+    expect(bright.length).toBeGreaterThan(100);
+    expect(bright.length).toBeLessThan(clouds.length / 2);
+    expect(galaxy(10)).toEqual(galaxy(10));
   });
 });

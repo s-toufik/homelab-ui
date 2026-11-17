@@ -91,6 +91,50 @@ describe('agent progress', () => {
     expect(tree.agents[0].tools[0].state).toBe('done');
   });
 
+  it('finishes the current step when the answer arrives', () => {
+    const tree = settle(
+      run({
+        kind: 'plan',
+        path: [],
+        steps: [
+          { number: 1, action: 'Ask', tool: 'delegate_tasks', state: 'current' },
+          { number: 2, action: 'Combine', tool: null, state: 'todo' },
+        ],
+      }),
+    );
+
+    expect(tree.steps.map((step) => step.state)).toEqual(['done', 'todo']);
+    expect(tree.state).toBeNull();
+  });
+
+  it('marks what was cut short as stopped when the request is cancelled', () => {
+    const tree = settle(
+      run(
+        {
+          kind: 'plan',
+          path: [],
+          steps: [
+            { number: 1, action: 'Ask', tool: 'delegate_tasks', state: 'current' },
+            { number: 2, action: 'Combine', tool: null, state: 'todo' },
+          ],
+        },
+        { kind: 'agent', path: [], name: 'kitchen', state: 'working' },
+        { kind: 'agent', path: [], name: 'travel', state: 'working' },
+        { kind: 'agent', path: [], name: 'travel', state: 'answered' },
+        { kind: 'tool', path: ['kitchen'], callId: 'c1', name: 'recipes', state: 'running' },
+      ),
+      'stopped',
+    );
+
+    expect(tree.state).toBe('stopped');
+    expect(tree.steps.map((step) => step.state)).toEqual(['stopped', 'todo']);
+    expect(tree.agents.map((a) => [a.agent, a.state])).toEqual([
+      ['kitchen', 'stopped'],
+      ['travel', 'answered'],
+    ]);
+    expect(tree.agents[0].tools[0].state).toBe('stopped');
+  });
+
   it('reads progress frames and ignores anything else', () => {
     expect(parseProgress('{"kind":"plan","path":["observation"],"steps":[]}')).toMatchObject({
       kind: 'plan',

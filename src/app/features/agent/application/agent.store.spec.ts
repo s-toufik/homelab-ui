@@ -65,6 +65,26 @@ describe('AgentStore', () => {
     expect(reply.status).toBeUndefined();
   });
 
+  it('shows the agents it was waiting on as stopped, not answered, after a cancel', async () => {
+    const api = {
+      async *stream(): AsyncGenerator<StreamEvent> {
+        yield event('progress', '{"kind":"agent","path":[],"name":"kitchen","state":"working"}');
+        throw new DOMException('The user aborted a request.', 'AbortError');
+      },
+    };
+    TestBed.configureTestingModule({ providers: [{ provide: AgentApiService, useValue: api }] });
+    const store = TestBed.inject(AgentStore);
+    store.draft.set('salad please');
+
+    await store.send();
+
+    const reply = store.messages().at(-1)!;
+    expect(reply.streaming).toBe(false);
+    expect(reply.progress?.state).toBe('stopped');
+    expect(reply.progress?.agents[0].state).toBe('stopped');
+    expect(store.requestError()).toBeNull();
+  });
+
   it('replaces the bubble with the final content', async () => {
     const store = storeStreaming([
       event('token', 'draft'),

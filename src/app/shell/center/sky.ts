@@ -158,41 +158,104 @@ function figure(
   return lines;
 }
 
+export const STAR_TONES = [
+  '#9BB0FF',
+  '#CAD7FF',
+  '#F8F7FF',
+  '#FFF4EA',
+  '#FFD2A1',
+  '#FFAD51',
+] as const;
+
 export interface FieldStar {
+  readonly vector: Vector;
+  readonly size: number;
+  readonly alpha: number;
+  readonly tone: number;
+  readonly phase: number;
+  readonly spikes: boolean;
+}
+
+export interface Cloud {
   readonly vector: Vector;
   readonly size: number;
   readonly alpha: number;
   readonly warm: boolean;
 }
 
+export interface Galaxy {
+  readonly clouds: readonly Cloud[];
+  readonly dust: readonly Cloud[];
+}
+
+const GALAXY_TILT = 62 * DEG;
+const GALACTIC_CORE = 30;
+
+function onBand(along: number, off: number): Vector {
+  const base = toVector(along, off);
+  return [
+    base[0],
+    base[1] * Math.cos(GALAXY_TILT) - base[2] * Math.sin(GALAXY_TILT),
+    base[1] * Math.sin(GALAXY_TILT) + base[2] * Math.cos(GALAXY_TILT),
+  ];
+}
+
+function nearCore(along: number): number {
+  const from = ((((along - GALACTIC_CORE) % 360) + 540) % 360) - 180;
+  return Math.exp(-((from / 55) ** 2));
+}
+
+function gaussian(random: () => number): number {
+  return random() + random() + random() - 1.5;
+}
+
 export function starField(count: number, seed = 7): FieldStar[] {
   const random = mulberry32(seed);
   const stars: FieldStar[] = [];
+  const star = (vector: Vector, bright: number): FieldStar => ({
+    vector,
+    size: 0.45 + bright ** 3 * 1.9,
+    alpha: 0.25 + bright * 0.7,
+    tone: Math.floor(random() * STAR_TONES.length),
+    phase: random() * Math.PI * 2,
+    spikes: bright > 0.985,
+  });
   for (let i = 0; i < count; i++) {
     const lon = random() * 360;
     const lat = Math.asin(2 * random() - 1) / DEG;
-    const bright = random();
-    stars.push({
-      vector: toVector(lon, lat),
-      size: bright > 0.97 ? 1.6 : bright > 0.85 ? 1.1 : 0.7,
-      alpha: 0.25 + bright * 0.6,
-      warm: random() > 0.8,
-    });
+    stars.push(star(toVector(lon, lat), random()));
   }
-  const band = mulberry32(seed + 1);
-  for (let i = 0; i < count * 1.6; i++) {
-    const along = band() * 360;
-    const off = (band() + band() + band() - 1.5) * 9;
-    const tilt = 62 * DEG;
-    const base = toVector(along, off);
-    const vector: Vector = [
-      base[0],
-      base[1] * Math.cos(tilt) - base[2] * Math.sin(tilt),
-      base[1] * Math.sin(tilt) + base[2] * Math.cos(tilt),
-    ];
-    stars.push({ vector, size: 0.55, alpha: 0.12 + band() * 0.22, warm: false });
+  for (let i = 0; i < count * 0.7; i++) {
+    const along = random() * 360;
+    stars.push(star(onBand(along, gaussian(random) * 8), random() * 0.8));
   }
   return stars;
+}
+
+export function galaxy(count: number, seed = 5): Galaxy {
+  const random = mulberry32(seed);
+  const clouds: Cloud[] = [];
+  for (let i = 0; i < count; i++) {
+    const along = random() * 360;
+    const core = nearCore(along);
+    clouds.push({
+      vector: onBand(along, gaussian(random) * (5 + 6 * core)),
+      size: 0.012 + random() * 0.03 * (1 + core),
+      alpha: 0.03 + 0.06 * core * random(),
+      warm: core > 0.35 && random() < 0.7,
+    });
+  }
+  const dust: Cloud[] = [];
+  for (let i = 0; i < count * 0.28; i++) {
+    const along = random() * 360;
+    dust.push({
+      vector: onBand(along, gaussian(random) * 1.2),
+      size: 0.008 + random() * 0.018 * (1 + nearCore(along)),
+      alpha: 0.18 + 0.15 * nearCore(along),
+      warm: false,
+    });
+  }
+  return { clouds, dust };
 }
 
 function mulberry32(seed: number): () => number {
