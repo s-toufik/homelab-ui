@@ -8,6 +8,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { RecipeEditorStore } from '../../application/recipe-editor.store';
 import { KitchenToastStore } from '../../application/kitchen-toast.store';
 import { IngredientList } from '../../components/ingredient-list/ingredient-list';
@@ -29,6 +31,7 @@ const SECTIONS = [
   selector: 'app-kitchen-page',
   imports: [
     DecimalPipe,
+    RouterLink,
     RecipePicker,
     VersionHistory,
     RecipeOverview,
@@ -44,12 +47,21 @@ export class KitchenPage implements AfterViewInit {
   protected readonly store = inject(RecipeEditorStore);
   protected readonly toast = inject(KitchenToastStore);
   private readonly destroyRef = inject(DestroyRef);
+  private readonly route = inject(ActivatedRoute);
 
   protected readonly sections = SECTIONS;
   protected readonly activeSection = signal<string>(SECTIONS[0].id);
   protected readonly headerHeight = signal(72);
 
   private readonly header = viewChild<ElementRef<HTMLElement>>('header');
+  private readonly query = toSignal(this.route.queryParamMap, {
+    initialValue: this.route.snapshot.queryParamMap,
+  });
+
+  constructor() {
+    const recipeId = this.query().get('recipe');
+    if (recipeId) void this.store.load(recipeId);
+  }
 
   ngAfterViewInit(): void {
     const element = this.header()?.nativeElement;

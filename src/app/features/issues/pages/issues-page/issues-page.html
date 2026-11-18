@@ -1,0 +1,116 @@
+<div class="hl-page hl-page--narrow">
+  <app-page-header
+    title="Report an issue"
+    eyebrow="Feedback"
+    summary="Something look or behave wrong? Tell me what happened — a picture helps a lot."
+  />
+
+  <section class="hl-card">
+    @if (form.state() === 'sent') {
+      <div class="issues-page__sent">
+        <p class="hl-badge hl-badge--ok">Thanks — got it.</p>
+        <p class="hl-muted">I'll take a look. You can send another one any time.</p>
+        <button type="button" class="hl-btn" (click)="form.reset()">Report another issue</button>
+      </div>
+    } @else {
+      <form class="issues-page__form" (ngSubmit)="submit()">
+        @if (form.error(); as error) {
+          <p class="hl-error" role="alert">{{ error }}</p>
+        }
+        <label class="hl-field">
+          What's wrong, in a few words
+          <input
+            class="hl-input"
+            name="title"
+            placeholder="e.g. Portions stepper buttons overlap on mobile"
+            [ngModel]="form.title()"
+            (ngModelChange)="form.title.set($event)"
+            maxlength="200"
+          />
+        </label>
+        <label class="hl-field">
+          What happened, what did you expect instead
+          <textarea
+            class="hl-input"
+            name="description"
+            rows="5"
+            placeholder="What were you doing when it happened? What did you expect to see?"
+            [ngModel]="form.description()"
+            (ngModelChange)="form.description.set($event)"
+            maxlength="4000"
+          ></textarea>
+        </label>
+        <label class="hl-field">
+          Screenshot (optional)
+          <app-screenshot-picker
+            [preview]="form.screenshot()"
+            (picked)="form.attach($event.file, $event.name)"
+            (cleared)="form.clearScreenshot()"
+          />
+        </label>
+        <div class="hl-row">
+          <button
+            type="submit"
+            class="hl-btn hl-btn--primary"
+            [disabled]="form.state() === 'submitting'"
+          >
+            {{ form.state() === 'submitting' ? 'Sending…' : 'Send report' }}
+          </button>
+        </div>
+      </form>
+    }
+  </section>
+
+  @if (access.isAdmin()) {
+    <section class="hl-card">
+      <div class="hl-row issues-page__head">
+        <h2 class="hl-card__title">Reported issues</h2>
+        <button type="button" class="hl-btn hl-btn--small" (click)="list.load()">Refresh</button>
+      </div>
+
+      @if (list.error(); as error) {
+        <p class="hl-error" role="alert">{{ error }}</p>
+      }
+
+      @if (list.state() === 'loading') {
+        <p class="hl-empty">Loading…</p>
+      } @else if (list.reports().length === 0) {
+        <p class="hl-empty">No reports yet.</p>
+      } @else {
+        <ul class="issues-page__list">
+          @for (report of list.reports(); track report.id) {
+            <li class="issues-page__report">
+              @if (report.screenshotDataUrl; as url) {
+                <a [href]="url" target="_blank" rel="noopener" class="issues-page__thumb">
+                  <img [src]="url" alt="" />
+                </a>
+              }
+              <div class="issues-page__report-body">
+                <div class="hl-row issues-page__report-head">
+                  <strong>{{ report.title }}</strong>
+                  <span class="hl-badge" [class]="badgeClass(report.status)">
+                    {{ statusLabel[report.status] }}
+                  </span>
+                </div>
+                <p class="issues-page__description">{{ report.description }}</p>
+                <p class="hl-muted hl-mono">
+                  {{ report.reporter }} · {{ report.pagePath }} ·
+                  {{ report.createdAt | date: 'medium' }}
+                </p>
+              </div>
+              <select
+                class="hl-input issues-page__status"
+                [ngModel]="report.status"
+                (change)="onStatusChange(report.id, $event)"
+              >
+                @for (status of statuses; track status) {
+                  <option [value]="status">{{ statusLabel[status] }}</option>
+                }
+              </select>
+            </li>
+          }
+        </ul>
+      }
+    </section>
+  }
+</div>

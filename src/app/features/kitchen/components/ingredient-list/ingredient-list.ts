@@ -70,16 +70,43 @@ export class IngredientList {
     this.editingIndex.set(null);
   }
 
-  protected saveMacroModal(): void {
+  protected async saveMacroModal(): Promise<void> {
     const index = this.editingIndex();
     if (index === null) return;
-    this.store.updateIngredient(index, {
+    const line = this.store.draft().ingredients[index];
+    if (!line) return;
+
+    const macros = {
       kcalPer100g: Math.max(0, this.modalKcal()),
       proteinPer100g: Math.max(0, this.modalProtein()),
       carbPer100g: Math.max(0, this.modalCarb()),
       fatPer100g: Math.max(0, this.modalFat()),
-    });
+    };
+    this.store.updateIngredient(index, macros);
     this.editingIndex.set(null);
-    this.toast.show('Updated custom ingredient macros');
+
+    if (line.ingredientRefId || !line.name.trim()) {
+      this.toast.show('Updated custom ingredient macros');
+      return;
+    }
+
+    try {
+      const ingredient = await this.ingredients.getOrCreate(line.name, macros);
+      this.store.updateIngredient(index, {
+        name: ingredient.nameFr,
+        ingredientRefId: ingredient.ciqualCode,
+        kcalPer100g: ingredient.kcalPer100g,
+        proteinPer100g: ingredient.proteinPer100g,
+        carbPer100g: ingredient.carbPer100g,
+        fatPer100g: ingredient.fatPer100g,
+      });
+      this.toast.show(
+        ingredient.source === 'custom'
+          ? `${ingredient.nameFr} added to the catalog`
+          : `Matched to ${ingredient.nameFr} in the catalog`,
+      );
+    } catch {
+      this.toast.show("Couldn't save to the catalog — kept locally for this recipe");
+    }
   }
 }

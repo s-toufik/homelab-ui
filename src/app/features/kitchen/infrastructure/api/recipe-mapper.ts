@@ -49,6 +49,7 @@ interface NutritionJson {
 export interface RecipeSummaryJson {
   readonly id: string;
   readonly title: string;
+  readonly course: string;
   readonly current_version_number: number;
   readonly created_at: string;
   readonly updated_at: string;
@@ -67,6 +68,7 @@ export function recipeSummaryFromJson(json: RecipeSummaryJson): RecipeSummary {
   return {
     id: json.id,
     title: json.title,
+    course: json.course,
     currentVersionNumber: json.current_version_number,
     createdAt: json.created_at,
     updatedAt: json.updated_at,

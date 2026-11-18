@@ -1,0 +1,33 @@
+@if (preview(); as url) {
+  <div class="screenshot-picker__preview">
+    <img [src]="url" alt="Attached screenshot" />
+    <button type="button" class="hl-btn hl-btn--small" (click)="clear()">Remove</button>
+  </div>
+} @else {
+  <button
+    type="button"
+    class="screenshot-picker__drop"
+    [class.screenshot-picker__drop--over]="dragOver()"
+    (click)="openPicker()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+    (drop)="onDrop($event)"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      width="22"
+      height="22"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.8"
+    >
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M4 16.5V18a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-1.5M7 9l5-5 5 5M12 4v12"
+      />
+    </svg>
+    <span>Drop a screenshot, paste it (⌘V), or click to choose a file</span>
+  </button>
+}
+<input #fileInput type="file" accept="image/*" hidden (change)="onFileChange($event)" />

@@ -53,6 +53,34 @@
     <div class="kitchen-header__actions">
       <app-recipe-picker />
       <app-version-history />
+      <a
+        class="kitchen-header__btn"
+        routerLink="/kitchen/recipes"
+        title="Browse saved recipes"
+        aria-label="Browse saved recipes"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15Z"
+          />
+        </svg>
+      </a>
+      <a
+        class="kitchen-header__btn"
+        routerLink="/kitchen/ingredients"
+        title="Browse the ingredient catalog"
+        aria-label="Browse the ingredient catalog"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 2a7 7 0 0 0-7 7c0 2.5 1.3 4.2 2.5 5.7C8.6 16 9 17 9 18v1a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1c0-1 .4-2 1.5-3.3C17.7 13.2 19 11.5 19 9a7 7 0 0 0-7-7ZM9 21h6"
+          />
+        </svg>
+      </a>
       <button
         type="button"
         class="kitchen-header__btn"
