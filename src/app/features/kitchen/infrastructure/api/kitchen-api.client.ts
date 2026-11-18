@@ -18,7 +18,7 @@ export class KitchenApiClient {
   async post<T>(path: string, body: unknown): Promise<T> {
     return this.request<T>(path, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'X-Homelab-Request': '1' },
       body: JSON.stringify(body),
     });
   }

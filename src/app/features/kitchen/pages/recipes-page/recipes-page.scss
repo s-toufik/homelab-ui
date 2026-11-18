@@ -1,0 +1,26 @@
+.recipes-page__title {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-caps, var(--font-sans));
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.recipes-page__card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3rem;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+  }
+}
+
+.recipes-page__name {
+  font-size: 0.95rem;
+}

@@ -1,0 +1,52 @@
+<div class="hl-page">
+  <app-page-header
+    title="Recipes"
+    summary="Every saved recipe, grouped by course. Opening one loads its latest version in the atelier."
+  >
+    <a class="hl-btn" routerLink="/kitchen">Back to atelier</a>
+  </app-page-header>
+
+  @if (store.error()) {
+    <p class="hl-error" role="alert">{{ store.error() }}</p>
+  }
+
+  @if (store.state() === 'loading') {
+    <p class="hl-empty">Loading recipes…</p>
+  } @else if (store.recipes().length === 0 && !store.error()) {
+    <p class="hl-empty">No recipes saved yet.</p>
+  }
+
+  @for (group of groups(); track group.course) {
+    <section class="recipes-page__group" [attr.aria-label]="group.course">
+      <h2 class="recipes-page__title">{{ group.course }}</h2>
+      <div class="hl-grid">
+        @for (recipe of group.recipes; track recipe.id) {
+          <button type="button" class="hl-card recipes-page__card" (click)="open(recipe)">
+            <strong class="recipes-page__name">{{ recipe.title || 'Untitled recipe' }}</strong>
+            <span class="hl-muted"
+              >v{{ recipe.currentVersionNumber }} · updated
+              {{ recipe.updatedAt | date: 'MMM d, y' }}</span
+            >
+          </button>
+        }
+      </div>
+    </section>
+  }
+
+  @if (uncategorized().length > 0) {
+    <section class="recipes-page__group" aria-label="Other">
+      <h2 class="recipes-page__title">Other</h2>
+      <div class="hl-grid">
+        @for (recipe of uncategorized(); track recipe.id) {
+          <button type="button" class="hl-card recipes-page__card" (click)="open(recipe)">
+            <strong class="recipes-page__name">{{ recipe.title || 'Untitled recipe' }}</strong>
+            <span class="hl-muted"
+              >v{{ recipe.currentVersionNumber }} · updated
+              {{ recipe.updatedAt | date: 'MMM d, y' }}</span
+            >
+          </button>
+        }
+      </div>
+    </section>
+  }
+</div>

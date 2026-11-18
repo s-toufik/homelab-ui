@@ -12,6 +12,16 @@
       (blur)="hideSuggestionsDelayed()"
     />
 
+    @if (line().ingredientRefId) {
+      <span
+        class="ingredient-row__catalog-flag"
+        title="Linked to the ingredient catalog"
+        aria-label="Linked to the ingredient catalog"
+      >
+        ✓
+      </span>
+    }
+
     @if (search.results().length > 0) {
       <div class="ingredient-row__suggestions">
         @for (ingredient of search.results(); track ingredient.ciqualCode) {

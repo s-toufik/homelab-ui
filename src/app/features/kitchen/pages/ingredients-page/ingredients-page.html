@@ -1,0 +1,70 @@
+<div class="hl-page">
+  <app-page-header
+    title="Ingredients"
+    summary="The shared macro catalog — CIQUAL entries plus anything added from a recipe."
+  >
+    <a class="hl-btn" routerLink="/kitchen">Back to atelier</a>
+  </app-page-header>
+
+  @if (error()) {
+    <p class="hl-error" role="alert">{{ error() }}</p>
+  }
+
+  @if (state() === 'loading' && ingredients().length === 0) {
+    <p class="hl-empty">Loading ingredients…</p>
+  } @else if (error()) {
+  } @else if (ingredients().length === 0) {
+    <p class="hl-empty">No ingredients in the catalog yet.</p>
+  } @else {
+    <div class="hl-table-wrap">
+      <table class="hl-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Source</th>
+            <th class="hl-num">Kcal/100g</th>
+            <th class="hl-num">Protein/100g</th>
+            <th class="hl-num">Carb/100g</th>
+            <th class="hl-num">Fat/100g</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (ingredient of ingredients(); track ingredient.ciqualCode) {
+            <tr>
+              <td>{{ ingredient.nameFr }}</td>
+              <td>
+                <span class="hl-badge" [class.hl-badge--ok]="ingredient.source === 'custom'">
+                  {{ ingredient.source }}
+                </span>
+              </td>
+              <td class="hl-num">{{ ingredient.kcalPer100g }}</td>
+              <td class="hl-num">{{ ingredient.proteinPer100g }}</td>
+              <td class="hl-num">{{ ingredient.carbPer100g }}</td>
+              <td class="hl-num">{{ ingredient.fatPer100g }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    </div>
+
+    <div class="hl-row ingredients-page__pager">
+      <button
+        type="button"
+        class="hl-btn hl-btn--small"
+        [disabled]="offset() === 0 || state() === 'loading'"
+        (click)="previous()"
+      >
+        ‹ Previous
+      </button>
+      <span class="hl-muted">{{ pageFirst() }}–{{ pageLast() }}</span>
+      <button
+        type="button"
+        class="hl-btn hl-btn--small"
+        [disabled]="ingredients().length < pageSize || state() === 'loading'"
+        (click)="next()"
+      >
+        Next ›
+      </button>
+    </div>
+  }
+</div>

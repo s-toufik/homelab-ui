@@ -30,6 +30,7 @@ export interface RecipeDraft {
 export interface RecipeSummary {
   readonly id: string;
   readonly title: string;
+  readonly course: string;
   readonly currentVersionNumber: number;
   readonly createdAt: string;
   readonly updatedAt: string;

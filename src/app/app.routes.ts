@@ -72,6 +72,26 @@ export const routes: Routes = [
       import('./features/kitchen/pages/kitchen-page/kitchen-page').then((m) => m.KitchenPage),
   },
   {
+    path: 'kitchen/recipes',
+    canMatch: [requireAccess('app:kitchen')],
+    loadComponent: () =>
+      import('./features/kitchen/pages/recipes-page/recipes-page').then((m) => m.RecipesPage),
+  },
+  {
+    path: 'kitchen/ingredients',
+    canMatch: [requireAccess('app:kitchen')],
+    loadComponent: () =>
+      import('./features/kitchen/pages/ingredients-page/ingredients-page').then(
+        (m) => m.IngredientsPage,
+      ),
+  },
+  {
+    path: 'issues',
+    canMatch: [requireAccess('app:issues')],
+    loadComponent: () =>
+      import('./features/issues/pages/issues-page/issues-page').then((m) => m.IssuesPage),
+  },
+  {
     path: 'metrics',
     canMatch: [requireAccess('page:metrics')],
     loadComponent: () =>

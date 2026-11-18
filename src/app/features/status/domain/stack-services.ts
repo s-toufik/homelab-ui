@@ -65,7 +65,16 @@ export const STACK_SERVICES: readonly StackService[] = [
     folder: 'repository/postgrest',
     description: "REST API over the tasker schema, one account's rows each.",
     check: health('postgrest'),
-    links: [],
+    links: [{ label: 'Tasker', route: '/tasker' }],
+  },
+  {
+    id: 'postgrest-issues',
+    label: 'PostgREST (issues)',
+    group: 'Repository',
+    folder: 'repository/postgrest-issues',
+    description: 'REST API over the issues schema: anyone can submit, admins triage.',
+    check: health('postgrest-issues'),
+    links: [{ label: 'Issues', route: '/issues' }],
   },
   {
     id: 'mongodb',
