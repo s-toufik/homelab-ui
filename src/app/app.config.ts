@@ -16,6 +16,7 @@ import { provideAlloyFeature } from '@features/alloy/alloy.feature';
 import { provideGrafanaFeature } from '@features/grafana/grafana.feature';
 import { provideInfrastructureResources } from '@features/infrastructure/infrastructure.feature';
 import { provideKafkaUiFeature } from '@features/kafka-ui/kafka-ui.feature';
+import { provideKitchenFeature } from '@features/kitchen/kitchen.feature';
 import { provideKubernetesFeature } from '@features/kubernetes/kubernetes.feature';
 import { provideLlmFeature } from '@features/llm/llm.feature';
 import { provideMapFeature } from '@features/map/map.feature';
@@ -60,6 +61,7 @@ export const appConfig: ApplicationConfig = {
     provideAlloyFeature(),
     provideKafkaUiFeature(),
     provideTaskerFeature(),
+    provideKitchenFeature(),
     ...provideInfrastructureResources(),
   ],
 };

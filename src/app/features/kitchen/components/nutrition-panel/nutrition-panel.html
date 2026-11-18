@@ -1,0 +1,71 @@
+@let currentTotals = totals();
+@let currentSplit = split();
+
+<section id="sec-nutrition" class="nutrition-panel">
+  <div class="nutrition-panel__header">
+    <div>
+      <h2>Nutritional &amp; Yield Telemetry</h2>
+    </div>
+    <div class="nutrition-panel__toggle">
+      <button type="button" [class.active]="view() === 'portion'" (click)="view.set('portion')">
+        Per Portion
+      </button>
+      <button type="button" [class.active]="view() === 'batch'" (click)="view.set('batch')">
+        Full Batch
+      </button>
+    </div>
+  </div>
+
+  <div class="nutrition-panel__tiles">
+    <div class="nutrition-panel__tile nutrition-panel__tile--energy">
+      <span class="nutrition-panel__tile-label">Energy</span>
+      <span class="nutrition-panel__tile-value">{{ currentTotals.kcal | number: '1.0-0' }}</span>
+      <span class="nutrition-panel__tile-unit">kcal</span>
+    </div>
+    <div class="nutrition-panel__tile nutrition-panel__tile--protein">
+      <span class="nutrition-panel__tile-label">Protein</span>
+      <span class="nutrition-panel__tile-value"
+        >{{ currentTotals.proteinG | number: '1.0-1' }}g</span
+      >
+      <span class="nutrition-panel__tile-unit"
+        >{{ currentSplit.proteinPct | number: '1.0-0' }}% kcal</span
+      >
+    </div>
+    <div class="nutrition-panel__tile nutrition-panel__tile--carb">
+      <span class="nutrition-panel__tile-label">Carbs</span>
+      <span class="nutrition-panel__tile-value">{{ currentTotals.carbG | number: '1.0-1' }}g</span>
+      <span class="nutrition-panel__tile-unit"
+        >{{ currentSplit.carbPct | number: '1.0-0' }}% kcal</span
+      >
+    </div>
+    <div class="nutrition-panel__tile nutrition-panel__tile--fat">
+      <span class="nutrition-panel__tile-label">Lipids / Fat</span>
+      <span class="nutrition-panel__tile-value">{{ currentTotals.fatG | number: '1.0-1' }}g</span>
+      <span class="nutrition-panel__tile-unit"
+        >{{ currentSplit.fatPct | number: '1.0-0' }}% kcal</span
+      >
+    </div>
+  </div>
+
+  <div class="nutrition-panel__ratio">
+    <div class="nutrition-panel__ratio-head">
+      <span>Caloric Macro Distribution</span>
+      <span class="nutrition-panel__density"
+        >Density: {{ density() | number: '1.0-0' }} kcal / 100g</span
+      >
+    </div>
+    <div class="nutrition-panel__bar">
+      <i class="nutrition-panel__bar-protein" [style.width.%]="currentSplit.proteinPct"></i>
+      <i class="nutrition-panel__bar-carb" [style.width.%]="currentSplit.carbPct"></i>
+      <i class="nutrition-panel__bar-fat" [style.width.%]="currentSplit.fatPct"></i>
+    </div>
+    <div class="nutrition-panel__legend">
+      <span><i class="nutrition-panel__dot nutrition-panel__dot--protein"></i>Protein</span>
+      <span><i class="nutrition-panel__dot nutrition-panel__dot--carb"></i>Carbs</span>
+      <span><i class="nutrition-panel__dot nutrition-panel__dot--fat"></i>Fat</span>
+      <span class="nutrition-panel__weight"
+        >Portion wt: <strong>{{ currentTotals.weightGrams | number: '1.0-0' }}g</strong></span
+      >
+    </div>
+  </div>
+</section>

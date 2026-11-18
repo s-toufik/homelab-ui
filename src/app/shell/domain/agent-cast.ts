@@ -9,6 +9,9 @@ export const CAST_IDS = [
   'pocket',
   'digital',
   'machines',
+  'neural',
+  'sylvan',
+  'deepforge',
   'sprites',
 ] as const;
 export type CastId = (typeof CAST_IDS)[number];
@@ -60,6 +63,21 @@ export const CASTS: readonly CastOption[] = [
     id: 'machines',
     name: 'Machines',
     description: 'A dispatch robot, a kettle bot, a rover, a searchlight drone, a vault guard',
+  },
+  {
+    id: 'neural',
+    name: 'Neural',
+    description: 'Glass AI beings with glowing eyes, holograms and floating hands',
+  },
+  {
+    id: 'sylvan',
+    name: 'Sylvan',
+    description: 'Elves in an old forest: a herald, a cook, a punter, an archer',
+  },
+  {
+    id: 'deepforge',
+    name: 'Deepforge',
+    description: 'Dwarfs under the mountain: a thane, a mine cart, a runesmith',
   },
   {
     id: 'sprites',

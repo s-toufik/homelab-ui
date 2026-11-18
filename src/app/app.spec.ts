@@ -28,7 +28,6 @@ describe('App', () => {
 
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('app-sidebar')).toBeTruthy();
-    expect(compiled.querySelector('app-toolbar')).toBeTruthy();
     expect(compiled.querySelector('app-center-page')).toBeTruthy();
 
     await router.navigateByUrl('/today');

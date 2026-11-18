@@ -4,6 +4,7 @@ export const FEATURE_CATEGORIES = [
   'Automation',
   'Observability',
   'Streaming',
+  'Life',
 ] as const;
 
 export type FeatureCategory = (typeof FEATURE_CATEGORIES)[number];

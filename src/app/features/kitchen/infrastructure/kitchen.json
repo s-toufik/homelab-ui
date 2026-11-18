@@ -1,0 +1,7 @@
+{
+  "key": "kitchen-atelier",
+  "port": 8002,
+  "subpath": null,
+  "healthPath": "/actuator/health/readiness",
+  "api": "/api/kitchen"
+}

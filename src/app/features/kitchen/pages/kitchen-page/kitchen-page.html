@@ -1,0 +1,144 @@
+@let perPortion = store.displayedNutritionPerPortion();
+@let batchWeight = store.displayedNutritionTotal().weightGrams;
+
+<header #header class="kitchen-header">
+  <div class="kitchen-header__top">
+    <div class="kitchen-header__brand">
+      <div class="kitchen-header__brand-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"
+          />
+        </svg>
+      </div>
+      <div>
+        <div class="kitchen-header__brand-row">
+          <span class="kitchen-header__brand-name">ATELIER</span>
+          <span class="kitchen-header__brand-badge">KITCHEN CARD</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="kitchen-header__telemetry">
+      <div class="kitchen-header__telemetry-group">
+        <span class="kitchen-header__telemetry-label">Per Portion</span>
+        <span class="kitchen-header__telemetry-kcal"
+          >{{ perPortion.kcal | number: '1.0-0' }} kcal</span
+        >
+      </div>
+      <div class="kitchen-header__divider"></div>
+      <div class="kitchen-header__telemetry-macros">
+        <div>
+          <span>Protein</span>
+          <b class="kitchen-header__protein">{{ perPortion.proteinG | number: '1.0-1' }}g</b>
+        </div>
+        <div>
+          <span>Carbs</span>
+          <b class="kitchen-header__carb">{{ perPortion.carbG | number: '1.0-1' }}g</b>
+        </div>
+        <div>
+          <span>Fat</span>
+          <b>{{ perPortion.fatG | number: '1.0-1' }}g</b>
+        </div>
+      </div>
+      <div class="kitchen-header__divider"></div>
+      <div class="kitchen-header__telemetry-group">
+        <span class="kitchen-header__telemetry-label">Batch Yield</span>
+        <span class="kitchen-header__telemetry-weight">{{ batchWeight | number: '1.0-0' }}g</span>
+      </div>
+    </div>
+
+    <div class="kitchen-header__actions">
+      <app-recipe-picker />
+      <app-version-history />
+      <button
+        type="button"
+        class="kitchen-header__btn"
+        title="Copy recipe sheet"
+        aria-label="Copy recipe sheet"
+        (click)="copySheet()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 9h10v12H9zM6 15H4V3h12v2" />
+        </svg>
+      </button>
+      <button
+        type="button"
+        class="kitchen-header__btn"
+        title="Start a new recipe"
+        aria-label="Start a new recipe"
+        (click)="startNew()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <nav class="kitchen-header__nav">
+    @for (section of sections; track section.id) {
+      <button
+        type="button"
+        [class.active]="activeSection() === section.id"
+        (click)="scrollTo(section.id)"
+      >
+        {{ section.label }}
+      </button>
+    }
+  </nav>
+</header>
+
+@if (store.error()) {
+  <div class="kitchen-banner kitchen-banner--error">{{ store.error() }}</div>
+}
+@if (!store.isEditingLatest()) {
+  <div class="kitchen-banner kitchen-banner--warn">
+    Viewing v{{ store.viewingVersionNumber() }} — read-only
+    <button type="button" (click)="store.forkToEdit()">Fork to edit</button>
+  </div>
+}
+
+<main class="kitchen-main">
+  <div class="kitchen-main__grid">
+    <div class="kitchen-main__column">
+      <app-recipe-overview />
+      <app-ingredient-list />
+    </div>
+    <div class="kitchen-main__column">
+      <app-nutrition-panel />
+      <app-method-steps />
+      <app-tasting-notes />
+    </div>
+  </div>
+</main>
+
+<div class="kitchen-mobile-bar">
+  <div class="kitchen-mobile-bar__stats" (click)="scrollTo('sec-nutrition')">
+    <div>
+      <span>Per Portion</span>
+      <b>{{ perPortion.kcal | number: '1.0-0' }} kcal</b>
+    </div>
+    <div class="kitchen-mobile-bar__divider"></div>
+    <div class="kitchen-mobile-bar__macros">
+      <span class="kitchen-mobile-bar__protein"
+        >P: {{ perPortion.proteinG | number: '1.0-0' }}g</span
+      >
+      <span
+        >C: {{ perPortion.carbG | number: '1.0-0' }}g · F:
+        {{ perPortion.fatG | number: '1.0-0' }}g</span
+      >
+    </div>
+  </div>
+</div>
+
+<div class="kitchen-toasts" [style.top.px]="headerHeight() + 12">
+  @for (item of toast.toasts(); track item.id) {
+    <div class="kitchen-toast">
+      <span class="kitchen-toast__dot"></span>
+      <span>{{ item.message }}</span>
+    </div>
+  }
+</div>

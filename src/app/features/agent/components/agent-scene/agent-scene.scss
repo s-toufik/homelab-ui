@@ -11,3 +11,7 @@ canvas {
   height: 100%;
   image-rendering: pixelated;
 }
+
+:host(.agent-scene--smooth) canvas {
+  image-rendering: auto;
+}

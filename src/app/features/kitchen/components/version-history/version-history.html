@@ -1,0 +1,23 @@
+@if (store.isEditingLatest()) {
+  <button
+    type="button"
+    class="version-history__save"
+    [class.version-history__save--busy]="store.state() === 'saving'"
+    [disabled]="store.state() === 'saving'"
+    [title]="
+      store.state() === 'saving' ? 'Saving…' : store.isNew() ? 'Create recipe' : 'Save version'
+    "
+    [attr.aria-label]="
+      store.state() === 'saving' ? 'Saving…' : store.isNew() ? 'Create recipe' : 'Save version'
+    "
+    (click)="save()"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        d="M5 4h11l3 3v13H5zM8 4v5h8V4M8 14h8v6H8z"
+      />
+    </svg>
+  </button>
+}

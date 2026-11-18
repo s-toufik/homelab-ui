@@ -229,4 +229,14 @@ export const STACK_SERVICES: readonly StackService[] = [
     links: [{ label: 'Tools', route: '/tools' }],
     connection: 'http://{host}:8001/mcp',
   },
+  {
+    id: 'kitchen-atelier',
+    label: 'kitchen-atelier',
+    group: 'Apps',
+    folder: 'apps/kitchen-atelier',
+    description: 'Recipes, versioning and the ingredient macro catalog.',
+    check: health('kitchen-atelier'),
+    links: [{ label: 'Kitchen', route: '/kitchen' }],
+    connection: 'http://{host}:8002',
+  },
 ];

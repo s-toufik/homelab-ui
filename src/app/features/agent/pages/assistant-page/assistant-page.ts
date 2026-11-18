@@ -56,7 +56,7 @@ function when(at: number, now = Date.now()): string {
 export class AssistantPage {
   protected readonly store = inject(AgentStore);
   protected readonly access = inject(AccessStore);
-  private readonly layout = inject(LayoutStore);
+  protected readonly layout = inject(LayoutStore);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly composer = viewChild(Composer);

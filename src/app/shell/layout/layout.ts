@@ -12,7 +12,6 @@ import { CommandPalette } from '../command-palette/command-palette';
 import { Sidebar } from '../sidebar/sidebar';
 import { Drawer } from '../drawer/drawer';
 import { PhoneBar } from '../phone-bar/phone-bar';
-import { Toolbar } from '../toolbar/toolbar';
 import { PagePanel } from '../page-panel/page-panel';
 import { SettingsModal } from '../settings-modal/settings-modal';
 
@@ -21,7 +20,6 @@ import { SettingsModal } from '../settings-modal/settings-modal';
   imports: [
     RouterOutlet,
     Sidebar,
-    Toolbar,
     Drawer,
     PhoneBar,
     CommandPalette,

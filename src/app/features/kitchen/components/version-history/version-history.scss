@@ -1,0 +1,44 @@
+.version-history__save {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex-shrink: 0;
+  border: 0;
+  border-radius: 0.75rem;
+  background: var(--k-ink);
+  color: var(--k-ink-on);
+  cursor: pointer;
+  transition:
+    transform 0.08s ease,
+    background-color 0.15s ease;
+
+  svg {
+    width: 1.15rem;
+    height: 1.15rem;
+  }
+
+  &:hover:not(:disabled) {
+    background: var(--k-stone-800);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.97);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: default;
+  }
+}
+
+.version-history__save--busy svg {
+  animation: version-history-spin 0.9s linear infinite;
+}
+
+@keyframes version-history-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}

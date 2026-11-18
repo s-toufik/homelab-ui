@@ -1,0 +1,161 @@
+@let draft = store.displayedDraft();
+@let editable = store.isEditingLatest();
+
+<section id="sec-overview" class="recipe-overview">
+  <div class="recipe-overview__top">
+    <div class="recipe-overview__courses">
+      @for (course of courses; track course) {
+        <button
+          type="button"
+          class="recipe-overview__course"
+          [class.recipe-overview__course--active]="draft.course === course"
+          [disabled]="!editable"
+          (click)="setCourse(course)"
+        >
+          {{ course }}
+        </button>
+      }
+    </div>
+
+    @if (store.versions().length > 0) {
+      <div class="recipe-overview__version">
+        <button
+          type="button"
+          class="recipe-overview__version-btn"
+          [disabled]="!hasPrevVersion()"
+          (click)="stepVersion(-1)"
+          aria-label="Previous version"
+        >
+          −
+        </button>
+        <span class="recipe-overview__version-label">v{{ store.viewingVersionNumber() }}</span>
+        <button
+          type="button"
+          class="recipe-overview__version-btn"
+          [disabled]="!hasNextVersion()"
+          (click)="stepVersion(1)"
+          aria-label="Next version"
+        >
+          +
+        </button>
+      </div>
+    }
+  </div>
+
+  <input
+    type="text"
+    class="recipe-overview__title"
+    placeholder="Untitled Culinary Creation…"
+    [ngModel]="draft.title"
+    [disabled]="!editable"
+    (ngModelChange)="store.updateDraft({ title: $event })"
+  />
+  <input
+    type="text"
+    class="recipe-overview__subtitle"
+    placeholder="Add plating concept, garnish notes, or menu pairing…"
+    [ngModel]="draft.subtitle"
+    [disabled]="!editable"
+    (ngModelChange)="store.updateDraft({ subtitle: $event })"
+  />
+
+  <div class="recipe-overview__steppers">
+    <div class="recipe-overview__stepper-card">
+      <div class="recipe-overview__stepper-head">
+        <span class="recipe-overview__stepper-label">Portions</span>
+        <button
+          type="button"
+          class="recipe-overview__scale-toggle"
+          [class.recipe-overview__scale-toggle--on]="store.autoScale()"
+          [disabled]="!editable"
+          [title]="'Auto-scale ' + (store.autoScale() ? 'on' : 'off')"
+          [attr.aria-pressed]="store.autoScale()"
+          [attr.aria-label]="'Auto-scale ' + (store.autoScale() ? 'on' : 'off')"
+          (click)="store.autoScale.set(!store.autoScale())"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.8"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+            <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+            <path d="M7 21h10" />
+            <path d="M12 3v18" />
+            <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+          </svg>
+        </button>
+      </div>
+      <div class="recipe-overview__stepper-row">
+        <button
+          type="button"
+          class="recipe-overview__stepper-btn"
+          [disabled]="!editable"
+          (click)="changePortions(-1)"
+          aria-label="Decrease portions"
+        >
+          −
+        </button>
+        <span class="recipe-overview__stepper-value">{{ draft.portions }}</span>
+        <button
+          type="button"
+          class="recipe-overview__stepper-btn"
+          [disabled]="!editable"
+          (click)="changePortions(1)"
+          aria-label="Increase portions"
+        >
+          +
+        </button>
+      </div>
+    </div>
+
+    <div class="recipe-overview__stepper-card">
+      <span class="recipe-overview__stepper-label">Prep (Mise)</span>
+      <div class="recipe-overview__stepper-row">
+        <button
+          type="button"
+          class="recipe-overview__stepper-btn"
+          [disabled]="!editable"
+          (click)="changePrepTime(-5)"
+        >
+          −5
+        </button>
+        <span class="recipe-overview__stepper-value">{{ draft.prepTimeMinutes }}m</span>
+        <button
+          type="button"
+          class="recipe-overview__stepper-btn"
+          [disabled]="!editable"
+          (click)="changePrepTime(5)"
+        >
+          +5
+        </button>
+      </div>
+    </div>
+
+    <div class="recipe-overview__stepper-card">
+      <span class="recipe-overview__stepper-label">Cook / Fire</span>
+      <div class="recipe-overview__stepper-row">
+        <button
+          type="button"
+          class="recipe-overview__stepper-btn"
+          [disabled]="!editable"
+          (click)="changeCookTime(-5)"
+        >
+          −5
+        </button>
+        <span class="recipe-overview__stepper-value">{{ draft.cookTimeMinutes }}m</span>
+        <button
+          type="button"
+          class="recipe-overview__stepper-btn"
+          [disabled]="!editable"
+          (click)="changeCookTime(5)"
+        >
+          +5
+        </button>
+      </div>
+    </div>
+  </div>
+</section>

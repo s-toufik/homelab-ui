@@ -129,6 +129,40 @@
   background: var(--accent-soft);
 }
 
+.layout__floating-tool {
+  position: fixed;
+  right: calc(1.25rem + var(--safe-right));
+  bottom: calc(1.25rem + var(--safe-bottom));
+  z-index: 25;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: 0.65rem;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  box-shadow: var(--shadow-float);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.layout__floating-tool--working {
+  border-color: var(--accent-border);
+  background: var(--accent-soft);
+}
+
+@media (max-width: 767px) {
+  .layout__floating-tool {
+    display: none;
+  }
+}
+
 @media (pointer: coarse) {
   .layout__tool {
     width: 2.5rem;

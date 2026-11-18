@@ -66,6 +66,12 @@ export const routes: Routes = [
       import('./features/tasker/pages/tasker-page/tasker-page').then((m) => m.TaskerPage),
   },
   {
+    path: 'kitchen',
+    canMatch: [requireAccess('app:kitchen')],
+    loadComponent: () =>
+      import('./features/kitchen/pages/kitchen-page/kitchen-page').then((m) => m.KitchenPage),
+  },
+  {
     path: 'metrics',
     canMatch: [requireAccess('page:metrics')],
     loadComponent: () =>

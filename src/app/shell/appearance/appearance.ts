@@ -1,6 +1,7 @@
-import { Component, computed, inject } from '@angular/core';
+import { Component, computed, inject, signal } from '@angular/core';
 import { AgentScene } from '@features/agent/components/agent-scene/agent-scene';
 import { agentLook } from '@features/agent/domain/agent-looks';
+import { SpriteSheets } from '@features/agent/infrastructure/sprites/sprite-sheets';
 import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { CastStore } from '../application/cast.store';
 import { ThemeStore } from '../application/theme.store';
@@ -32,6 +33,7 @@ export class Appearance {
     'coding',
     'security',
   ].map((name) => ({ name, label: agentLook(name).label }));
+  protected readonly hasSprites = signal(false);
   protected readonly themeCast = computed(() => castForTheme(this.theme.active()));
   protected readonly themeCastName = computed(() => castOption(this.themeCast()).name);
   protected readonly activeCastName = computed(() => castOption(this.cast.active()).name);
@@ -48,6 +50,13 @@ export class Appearance {
   });
   protected readonly dayName = themeOption(DAY_THEME).name;
   protected readonly nightName = themeOption(NIGHT_THEME).name;
+
+  constructor() {
+    const sprites = inject(SpriteSheets);
+    void Promise.all(this.actors.map((actor) => sprites.load(actor.name))).then((sheets) =>
+      this.hasSprites.set(sheets.some((sheet) => sheet !== null)),
+    );
+  }
 
   protected tagline(id: ThemeId, fallback: string): string {
     if (!this.auto()) return fallback;

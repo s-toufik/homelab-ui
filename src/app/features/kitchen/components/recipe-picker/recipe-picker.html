@@ -1,0 +1,26 @@
+@switch (list.state()) {
+  @case ('error') {
+    <span class="recipe-picker__error" [title]="list.error()">Recipes unavailable</span>
+  }
+  @default {
+    <select
+      class="recipe-picker__select"
+      [ngModel]="editor.recipeId()"
+      [disabled]="list.state() === 'loading'"
+      (ngModelChange)="open($event)"
+    >
+      <option [value]="null" disabled>
+        {{
+          list.state() === 'loading'
+            ? 'Loading…'
+            : list.recipes().length === 0
+              ? 'No recipes yet'
+              : 'Open recipe…'
+        }}
+      </option>
+      @for (recipe of list.recipes(); track recipe.id) {
+        <option [value]="recipe.id">{{ recipe.title || 'Untitled recipe' }}</option>
+      }
+    </select>
+  }
+}

@@ -1,0 +1,95 @@
+<div class="ingredient-row">
+  <div class="ingredient-row__name-wrap">
+    <span class="ingredient-row__grip" aria-hidden="true">⋮⋮</span>
+    <input
+      type="text"
+      class="ingredient-row__name"
+      placeholder="Ingredient (e.g., Duck Breast, Butter…)"
+      autocomplete="off"
+      [ngModel]="line().name"
+      [disabled]="readonly()"
+      (ngModelChange)="onNameInput($event)"
+      (blur)="hideSuggestionsDelayed()"
+    />
+
+    @if (search.results().length > 0) {
+      <div class="ingredient-row__suggestions">
+        @for (ingredient of search.results(); track ingredient.ciqualCode) {
+          <button type="button" (mousedown)="pick(ingredient)">
+            <span class="ingredient-row__suggestion-name">{{ ingredient.nameFr }}</span>
+            <span class="ingredient-row__suggestion-kcal"
+              >{{ ingredient.kcalPer100g }} kcal · P:{{ ingredient.proteinPer100g }}g</span
+            >
+          </button>
+        }
+      </div>
+    }
+  </div>
+
+  <div class="ingredient-row__controls">
+    <div class="ingredient-row__stepper">
+      <button
+        type="button"
+        [disabled]="readonly()"
+        (click)="step(-1)"
+        aria-label="Decrease quantity"
+      >
+        −
+      </button>
+      <input
+        type="number"
+        step="any"
+        [ngModel]="line().quantity"
+        [disabled]="readonly()"
+        (ngModelChange)="changed.emit({ quantity: $event })"
+      />
+      <button
+        type="button"
+        [disabled]="readonly()"
+        (click)="step(1)"
+        aria-label="Increase quantity"
+      >
+        +
+      </button>
+    </div>
+
+    <select
+      class="ingredient-row__unit"
+      [ngModel]="line().unit"
+      [disabled]="readonly()"
+      (ngModelChange)="changed.emit({ unit: $event })"
+    >
+      @for (unit of units; track unit) {
+        <option [value]="unit">{{ unit }}</option>
+      }
+    </select>
+
+    <button
+      type="button"
+      class="ingredient-row__macro-btn"
+      title="Edit macros per 100g"
+      [disabled]="readonly()"
+      (click)="editMacros.emit()"
+    >
+      <span class="ingredient-row__macro-kcal">{{ kcal() | number: '1.0-0' }}</span>
+      <span class="ingredient-row__macro-label">kcal ✎</span>
+    </button>
+
+    @if (!readonly()) {
+      <button
+        type="button"
+        class="ingredient-row__delete"
+        title="Remove ingredient"
+        (click)="removed.emit()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+          />
+        </svg>
+      </button>
+    }
+  </div>
+</div>
