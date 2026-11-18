@@ -4,6 +4,7 @@ import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { AccessStore } from '../application/access.store';
 import { ASSISTANT_PANEL } from '../application/assistant-panel';
 import { AppsStore } from '../application/apps.store';
+import { CommandPaletteStore } from '../application/commands';
 import { LayoutStore } from '../application/layout.store';
 import { NavigationStore } from '../application/navigation.store';
 import { SHELL_ICONS } from '../domain/navigation';
@@ -21,6 +22,7 @@ export class Sidebar {
   protected readonly nav = inject(NavigationStore);
   protected readonly access = inject(AccessStore);
   protected readonly session = inject(GatewaySession);
+  protected readonly palette = inject(CommandPaletteStore);
   private readonly assistant = inject(ASSISTANT_PANEL, { optional: true });
   protected readonly icons = SHELL_ICONS;
   protected readonly waiting = computed(() => this.assistant?.waiting() ?? 0);

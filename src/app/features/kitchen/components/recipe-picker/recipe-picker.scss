@@ -1,0 +1,23 @@
+.recipe-picker__select {
+  height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 0.75rem;
+  background: var(--k-saffron-50);
+  border: 1px solid color-mix(in srgb, var(--k-saffron-500) 30%, transparent);
+  color: var(--k-saffron-700);
+  font-family: var(--k-font-sans);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  max-width: 11rem;
+
+  &:hover {
+    background: var(--k-saffron-100);
+  }
+}
+
+.recipe-picker__error {
+  font-size: 0.78rem;
+  color: var(--k-terracotta-600);
+  font-weight: 600;
+}

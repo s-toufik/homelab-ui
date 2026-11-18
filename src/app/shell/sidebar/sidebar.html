@@ -37,6 +37,11 @@
     </button>
   </div>
 
+  <button type="button" class="side__item side__search" title="Search" (click)="palette.open()">
+    <app-feature-icon [paths]="icons.search" [size]="16" /><span class="side__label">Search</span>
+    <kbd class="side__kbd">⌘K</kbd>
+  </button>
+
   <a
     class="side__item"
     routerLink="/"

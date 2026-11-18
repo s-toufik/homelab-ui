@@ -1,0 +1,65 @@
+@let draft = store.displayedDraft();
+@let editable = store.isEditingLatest();
+
+<section class="tasting-notes">
+  <div class="tasting-notes__header">
+    <h2>Tasting &amp; Pass Notes</h2>
+    <span class="tasting-notes__eyebrow">Sensory Log</span>
+  </div>
+
+  <div class="tasting-notes__sensory">
+    <div class="tasting-notes__group">
+      <span>Seasoning</span>
+      <div class="tasting-notes__chips">
+        @for (option of seasoningOptions; track option) {
+          <button
+            type="button"
+            [class.active]="draft.sensory.seasoning === option"
+            [disabled]="!editable"
+            (click)="setSensory({ seasoning: option })"
+          >
+            {{ option }}
+          </button>
+        }
+      </div>
+    </div>
+    <div class="tasting-notes__group">
+      <span>Acidity</span>
+      <div class="tasting-notes__chips">
+        @for (option of acidityOptions; track option) {
+          <button
+            type="button"
+            [class.active]="draft.sensory.acidity === option"
+            [disabled]="!editable"
+            (click)="setSensory({ acidity: option })"
+          >
+            {{ option }}
+          </button>
+        }
+      </div>
+    </div>
+    <div class="tasting-notes__group">
+      <span>Texture</span>
+      <div class="tasting-notes__chips">
+        @for (option of textureOptions; track option) {
+          <button
+            type="button"
+            [class.active]="draft.sensory.texture === option"
+            [disabled]="!editable"
+            (click)="setSensory({ texture: option })"
+          >
+            {{ option }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <textarea
+    rows="2"
+    placeholder="Record tasting adjustments (e.g., 'Reduce jus by 15% more, finish with cold butter')…"
+    [ngModel]="draft.notes"
+    [disabled]="!editable"
+    (ngModelChange)="store.updateDraft({ notes: $event })"
+  ></textarea>
+</section>

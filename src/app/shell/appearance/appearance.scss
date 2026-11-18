@@ -249,6 +249,14 @@
   border-radius: 0.35rem;
 }
 
+.appearance__thumb--empty {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 3 / 2;
+  border: 1.5px dashed currentColor;
+  opacity: 0.6;
+}
+
 @media (max-width: 480px) {
   .appearance__stage {
     grid-template-columns: repeat(3, minmax(0, 1fr));

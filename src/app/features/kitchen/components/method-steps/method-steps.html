@@ -1,0 +1,82 @@
+@let draft = store.displayedDraft();
+@let editable = store.isEditingLatest();
+
+<section id="sec-method" class="method-steps">
+  <div class="method-steps__header">
+    <div>
+      <h2>
+        Method &amp; Execution
+        <span class="method-steps__badge">{{ draft.steps.length }}</span>
+      </h2>
+      <p>Tap quick badges to attach thermal or timer cues</p>
+    </div>
+    @if (editable) {
+      <button
+        type="button"
+        class="method-steps__add-icon"
+        title="Add execution step"
+        aria-label="Add execution step"
+        (click)="store.addStep()"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
+        </svg>
+      </button>
+    }
+  </div>
+
+  @if (draft.steps.length === 0) {
+    <p class="method-steps__empty">No steps yet.</p>
+  } @else {
+    <div class="method-steps__rows">
+      @for (step of draft.steps; track $index) {
+        <div class="method-steps__row">
+          <div class="method-steps__number">{{ $index + 1 }}</div>
+          <div class="method-steps__body">
+            <textarea
+              rows="2"
+              placeholder="Describe technique, heat level, visual cue…"
+              [ngModel]="step.text"
+              [disabled]="!editable"
+              (ngModelChange)="store.updateStep($index, { text: $event })"
+            ></textarea>
+            <div class="method-steps__tags">
+              @for (tag of step.tags; track tag) {
+                <button
+                  type="button"
+                  class="method-steps__tag method-steps__tag--active"
+                  (click)="toggleTag($index, tag, step.tags)"
+                >
+                  {{ tag }}
+                  <span>×</span>
+                </button>
+              }
+              @if (editable) {
+                @for (tag of quickTagsFor(step.tags); track tag) {
+                  <button
+                    type="button"
+                    class="method-steps__tag"
+                    (click)="toggleTag($index, tag, step.tags)"
+                  >
+                    + {{ tag }}
+                  </button>
+                }
+              }
+            </div>
+          </div>
+          @if (editable) {
+            <button type="button" class="method-steps__delete" (click)="store.removeStep($index)">
+              ✕
+            </button>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  @if (editable) {
+    <button type="button" class="method-steps__add" (click)="store.addStep()">
+      + Add execution step
+    </button>
+  }
+</section>

@@ -1,0 +1,6 @@
+{
+  "key": "issues-api",
+  "port": 3003,
+  "subpath": null,
+  "api": "/api/issues"
+}

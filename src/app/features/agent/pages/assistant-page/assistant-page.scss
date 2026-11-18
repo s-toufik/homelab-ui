@@ -197,6 +197,31 @@
   flex-shrink: 0;
 }
 
+.assistant__settings-toggle {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.15rem;
+  height: 2.15rem;
+  padding: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: 0.55rem;
+  background: var(--surface-raised);
+  color: var(--text-muted);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--text);
+  }
+}
+
+.assistant__settings-toggle--on {
+  border-color: var(--accent-border);
+  color: var(--accent);
+}
+
 .assistant__chip {
   display: inline-flex;
   align-items: center;

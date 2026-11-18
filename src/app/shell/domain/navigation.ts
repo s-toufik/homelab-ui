@@ -1,11 +1,12 @@
 import type { HomelabFeature } from './homelab-feature';
 
-export const NAV_SECTIONS = ['Observe', 'Operate', 'Automate'] as const;
+export const NAV_SECTIONS = ['Observe', 'Operate', 'Automate', 'Life'] as const;
 export type NavSection = (typeof NAV_SECTIONS)[number];
 
 export function navSection(feature: Pick<HomelabFeature, 'category'>): NavSection {
   if (feature.category === 'Observability') return 'Observe';
   if (feature.category === 'Automation') return 'Automate';
+  if (feature.category === 'Life') return 'Life';
   return 'Operate';
 }
 

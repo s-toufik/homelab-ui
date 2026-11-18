@@ -1,0 +1,52 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap');
+
+:host {
+  --k-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --k-font-mono: 'JetBrains Mono', monospace;
+
+  --k-parchment: var(--surface);
+  --k-ink: var(--text);
+  --k-ink-on: var(--on-accent);
+
+  --k-stone-50: var(--surface-raised);
+  --k-stone-100: var(--surface-hover);
+  --k-stone-200: var(--border);
+  --k-stone-300: color-mix(in srgb, var(--text-muted) 55%, transparent);
+  --k-stone-400: var(--text-muted);
+  --k-stone-500: var(--text-muted);
+  --k-stone-600: color-mix(in srgb, var(--text) 55%, var(--text-muted) 45%);
+  --k-stone-700: color-mix(in srgb, var(--text) 70%, var(--text-muted) 30%);
+  --k-stone-800: color-mix(in srgb, var(--text) 85%, transparent);
+  --k-stone-900: var(--text);
+
+  --k-saffron-50: var(--hue-amber-soft);
+  --k-saffron-100: var(--hue-amber-soft);
+  --k-saffron-500: var(--hue-amber);
+  --k-saffron-600: var(--hue-amber);
+  --k-saffron-700: var(--hue-amber);
+
+  --k-terracotta-50: var(--hue-orange-soft);
+  --k-terracotta-100: var(--hue-orange-soft);
+  --k-terracotta-600: var(--hue-orange);
+  --k-terracotta-700: var(--hue-orange);
+
+  --k-sage-50: var(--hue-green-soft);
+  --k-sage-100: var(--hue-green-soft);
+  --k-sage-600: var(--hue-green);
+  --k-sage-700: var(--hue-green);
+
+  --k-radius-card: 1.5rem;
+  --k-radius: 0.75rem;
+  --k-radius-pill: 999px;
+  --k-shadow-xs: 0 1px 2px rgb(0 0 0 / 5%);
+  --k-shadow-sm: 0 1px 3px rgb(0 0 0 / 8%);
+  --k-shadow-xl: 0 20px 40px -10px rgb(0 0 0 / 25%);
+
+  display: flex;
+  flex-direction: column;
+  flex: 1 1 auto;
+  min-height: 0;
+  background: var(--k-parchment);
+  color: var(--k-ink);
+  font-family: var(--k-font-sans);
+}
