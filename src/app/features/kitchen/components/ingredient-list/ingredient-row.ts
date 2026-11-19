@@ -19,6 +19,7 @@ export class IngredientRow {
   readonly changed = output<Partial<IngredientLine>>();
   readonly removed = output<void>();
   readonly editMacros = output<void>();
+  readonly showDetails = output<void>();
 
   protected readonly search = inject(IngredientSearchStore);
   protected readonly units = UNITS;

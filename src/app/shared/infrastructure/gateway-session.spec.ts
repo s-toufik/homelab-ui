@@ -7,8 +7,18 @@ function session(routing: ApiRouting): GatewaySession {
   return TestBed.inject(GatewaySession);
 }
 
+function stubAssign() {
+  const assign = vi.fn();
+  vi.stubGlobal('location', { ...location, assign });
+  return assign;
+}
+
 describe('GatewaySession', () => {
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+    sessionStorage.clear();
+  });
 
   it('does nothing outside the gateway', async () => {
     const fetch = vi.fn();
@@ -62,12 +72,46 @@ describe('GatewaySession', () => {
   it('sends the browser to sign in when the session has ended', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 401 })));
     const current = session('gateway');
-    const signIn = vi.spyOn(current, 'signIn').mockImplementation(() => undefined);
+    const signIn = vi.spyOn(current, 'signIn').mockImplementation(() => true);
 
     await current.load();
 
     expect(signIn).toHaveBeenCalledOnce();
     expect(current.user()).toBeNull();
+  });
+
+  it('redirects to sign-in', () => {
+    const assign = stubAssign();
+    const current = session('gateway');
+
+    const redirected = current.signIn();
+
+    expect(redirected).toBe(true);
+    expect(assign).toHaveBeenCalledWith(expect.stringContaining('/oauth2/sign_in?rd='));
+  });
+
+  it('does not bounce back and forth once a redirect already failed to fix it', () => {
+    const assign = stubAssign();
+    const current = session('gateway');
+
+    current.signIn();
+    const redirectedAgain = current.signIn();
+
+    expect(redirectedAgain).toBe(false);
+    expect(assign).toHaveBeenCalledOnce();
+  });
+
+  it('allows signing in again once a load succeeds', async () => {
+    const assign = stubAssign();
+    const current = session('gateway');
+    current.signIn();
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({}))));
+
+    await current.load();
+    const redirected = current.signIn();
+
+    expect(redirected).toBe(true);
+    expect(assign).toHaveBeenCalledTimes(2);
   });
 
   it('outside the gateway, previews a non-admin with the groups saved for it', () => {

@@ -59,12 +59,21 @@
   justify-content: center;
   width: 1.3rem;
   height: 1.3rem;
+  padding: 0;
+  border: 0;
   border-radius: 50%;
   background: var(--k-sage-100);
   color: var(--k-sage-700);
+  font: inherit;
   font-size: 0.7rem;
   font-weight: 700;
   line-height: 1;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--k-sage-100);
+    filter: brightness(0.95);
+  }
 }
 
 .ingredient-row__suggestions {

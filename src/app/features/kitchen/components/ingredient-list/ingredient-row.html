@@ -13,13 +13,15 @@
     />
 
     @if (line().ingredientRefId) {
-      <span
+      <button
+        type="button"
         class="ingredient-row__catalog-flag"
-        title="Linked to the ingredient catalog"
-        aria-label="Linked to the ingredient catalog"
+        title="Linked to the ingredient catalog — view full nutrition"
+        aria-label="Linked to the ingredient catalog — view full nutrition"
+        (click)="showDetails.emit()"
       >
         ✓
-      </span>
+      </button>
     }
 
     @if (search.results().length > 0) {

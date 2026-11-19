@@ -30,6 +30,8 @@ const USERINFO_PATH = '/oauth2/userinfo';
 const ADMIN_GROUP = 'role:admin';
 const TIMEOUT_MS = 4000;
 const CHECK_INTERVAL_MS = 60_000;
+const SIGN_IN_RETRY_KEY = 'homelab-ui.signin-attempted-at';
+const SIGN_IN_RETRY_WINDOW_MS = 10_000;
 
 @Injectable({ providedIn: 'root' })
 export class GatewaySession {
@@ -60,6 +62,7 @@ export class GatewaySession {
     }
     if (!response.ok) return;
 
+    sessionStorage.removeItem(SIGN_IN_RETRY_KEY);
     const body = (await response.json().catch(() => ({}))) as UserInfoResponse;
     const username = body.preferredUsername || body.user;
     if (username) this.user.set({ username, email: body.email ?? null });
@@ -80,7 +83,11 @@ export class GatewaySession {
     });
   }
 
-  signIn(): void {
+  signIn(): boolean {
+    const attemptedAt = Number(sessionStorage.getItem(SIGN_IN_RETRY_KEY) ?? 0);
+    if (Date.now() - attemptedAt < SIGN_IN_RETRY_WINDOW_MS) return false;
+    sessionStorage.setItem(SIGN_IN_RETRY_KEY, String(Date.now()));
     location.assign(`/oauth2/sign_in?rd=${encodeURIComponent(location.href)}`);
+    return true;
   }
 }
