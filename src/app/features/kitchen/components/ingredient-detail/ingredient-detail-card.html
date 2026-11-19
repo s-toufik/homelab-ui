@@ -1,0 +1,38 @@
+<div class="ingredient-detail">
+  <header class="ingredient-detail__head">
+    <h3>{{ ingredient().nameFr }}</h3>
+    @if (ingredient().scientificName; as scientificName) {
+      <p class="ingredient-detail__scientific">{{ scientificName }}</p>
+    }
+    @if (breadcrumb().length > 0) {
+      <p class="ingredient-detail__breadcrumb">{{ breadcrumb().join(' › ') }}</p>
+    }
+    <div class="ingredient-detail__meta">
+      <span class="ingredient-detail__badge">{{ ingredient().source }}</span>
+      @if (ingredient().sourceVersion) {
+        <span class="ingredient-detail__badge ingredient-detail__badge--muted">{{
+          ingredient().sourceVersion
+        }}</span>
+      }
+      <span class="ingredient-detail__code">{{ ingredient().ciqualCode }}</span>
+    </div>
+  </header>
+
+  @if (sections().length === 0) {
+    <p class="ingredient-detail__empty">No detailed nutrition values recorded for this entry.</p>
+  } @else {
+    @for (group of sections(); track group.title) {
+      <section class="ingredient-detail__section">
+        <h4>{{ group.title }}</h4>
+        <dl class="ingredient-detail__grid">
+          @for (entry of group.entries; track entry.label) {
+            <div class="ingredient-detail__row">
+              <dt>{{ entry.label }}</dt>
+              <dd>{{ entry.value }}</dd>
+            </div>
+          }
+        </dl>
+      </section>
+    }
+  }
+</div>

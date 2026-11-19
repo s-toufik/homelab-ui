@@ -36,6 +36,7 @@
           (changed)="onChanged($index, $event)"
           (removed)="store.removeIngredient($index)"
           (editMacros)="openMacroModal($index)"
+          (showDetails)="openDetails($index)"
         />
       }
     </div>
@@ -106,6 +107,27 @@
           Save macros
         </button>
       </div>
+    </div>
+  </div>
+}
+
+@if (detailLoading() || detailError() || detailIngredient()) {
+  <div class="ingredient-modal-backdrop" (click)="closeDetails()">
+    <div class="ingredient-modal ingredient-modal--wide" (click)="$event.stopPropagation()">
+      <div class="ingredient-modal__head">
+        <div>
+          <h3>Full ingredient card</h3>
+        </div>
+        <button type="button" class="ingredient-modal__close" (click)="closeDetails()">✕</button>
+      </div>
+
+      @if (detailLoading()) {
+        <p class="ingredient-modal__loading">Loading…</p>
+      } @else if (detailError(); as error) {
+        <p class="hl-error" role="alert">{{ error }}</p>
+      } @else if (detailIngredient(); as ingredient) {
+        <app-ingredient-detail-card [ingredient]="ingredient" />
+      }
     </div>
   </div>
 }

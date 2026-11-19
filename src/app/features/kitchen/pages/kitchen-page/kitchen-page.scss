@@ -153,8 +153,11 @@
 .kitchen-header__actions {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
   gap: 0.5rem;
   flex-shrink: 0;
+  max-width: 100%;
 }
 
 .kitchen-header__btn {

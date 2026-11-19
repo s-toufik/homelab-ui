@@ -1,26 +1,38 @@
 import { Injectable, inject } from '@angular/core';
 import type { Ingredient } from '../../domain/ingredient';
+import type {
+  FoodClassification,
+  NutritionalComposition,
+} from '../../domain/nutritional-composition';
 import { KitchenApiClient } from './kitchen-api.client';
 
 interface IngredientJson {
   readonly ciqual_code: string;
   readonly name_fr: string;
+  readonly scientific_name: string | null;
+  readonly classification: FoodClassification;
   readonly kcal_per_100g: number;
   readonly protein_per_100g: number;
   readonly carb_per_100g: number;
   readonly fat_per_100g: number;
   readonly source: string;
+  readonly source_version: string;
+  readonly nutrition: NutritionalComposition;
 }
 
 function fromJson(json: IngredientJson): Ingredient {
   return {
     ciqualCode: json.ciqual_code,
     nameFr: json.name_fr,
+    scientificName: json.scientific_name,
+    classification: json.classification,
     kcalPer100g: json.kcal_per_100g,
     proteinPer100g: json.protein_per_100g,
     carbPer100g: json.carb_per_100g,
     fatPer100g: json.fat_per_100g,
     source: json.source,
+    sourceVersion: json.source_version,
+    nutrition: json.nutrition,
   };
 }
 
@@ -40,6 +52,13 @@ export class IngredientRepository {
       `/v1/ingredients?limit=${limit}&offset=${offset}`,
     );
     return ingredients.map(fromJson);
+  }
+
+  async get(ciqualCode: string): Promise<Ingredient> {
+    const json = await this.client.get<IngredientJson>(
+      `/v1/ingredients/${encodeURIComponent(ciqualCode)}`,
+    );
+    return fromJson(json);
   }
 
   async getOrCreate(

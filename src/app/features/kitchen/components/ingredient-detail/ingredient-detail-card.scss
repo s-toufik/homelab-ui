@@ -1,0 +1,106 @@
+.ingredient-detail__head {
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-family: var(--k-font-sans);
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--k-ink);
+  }
+}
+
+.ingredient-detail__scientific {
+  margin: 0.15rem 0 0;
+  font-style: italic;
+  font-size: 0.85rem;
+  color: var(--k-stone-500);
+}
+
+.ingredient-detail__breadcrumb {
+  margin: 0.35rem 0 0;
+  font-size: 0.78rem;
+  color: var(--k-stone-500);
+}
+
+.ingredient-detail__meta {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-top: 0.6rem;
+}
+
+.ingredient-detail__badge {
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--k-radius-pill, 999px);
+  background: var(--k-sage-100);
+  color: var(--k-sage-700);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+
+  &--muted {
+    background: var(--k-stone-100);
+    color: var(--k-stone-600);
+  }
+}
+
+.ingredient-detail__code {
+  font-family: var(--k-font-mono);
+  font-size: 0.72rem;
+  color: var(--k-stone-400);
+}
+
+.ingredient-detail__empty {
+  margin: 0;
+  color: var(--k-stone-500);
+  font-size: 0.88rem;
+}
+
+.ingredient-detail__section {
+  padding-top: 0.85rem;
+  margin-top: 0.85rem;
+  border-top: 1px solid var(--k-stone-200);
+
+  h4 {
+    margin: 0 0 0.5rem;
+    font-family: var(--k-font-sans);
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--k-stone-500);
+  }
+}
+
+.ingredient-detail__grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(11rem, 1fr));
+  gap: 0.4rem 1rem;
+}
+
+.ingredient-detail__row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid var(--k-stone-100);
+
+  dt {
+    font-size: 0.8rem;
+    color: var(--k-stone-600);
+  }
+
+  dd {
+    margin: 0;
+    font-family: var(--k-font-mono);
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--k-ink);
+    white-space: nowrap;
+  }
+}

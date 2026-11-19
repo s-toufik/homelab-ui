@@ -19,6 +19,12 @@
     --row: 2.75rem;
     --control: 2.75rem;
   }
+
+  input,
+  select,
+  textarea {
+    font-size: max(16px, 1em) !important;
+  }
 }
 
 * {
