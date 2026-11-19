@@ -40,7 +40,7 @@ export class KubernetesStore {
   readonly selected = signal<{ resource: ResourceKind; object: KubeObject } | null>(null);
   readonly detailTab = signal<DetailTab>('overview');
   readonly related = signal<ResourceRow[]>([]);
-  readonly jobPod = signal<string | null>(null);
+  readonly jobPod = signal<KubeObject | null>(null);
   readonly busy = signal(false);
   readonly actionError = signal<string | null>(null);
   readonly notice = signal<string | null>(null);
@@ -170,7 +170,7 @@ export class KubernetesStore {
     }
   }
 
-  private async findJobPod(job: KubeObject): Promise<string | null> {
+  private async findJobPod(job: KubeObject): Promise<KubeObject | null> {
     const namespace = job.metadata.namespace ?? '';
     for (const label of ['job-name', 'batch.kubernetes.io/job-name']) {
       const pods = await this.api
@@ -185,7 +185,7 @@ export class KubernetesStore {
         (a, b) =>
           Date.parse(b.metadata.creationTimestamp ?? '') -
           Date.parse(a.metadata.creationTimestamp ?? ''),
-      )[0].metadata.name;
+      )[0];
     }
     return null;
   }

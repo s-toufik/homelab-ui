@@ -107,7 +107,7 @@
             @if (isJob()) {
               <tr>
                 <th>Pod</th>
-                <td>{{ store.jobPod() ?? 'not created yet — hit Refresh' }}</td>
+                <td>{{ logsPod() || 'not created yet — hit Refresh' }}</td>
               </tr>
             }
             @if (labels().length) {
@@ -271,12 +271,19 @@
             }
           </select>
         }
-        @for (name of [container()]; track name) {
-          <app-pod-terminal
-            [namespace]="current.object.metadata.namespace ?? ''"
-            [pod]="logsPod()"
-            [container]="name"
-          />
+        @if (shellReady()) {
+          @for (name of [container()]; track name) {
+            <app-pod-terminal
+              [namespace]="current.object.metadata.namespace ?? ''"
+              [pod]="logsPod()"
+              [container]="name"
+            />
+          }
+        } @else {
+          <p class="hl-muted">
+            This container isn't running — it already exited, so there's nothing to open a shell
+            into. Use Logs for its output.
+          </p>
         }
       }
       @case ('events') {

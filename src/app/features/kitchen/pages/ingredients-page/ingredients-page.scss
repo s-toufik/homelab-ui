@@ -1,3 +1,46 @@
+.ingredients-page__search-row {
+  align-items: center;
+}
+
+.ingredients-page__search {
+  width: 100%;
+  max-width: 22rem;
+}
+
 .ingredients-page__pager {
   justify-content: center;
+}
+
+.ingredients-page__count {
+  text-align: center;
+}
+
+.ingredients-page__cards {
+  display: none;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ingredients-page__card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.ingredients-page__card-head {
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+@media (max-width: 767px) {
+  .ingredients-page__table {
+    display: none;
+  }
+
+  .ingredients-page__cards {
+    display: flex;
+  }
 }

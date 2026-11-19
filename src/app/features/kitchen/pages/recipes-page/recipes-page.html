@@ -10,10 +10,23 @@
     <p class="hl-error" role="alert">{{ store.error() }}</p>
   }
 
+  @if (store.recipes().length > 0) {
+    <input
+      class="hl-input recipes-page__search"
+      type="search"
+      placeholder="Search recipes"
+      aria-label="Search recipes"
+      [ngModel]="search()"
+      (ngModelChange)="search.set($event)"
+    />
+  }
+
   @if (store.state() === 'loading') {
     <p class="hl-empty">Loading recipes…</p>
   } @else if (store.recipes().length === 0 && !store.error()) {
     <p class="hl-empty">No recipes saved yet.</p>
+  } @else if (noMatches()) {
+    <p class="hl-empty">No recipes match "{{ search() }}".</p>
   }
 
   @for (group of groups(); track group.course) {

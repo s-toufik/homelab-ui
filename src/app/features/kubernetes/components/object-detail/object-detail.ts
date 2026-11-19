@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { type DetailTab, KubernetesStore } from '../../application/kubernetes.store';
-import { canRestart, canScale } from '../../domain/resources';
+import { type KubeObject, canRestart, canScale } from '../../domain/resources';
 import { PodLogs } from '../pod-logs/pod-logs';
 import { PodTerminal } from '../pod-terminal/pod-terminal';
 
@@ -17,9 +17,14 @@ export class ObjectDetail {
   protected readonly current = computed(() => this.store.selected());
   protected readonly isPod = computed(() => this.current()?.resource.id === 'pods');
   protected readonly isJob = computed(() => this.current()?.resource.id === 'jobs');
-  protected readonly logsPod = computed(
-    () => (this.isJob() ? this.store.jobPod() : this.current()?.object.metadata.name) ?? '',
+  protected readonly logsObject = computed<KubeObject | null>(
+    () => (this.isJob() ? this.store.jobPod() : this.current()?.object) ?? null,
   );
+  protected readonly logsPod = computed(() => this.logsObject()?.metadata.name ?? '');
+  protected readonly shellReady = computed(() => {
+    const statuses: any[] = this.logsObject()?.status?.['containerStatuses'] ?? [];
+    return !!statuses.find((s) => s.name === this.container())?.state?.running;
+  });
   protected readonly canScale = computed(
     () => !!this.current() && canScale(this.current()!.resource),
   );
@@ -53,7 +58,7 @@ export class ObjectDetail {
     { type: string; status: string; reason?: string; message?: string }[]
   >(() => this.current()?.object.status?.['conditions'] ?? []);
   protected readonly containerStatuses = computed<any[]>(
-    () => this.current()?.object.status?.['containerStatuses'] ?? [],
+    () => this.logsObject()?.status?.['containerStatuses'] ?? [],
   );
   protected readonly labels = computed(() =>
     Object.entries(this.current()?.object.metadata.labels ?? {}),
