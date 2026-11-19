@@ -101,7 +101,7 @@ describe('GatewaySession', () => {
     expect(assign).toHaveBeenCalledOnce();
   });
 
-  it('allows signing in again once a load succeeds', async () => {
+  it('does not let an unrelated successful load clear the retry guard', async () => {
     const assign = stubAssign();
     const current = session('gateway');
     current.signIn();
@@ -110,8 +110,8 @@ describe('GatewaySession', () => {
     await current.load();
     const redirected = current.signIn();
 
-    expect(redirected).toBe(true);
-    expect(assign).toHaveBeenCalledTimes(2);
+    expect(redirected).toBe(false);
+    expect(assign).toHaveBeenCalledOnce();
   });
 
   it('outside the gateway, previews a non-admin with the groups saved for it', () => {
