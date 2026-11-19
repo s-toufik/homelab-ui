@@ -16,6 +16,10 @@ export class ObjectDetail {
   protected readonly store = inject(KubernetesStore);
   protected readonly current = computed(() => this.store.selected());
   protected readonly isPod = computed(() => this.current()?.resource.id === 'pods');
+  protected readonly isJob = computed(() => this.current()?.resource.id === 'jobs');
+  protected readonly logsPod = computed(
+    () => (this.isJob() ? this.store.jobPod() : this.current()?.object.metadata.name) ?? '',
+  );
   protected readonly canScale = computed(
     () => !!this.current() && canScale(this.current()!.resource),
   );
@@ -23,9 +27,11 @@ export class ObjectDetail {
     () => !!this.current() && canRestart(this.current()!.resource),
   );
   protected readonly isCronJob = computed(() => this.current()?.resource.id === 'cronjobs');
-  protected readonly containers = computed<string[]>(() =>
-    (this.current()?.object.spec?.['containers'] ?? []).map((c: { name: string }) => c.name),
-  );
+  protected readonly containers = computed<string[]>(() => {
+    const spec = this.current()?.object.spec;
+    const list = spec?.['containers'] ?? spec?.['template']?.['spec']?.['containers'] ?? [];
+    return list.map((c: { name: string }) => c.name);
+  });
   protected readonly container = signal('');
   protected readonly replicas = signal(1);
   protected readonly yamlText = signal('');
@@ -34,7 +40,7 @@ export class ObjectDetail {
   protected readonly tabs = computed<{ id: DetailTab; label: string }[]>(() => [
     { id: 'overview', label: 'Overview' },
     { id: 'yaml', label: 'YAML' },
-    ...(this.isPod()
+    ...(this.isPod() || (this.isJob() && this.store.jobPod())
       ? [
           { id: 'logs' as const, label: 'Logs' },
           { id: 'shell' as const, label: 'Shell' },

@@ -104,6 +104,12 @@
                 <td>{{ owner.kind }}/{{ owner.name }}</td>
               </tr>
             }
+            @if (isJob()) {
+              <tr>
+                <th>Pod</th>
+                <td>{{ store.jobPod() ?? 'not created yet — hit Refresh' }}</td>
+              </tr>
+            }
             @if (labels().length) {
               <tr>
                 <th>Labels</th>
@@ -248,7 +254,7 @@
         }
         <app-pod-logs
           [namespace]="current.object.metadata.namespace ?? ''"
-          [pod]="current.object.metadata.name"
+          [pod]="logsPod()"
           [container]="container()"
         />
       }
@@ -268,7 +274,7 @@
         @for (name of [container()]; track name) {
           <app-pod-terminal
             [namespace]="current.object.metadata.namespace ?? ''"
-            [pod]="current.object.metadata.name"
+            [pod]="logsPod()"
             [container]="name"
           />
         }

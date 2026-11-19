@@ -40,6 +40,7 @@ export class KubernetesStore {
   readonly selected = signal<{ resource: ResourceKind; object: KubeObject } | null>(null);
   readonly detailTab = signal<DetailTab>('overview');
   readonly related = signal<ResourceRow[]>([]);
+  readonly jobPod = signal<string | null>(null);
   readonly busy = signal(false);
   readonly actionError = signal<string | null>(null);
   readonly notice = signal<string | null>(null);
@@ -163,9 +164,30 @@ export class KubernetesStore {
             .sort((a, b) => b.createdMs - a.createdMs),
         );
       }
+      this.jobPod.set(current.resource.id === 'jobs' ? await this.findJobPod(object) : null);
     } catch (error) {
       this.actionError.set((error as Error).message);
     }
+  }
+
+  private async findJobPod(job: KubeObject): Promise<string | null> {
+    const namespace = job.metadata.namespace ?? '';
+    for (const label of ['job-name', 'batch.kubernetes.io/job-name']) {
+      const pods = await this.api
+        .list(
+          kindById('pods'),
+          namespace,
+          `?labelSelector=${encodeURIComponent(`${label}=${job.metadata.name}`)}`,
+        )
+        .catch(() => []);
+      if (pods.length === 0) continue;
+      return [...pods].sort(
+        (a, b) =>
+          Date.parse(b.metadata.creationTimestamp ?? '') -
+          Date.parse(a.metadata.creationTimestamp ?? ''),
+      )[0].metadata.name;
+    }
+    return null;
   }
 
   yaml(object: KubeObject): string {
@@ -212,9 +234,16 @@ export class KubernetesStore {
   runNow(): Promise<boolean> {
     const current = this.selected();
     if (!current) return Promise.resolve(false);
+    const namespace = current.object.metadata.namespace ?? '';
     return this.act('Job started.', async () => {
       const job = await this.api.runNow(current.object);
       this.notice.set(`Job ${job} started.`);
+      this.view.set('jobs');
+      this.detailTab.set('overview');
+      this.selected.set({
+        resource: kindById('jobs'),
+        object: await this.api.get(kindById('jobs'), job, namespace),
+      });
     });
   }
 
