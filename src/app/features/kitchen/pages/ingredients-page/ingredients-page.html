@@ -6,6 +6,20 @@
     <a class="hl-btn" routerLink="/kitchen">Back to atelier</a>
   </app-page-header>
 
+  <div class="hl-row ingredients-page__search-row">
+    <input
+      class="hl-input ingredients-page__search"
+      type="search"
+      placeholder="Search ingredients"
+      aria-label="Search ingredients"
+      [ngModel]="search()"
+      (ngModelChange)="onSearchInput($event)"
+    />
+    @if (search()) {
+      <button type="button" class="hl-btn hl-btn--small" (click)="clearSearch()">Clear</button>
+    }
+  </div>
+
   @if (error()) {
     <p class="hl-error" role="alert">{{ error() }}</p>
   }
@@ -14,9 +28,15 @@
     <p class="hl-empty">Loading ingredients…</p>
   } @else if (error()) {
   } @else if (ingredients().length === 0) {
-    <p class="hl-empty">No ingredients in the catalog yet.</p>
+    <p class="hl-empty">
+      {{
+        searching()
+          ? 'No ingredients match "' + search().trim() + '".'
+          : 'No ingredients in the catalog yet.'
+      }}
+    </p>
   } @else {
-    <div class="hl-table-wrap">
+    <div class="hl-table-wrap ingredients-page__table">
       <table class="hl-table">
         <thead>
           <tr>
@@ -47,24 +67,49 @@
       </table>
     </div>
 
-    <div class="hl-row ingredients-page__pager">
-      <button
-        type="button"
-        class="hl-btn hl-btn--small"
-        [disabled]="offset() === 0 || state() === 'loading'"
-        (click)="previous()"
-      >
-        ‹ Previous
-      </button>
-      <span class="hl-muted">{{ pageFirst() }}–{{ pageLast() }}</span>
-      <button
-        type="button"
-        class="hl-btn hl-btn--small"
-        [disabled]="ingredients().length < pageSize || state() === 'loading'"
-        (click)="next()"
-      >
-        Next ›
-      </button>
-    </div>
+    <ul class="ingredients-page__cards">
+      @for (ingredient of ingredients(); track ingredient.ciqualCode) {
+        <li class="hl-card ingredients-page__card">
+          <div class="hl-row ingredients-page__card-head">
+            <strong>{{ ingredient.nameFr }}</strong>
+            <span class="hl-badge" [class.hl-badge--ok]="ingredient.source === 'custom'">
+              {{ ingredient.source }}
+            </span>
+          </div>
+          <span class="hl-muted"
+            >{{ ingredient.kcalPer100g }} kcal · P {{ ingredient.proteinPer100g }}g · C
+            {{ ingredient.carbPer100g }}g · F {{ ingredient.fatPer100g }}g</span
+          >
+        </li>
+      }
+    </ul>
+
+    @if (searching()) {
+      <p class="hl-muted ingredients-page__count">
+        {{ ingredients().length }} result{{ ingredients().length === 1 ? '' : 's' }} for "{{
+          search().trim()
+        }}"
+      </p>
+    } @else {
+      <div class="hl-row ingredients-page__pager">
+        <button
+          type="button"
+          class="hl-btn hl-btn--small"
+          [disabled]="offset() === 0 || state() === 'loading'"
+          (click)="previous()"
+        >
+          ‹ Previous
+        </button>
+        <span class="hl-muted">{{ pageFirst() }}–{{ pageLast() }}</span>
+        <button
+          type="button"
+          class="hl-btn hl-btn--small"
+          [disabled]="ingredients().length < pageSize || state() === 'loading'"
+          (click)="next()"
+        >
+          Next ›
+        </button>
+      </div>
+    }
   }
 </div>
