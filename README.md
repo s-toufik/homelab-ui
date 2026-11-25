@@ -20,7 +20,7 @@
 | **Agents**     | Everyone, for the assistants they were given | A live map: the Assistant in the middle, each agent as an animated scene, lines when the Assistant asks one                                       |
 | **Map**        | Admins                                       | The Kubernetes cluster, live: every service, its state, what it talks to                                                                          |
 | **People**     | Admins                                       | Accounts, and the pages each person may open                                                                                                      |
-| **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker                                           |
+| **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker, Kitchen                                  |
 | **Account**    | Everyone                                     | Profile, password, devices and sessions, deleting your account                                                                                    |
 | **Appearance** | Everyone                                     | Theme and agent cast                                                                                                                              |
 
@@ -174,6 +174,7 @@ Each card shows the service's live state from Kubernetes, refreshed every 30 sec
 | **Tool UIs**   | Links to each tool's own web interface, with whether it answers                                                                                                                                                                                                   |
 | **Kubernetes** | Admins: nodes, pods, workloads, services, volumes, secrets and events; scale, restart, run a cron job now, delete, edit YAML, read a pod's logs and open a shell                                                                                                  |
 | **Tasker**     | Automations as blocks on a canvas (Trigger, HTTP request, Code, Transform, Output): several canvases side by side, named and grouped blocks, favourites, each block's last result; saved to your account                                                          |
+| **Kitchen**    | A recipe and nutrition card: ingredients with live per-portion macros, method steps, tasting notes, versioned saves; two sibling pages search the shared ingredient catalog and your saved recipes                                                                |
 
 <table>
   <tr>
@@ -181,6 +182,8 @@ Each card shows the service's live state from Kubernetes, refreshed every 30 sec
     <td><img src="docs/screenshots/kubernetes.webp" alt="Kubernetes: the overview of pods and recent warnings, with the resource list on the left" /></td>
   </tr>
 </table>
+
+<img src="docs/screenshots/kitchen.webp" alt="Kitchen: a recipe card for Seared Duck Breast with live per-portion macros, ingredients with catalog macros, and tagged method steps" />
 
 Changes that can't be undone ask for confirmation first.
 

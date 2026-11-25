@@ -2,6 +2,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { PageHeader } from '@shared/ui/page-header/page-header';
+import { IngredientDetailModal } from '../../components/ingredient-detail/ingredient-detail-modal';
 import type { Ingredient } from '../../domain/ingredient';
 import { IngredientRepository } from '../../infrastructure/api/ingredient.repository';
 
@@ -14,7 +15,7 @@ type LoadState = 'loading' | 'ready' | 'error';
 
 @Component({
   selector: 'app-ingredients-page',
-  imports: [PageHeader, RouterLink, FormsModule],
+  imports: [PageHeader, RouterLink, FormsModule, IngredientDetailModal],
   templateUrl: './ingredients-page.html',
   styleUrl: './ingredients-page.scss',
 })
@@ -29,6 +30,11 @@ export class IngredientsPage {
   protected readonly offset = signal(0);
   protected readonly search = signal('');
   protected readonly searching = computed(() => this.search().trim().length >= MIN_SEARCH_LENGTH);
+  protected readonly detailCode = signal<string | null>(null);
+
+  protected openDetails(ciqualCode: string): void {
+    this.detailCode.set(ciqualCode);
+  }
 
   constructor() {
     void this.load();

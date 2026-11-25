@@ -168,7 +168,7 @@
     </header>
 
     @if (picking()) {
-      <div class="assistant__sheet-shade" (click)="picking.set(false)"></div>
+      <div class="assistant__sheet-shade" appScrollLock (click)="picking.set(false)"></div>
       <div class="assistant__sheet" role="menu" aria-label="Choose an assistant">
         <span class="assistant__sheet-grip" aria-hidden="true"></span>
         @for (agent of agents(); track agent) {

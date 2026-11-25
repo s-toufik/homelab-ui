@@ -6,6 +6,7 @@ import {
 } from '@shared/infrastructure/connection-settings';
 import { ConnectionSettingsStorage } from '@shared/infrastructure/connection-settings.storage';
 import { HomelabServer } from '@shared/infrastructure/homelab-server';
+import { ScrollLockDirective } from '@shared/ui/scroll-lock/scroll-lock.directive';
 import { FeatureStatusStore } from '../application/feature-status.store';
 import { SettingsModalStore } from '../application/settings-modal.store';
 import { CONNECTABLE_SERVICES } from '../domain/connectable-services';
@@ -34,7 +35,7 @@ function normalizeHost(value: string): string {
 
 @Component({
   selector: 'app-settings-modal',
-  imports: [FormsModule, Appearance],
+  imports: [FormsModule, Appearance, ScrollLockDirective],
   templateUrl: './settings-modal.html',
   styleUrl: './settings-modal.scss',
 })

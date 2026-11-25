@@ -1,5 +1,5 @@
 @if (store.isOpen()) {
-  <div class="settings-modal__backdrop" (click)="store.close()"></div>
+  <div class="settings-modal__backdrop" appScrollLock (click)="store.close()"></div>
 
   <div class="settings-modal" role="dialog" aria-modal="true" aria-labelledby="settings-title">
     <nav class="settings-modal__rail">

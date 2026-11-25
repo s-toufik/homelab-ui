@@ -2,6 +2,7 @@ import { Component, computed, effect, inject } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { SwarmAvatar } from '@shared/ui/swarm-avatar/swarm-avatar';
+import { ScrollLockDirective } from '@shared/ui/scroll-lock/scroll-lock.directive';
 import { filter, map } from 'rxjs';
 import { ASSISTANT_PANEL } from '../application/assistant-panel';
 import { LayoutStore } from '../application/layout.store';
@@ -27,6 +28,7 @@ import { SettingsModal } from '../settings-modal/settings-modal';
     AssistantDrawer,
     SettingsModal,
     SwarmAvatar,
+    ScrollLockDirective,
   ],
   templateUrl: './layout.html',
   styleUrl: './layout.scss',

@@ -46,6 +46,7 @@
             <th class="hl-num">Protein/100g</th>
             <th class="hl-num">Carb/100g</th>
             <th class="hl-num">Fat/100g</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -61,6 +62,15 @@
               <td class="hl-num">{{ ingredient.proteinPer100g }}</td>
               <td class="hl-num">{{ ingredient.carbPer100g }}</td>
               <td class="hl-num">{{ ingredient.fatPer100g }}</td>
+              <td class="hl-num">
+                <button
+                  type="button"
+                  class="hl-btn hl-btn--small"
+                  (click)="openDetails(ingredient.ciqualCode)"
+                >
+                  Details
+                </button>
+              </td>
             </tr>
           }
         </tbody>
@@ -80,6 +90,13 @@
             >{{ ingredient.kcalPer100g }} kcal · P {{ ingredient.proteinPer100g }}g · C
             {{ ingredient.carbPer100g }}g · F {{ ingredient.fatPer100g }}g</span
           >
+          <button
+            type="button"
+            class="hl-btn hl-btn--small ingredients-page__card-details"
+            (click)="openDetails(ingredient.ciqualCode)"
+          >
+            Details
+          </button>
         </li>
       }
     </ul>
@@ -113,3 +130,5 @@
     }
   }
 </div>
+
+<app-ingredient-detail-modal [ciqualCode]="detailCode()" (closed)="detailCode.set(null)" />

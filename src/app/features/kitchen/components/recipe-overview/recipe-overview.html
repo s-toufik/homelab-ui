@@ -120,8 +120,9 @@
           class="recipe-overview__stepper-btn"
           [disabled]="!editable"
           (click)="changePrepTime(-5)"
+          aria-label="Decrease prep time"
         >
-          −5
+          −
         </button>
         <span class="recipe-overview__stepper-value">{{ draft.prepTimeMinutes }}m</span>
         <button
@@ -129,8 +130,9 @@
           class="recipe-overview__stepper-btn"
           [disabled]="!editable"
           (click)="changePrepTime(5)"
+          aria-label="Increase prep time"
         >
-          +5
+          +
         </button>
       </div>
     </div>
@@ -143,8 +145,9 @@
           class="recipe-overview__stepper-btn"
           [disabled]="!editable"
           (click)="changeCookTime(-5)"
+          aria-label="Decrease cook time"
         >
-          −5
+          −
         </button>
         <span class="recipe-overview__stepper-value">{{ draft.cookTimeMinutes }}m</span>
         <button
@@ -152,8 +155,9 @@
           class="recipe-overview__stepper-btn"
           [disabled]="!editable"
           (click)="changeCookTime(5)"
+          aria-label="Increase cook time"
         >
-          +5
+          +
         </button>
       </div>
     </div>

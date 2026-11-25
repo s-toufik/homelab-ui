@@ -13,6 +13,7 @@ import { NgTemplateOutlet } from '@angular/common';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { PaneState } from '@shared/ui/side-pane/pane-state';
 import { DeleteButton } from '@shared/ui/delete-button/delete-button';
+import { ScrollLockDirective } from '@shared/ui/scroll-lock/scroll-lock.directive';
 import { SidePane } from '@shared/ui/side-pane/side-pane';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AccessStore } from '@shell/application/access.store';
@@ -49,6 +50,7 @@ function when(at: number, now = Date.now()): string {
     Composer,
     SidePane,
     DeleteButton,
+    ScrollLockDirective,
   ],
   templateUrl: './assistant-page.html',
   styleUrl: './assistant-page.scss',

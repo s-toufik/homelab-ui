@@ -16,10 +16,24 @@
 .recipes-page__card {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  gap: 0.5rem;
+}
+
+.recipes-page__card-open {
+  display: flex;
+  flex-direction: column;
   align-items: flex-start;
   gap: 0.3rem;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
   text-align: start;
   cursor: pointer;
+  color: inherit;
+  font: inherit;
+  border-radius: var(--radius);
 
   &:hover {
     background: var(--surface-hover);
@@ -28,4 +42,8 @@
 
 .recipes-page__name {
   font-size: 0.95rem;
+}
+
+.recipes-page__delete {
+  align-self: flex-end;
 }

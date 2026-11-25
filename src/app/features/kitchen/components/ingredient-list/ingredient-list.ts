@@ -1,18 +1,18 @@
 import { FormsModule } from '@angular/forms';
 import { Component, computed, inject, signal } from '@angular/core';
+import { ScrollLockDirective } from '@shared/ui/scroll-lock/scroll-lock.directive';
 import { KitchenToastStore } from '../../application/kitchen-toast.store';
 import { RecipeEditorStore } from '../../application/recipe-editor.store';
-import type { Ingredient } from '../../domain/ingredient';
 import type { IngredientLine } from '../../domain/ingredient-line';
 import { IngredientRepository } from '../../infrastructure/api/ingredient.repository';
-import { IngredientDetailCard } from '../ingredient-detail/ingredient-detail-card';
+import { IngredientDetailModal } from '../ingredient-detail/ingredient-detail-modal';
 import { IngredientRow } from './ingredient-row';
 
 const PANTRY_STAPLES = ['Beurre doux', 'Huile d’olive', 'Sel fin', 'Farine T55', 'Échalote', 'Ail'];
 
 @Component({
   selector: 'app-ingredient-list',
-  imports: [IngredientRow, FormsModule, IngredientDetailCard],
+  imports: [IngredientRow, FormsModule, IngredientDetailModal, ScrollLockDirective],
   templateUrl: './ingredient-list.html',
   styleUrl: './ingredient-list.scss',
 })
@@ -28,32 +28,10 @@ export class IngredientList {
     return index === null ? null : (this.store.draft().ingredients[index] ?? null);
   });
 
-  protected readonly detailIngredient = signal<Ingredient | null>(null);
-  protected readonly detailLoading = signal(false);
-  protected readonly detailError = signal<string | null>(null);
+  protected readonly detailCode = signal<string | null>(null);
 
-  protected async openDetails(index: number): Promise<void> {
-    const code = this.store.draft().ingredients[index]?.ingredientRefId;
-    if (!code) return;
-
-    this.detailIngredient.set(null);
-    this.detailError.set(null);
-    this.detailLoading.set(true);
-    try {
-      this.detailIngredient.set(await this.ingredients.get(code));
-    } catch (error) {
-      this.detailError.set(
-        error instanceof Error ? error.message : 'Could not load this ingredient',
-      );
-    } finally {
-      this.detailLoading.set(false);
-    }
-  }
-
-  protected closeDetails(): void {
-    this.detailIngredient.set(null);
-    this.detailError.set(null);
-    this.detailLoading.set(false);
+  protected openIngredientDetails(index: number): void {
+    this.detailCode.set(this.store.draft().ingredients[index]?.ingredientRefId ?? null);
   }
 
   protected onChanged(index: number, patch: Partial<IngredientLine>): void {

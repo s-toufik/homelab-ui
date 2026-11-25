@@ -35,6 +35,10 @@
   align-items: baseline;
 }
 
+.ingredients-page__card-details {
+  align-self: flex-start;
+}
+
 @media (max-width: 767px) {
   .ingredients-page__table {
     display: none;

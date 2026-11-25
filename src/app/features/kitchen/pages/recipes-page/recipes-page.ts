@@ -3,6 +3,7 @@ import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { PageHeader } from '@shared/ui/page-header/page-header';
+import { KitchenToastStore } from '../../application/kitchen-toast.store';
 import { RecipeListStore } from '../../application/recipe-list.store';
 import { COURSES, type RecipeSummary } from '../../domain/recipe';
 
@@ -15,6 +16,7 @@ import { COURSES, type RecipeSummary } from '../../domain/recipe';
 export class RecipesPage {
   protected readonly store = inject(RecipeListStore);
   private readonly router = inject(Router);
+  private readonly toast = inject(KitchenToastStore);
 
   protected readonly search = signal('');
 
@@ -48,5 +50,14 @@ export class RecipesPage {
 
   protected async open(recipe: RecipeSummary): Promise<void> {
     await this.router.navigate(['/kitchen'], { queryParams: { recipe: recipe.id } });
+  }
+
+  protected async remove(recipe: RecipeSummary, event: Event): Promise<void> {
+    event.stopPropagation();
+    const title = recipe.title || 'Untitled recipe';
+    if (!confirm(`Delete "${title}" and all of its versions? This can't be undone.`)) return;
+
+    const ok = await this.store.remove(recipe.id);
+    this.toast.show(ok ? `Deleted "${title}"` : `Couldn't delete "${title}"`);
   }
 }
