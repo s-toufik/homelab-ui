@@ -6,8 +6,7 @@
   display: flex;
   align-items: flex-end;
   gap: 0.5rem;
-  width: calc(100% - 2rem);
-  max-width: 44rem;
+  width: min(92vw, 72rem);
   margin: 0 auto calc(1rem + var(--safe-bottom));
   padding: 0.45rem 0.45rem 0.45rem 1.2rem;
   border: var(--card-border);

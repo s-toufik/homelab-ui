@@ -142,84 +142,56 @@
         }
       </div>
     }
-    <dialog
-      #details
-      class="details"
-      [attr.aria-label]="look().label + ', ' + stateText()"
-      (close)="detailsOpen.set(false)"
-      (click)="onDetailsClick($event)"
-    >
-      @if (detailsOpen()) {
-        <div class="details__panel">
-          <header class="details__head">
-            <app-agent-scene
-              class="details__scene"
-              [agent]="name"
-              [mood]="mood()"
-              [label]="look().label"
-            />
-            <div class="details__who">
-              <h2 class="details__name">
-                {{ look().label }}
-                <span [class]="'card__state card__state--' + state()">{{ stateText() }}</span>
-              </h2>
-              @if (node().task) {
-                <p class="details__task">{{ node().task }}</p>
-              }
-            </div>
-            <button type="button" class="card__icon" aria-label="Close" (click)="closeDetails()">
-              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-                <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" />
-              </svg>
-            </button>
-          </header>
-          <div class="details__body">
-            <ng-container [ngTemplateOutlet]="work" [ngTemplateOutletContext]="{ full: true }" />
-            @if (node().agents.length) {
-              <h3 class="details__label">Agents it asked</h3>
-              <div class="nested">
-                @for (child of node().agents; track child.agent) {
-                  <app-agent-progress [node]="child" [streaming]="streaming()" />
-                }
-              </div>
-            }
-            @if (!hasWork() && !node().agents.length) {
-              <p class="details__empty">Nothing to show yet: no plan or tool calls so far.</p>
-            }
-          </div>
-        </div>
-      }
-    </dialog>
   </article>
 } @else {
   <div class="root">
     @if (hasWork()) {
       <div class="own" [class.own--open]="ownOpen()">
-        <button
-          type="button"
-          class="own__head"
-          [attr.aria-expanded]="ownOpen()"
-          (click)="toggleOwn()"
-        >
-          @if (stopped()) {
-            <svg class="own__stop" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-              <rect class="stop" x="3.5" y="3.5" width="9" height="9" rx="1.5" />
+        <div class="card__head">
+          <button
+            type="button"
+            class="own__head"
+            [attr.aria-expanded]="ownOpen()"
+            (click)="toggleOwn()"
+          >
+            @if (stopped()) {
+              <svg class="own__stop" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                <rect class="stop" x="3.5" y="3.5" width="9" height="9" rx="1.5" />
+              </svg>
+            } @else if (streaming() && (count().done < count().total || tools().length)) {
+              <span class="spinner"></span>
+            } @else {
+              <svg class="own__check" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
+                <path d="M3.5 8.5l3 3 6-7" />
+              </svg>
+            }
+            <span class="own__title">{{
+              stopped() ? 'Stopped' : steps().length ? 'Working through the plan' : 'Tools used'
+            }}</span>
+            <span class="own__summary">{{ summary() }}</span>
+            <svg
+              class="card__chevron"
+              viewBox="0 0 16 16"
+              width="14"
+              height="14"
+              aria-hidden="true"
+            >
+              <path d="M4 6l4 4 4-4" />
             </svg>
-          } @else if (streaming() && (count().done < count().total || tools().length)) {
-            <span class="spinner"></span>
-          } @else {
-            <svg class="own__check" viewBox="0 0 16 16" width="12" height="12" aria-hidden="true">
-              <path d="M3.5 8.5l3 3 6-7" />
+          </button>
+          <button
+            type="button"
+            class="card__icon"
+            aria-haspopup="dialog"
+            aria-label="Open run details"
+            title="Open details"
+            (click)="openDetails()"
+          >
+            <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+              <path d="M3 6.5V3h3.5M9.5 3H13v3.5M13 9.5V13H9.5M6.5 13H3V9.5" />
             </svg>
-          }
-          <span class="own__title">{{
-            stopped() ? 'Stopped' : steps().length ? 'Working through the plan' : 'Tools used'
-          }}</span>
-          <span class="own__summary">{{ summary() }}</span>
-          <svg class="card__chevron" viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
-            <path d="M4 6l4 4 4-4" />
-          </svg>
-        </button>
+          </button>
+        </div>
         @if (ownOpen()) {
           <div class="own__body"><ng-container [ngTemplateOutlet]="work" /></div>
         }
@@ -234,3 +206,54 @@
     }
   </div>
 }
+
+<dialog
+  #details
+  class="details"
+  [attr.aria-label]="node().agent ? look().label + ', ' + stateText() : 'Run details'"
+  (close)="detailsOpen.set(false)"
+  (click)="onDetailsClick($event)"
+>
+  @if (detailsOpen()) {
+    <div class="details__panel">
+      <header class="details__head">
+        @if (node().agent; as name) {
+          <app-agent-scene
+            class="details__scene"
+            [agent]="name"
+            [mood]="mood()"
+            [label]="look().label"
+          />
+        }
+        <div class="details__who">
+          <h2 class="details__name">
+            {{ node().agent ? look().label : 'Run details' }}
+            <span [class]="'card__state card__state--' + state()">{{ stateText() }}</span>
+          </h2>
+          @if (node().task) {
+            <p class="details__task">{{ node().task }}</p>
+          }
+        </div>
+        <button type="button" class="card__icon" aria-label="Close" (click)="closeDetails()">
+          <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+            <path d="M4.5 4.5l7 7M11.5 4.5l-7 7" />
+          </svg>
+        </button>
+      </header>
+      <div class="details__body">
+        <ng-container [ngTemplateOutlet]="work" [ngTemplateOutletContext]="{ full: true }" />
+        @if (node().agents.length) {
+          <h3 class="details__label">Agents it asked</h3>
+          <div class="nested">
+            @for (child of node().agents; track child.agent) {
+              <app-agent-progress [node]="child" [streaming]="streaming()" />
+            }
+          </div>
+        }
+        @if (!hasWork() && !node().agents.length) {
+          <p class="details__empty">Nothing to show yet: no plan or tool calls so far.</p>
+        }
+      </div>
+    </div>
+  }
+</dialog>

@@ -5,8 +5,7 @@
 .conversation {
   flex: 1 1 auto;
   overflow-y: auto;
-  width: calc(100% - 2rem);
-  max-width: 44rem;
+  width: min(92vw, 72rem);
   margin-inline: auto;
   padding-block: 1.5rem 1.25rem;
   display: flex;

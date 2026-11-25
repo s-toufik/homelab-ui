@@ -310,6 +310,10 @@
   .kitchen-header__nav {
     display: flex;
   }
+
+  .kitchen-main__grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 767px) {
@@ -322,10 +326,6 @@
     .kitchen-header__btn--copy {
       display: none;
     }
-  }
-
-  .kitchen-main__grid {
-    grid-template-columns: 1fr;
   }
 
   .kitchen-mobile-bar {

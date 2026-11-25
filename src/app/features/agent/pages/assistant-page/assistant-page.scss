@@ -326,8 +326,7 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: 0.5rem;
-  width: calc(100% - 2rem);
-  max-width: 44rem;
+  width: min(92vw, 72rem);
   margin: 0 auto 0.75rem;
 }
 
@@ -354,15 +353,13 @@
 
 .assistant__error {
   flex-shrink: 0;
-  width: calc(100% - 2rem);
-  max-width: 44rem;
+  width: min(92vw, 72rem);
   margin: 0 auto 0.75rem;
 }
 
 .assistant__plan {
   flex-shrink: 0;
-  width: calc(100% - 2rem);
-  max-width: 44rem;
+  width: min(92vw, 72rem);
   margin: 0 auto 1rem;
   border: var(--card-border);
   border-radius: var(--radius-card);

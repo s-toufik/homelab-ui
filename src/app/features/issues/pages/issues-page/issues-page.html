@@ -1,4 +1,4 @@
-<div class="hl-page hl-page--narrow">
+<div class="hl-page">
   <app-page-header
     title="Report an issue"
     eyebrow="Feedback"
@@ -77,39 +77,66 @@
       } @else if (list.reports().length === 0) {
         <p class="hl-empty">No reports yet.</p>
       } @else {
-        <ul class="issues-page__list">
-          @for (report of list.reports(); track report.id) {
-            <li class="issues-page__report">
-              @if (report.screenshotDataUrl; as url) {
-                <a [href]="url" target="_blank" rel="noopener" class="issues-page__thumb">
-                  <img [src]="url" alt="" />
-                </a>
+        <div class="issues-page__groups">
+          @for (group of groups(); track group.status) {
+            <div class="issues-page__group">
+              <h3 class="issues-page__group-title">
+                {{ group.label }} <span class="hl-muted">({{ group.reports.length }})</span>
+              </h3>
+              @if (group.reports.length === 0) {
+                <p class="hl-empty">Nothing here.</p>
+              } @else {
+                <ul class="issues-page__list">
+                  @for (report of group.reports; track report.id) {
+                    <li class="issues-page__report">
+                      @if (report.screenshotDataUrl; as url) {
+                        <div
+                          class="issues-page__thumb-wrap"
+                          (mouseenter)="peeking.set(report.id)"
+                          (mouseleave)="peeking.set(null)"
+                        >
+                          <button
+                            type="button"
+                            class="issues-page__thumb"
+                            [attr.aria-expanded]="peeking() === report.id"
+                            aria-label="Preview screenshot"
+                            (click)="togglePeek(report.id)"
+                          >
+                            <img [src]="url" alt="" />
+                          </button>
+                          @if (peeking() === report.id) {
+                            <div class="issues-page__preview">
+                              <img [src]="url" alt="Screenshot preview" />
+                            </div>
+                          }
+                        </div>
+                      }
+                      <div class="issues-page__report-body">
+                        <div class="hl-row issues-page__report-head">
+                          <strong>{{ report.title }}</strong>
+                        </div>
+                        <p class="issues-page__description">{{ report.description }}</p>
+                        <p class="hl-muted hl-mono">
+                          {{ report.reporter }} · {{ report.pagePath }} ·
+                          {{ report.createdAt | date: 'medium' }}
+                        </p>
+                      </div>
+                      <select
+                        class="hl-input issues-page__status"
+                        [ngModel]="report.status"
+                        (change)="onStatusChange(report.id, $event)"
+                      >
+                        @for (status of statuses; track status) {
+                          <option [value]="status">{{ statusLabel[status] }}</option>
+                        }
+                      </select>
+                    </li>
+                  }
+                </ul>
               }
-              <div class="issues-page__report-body">
-                <div class="hl-row issues-page__report-head">
-                  <strong>{{ report.title }}</strong>
-                  <span class="hl-badge" [class]="badgeClass(report.status)">
-                    {{ statusLabel[report.status] }}
-                  </span>
-                </div>
-                <p class="issues-page__description">{{ report.description }}</p>
-                <p class="hl-muted hl-mono">
-                  {{ report.reporter }} · {{ report.pagePath }} ·
-                  {{ report.createdAt | date: 'medium' }}
-                </p>
-              </div>
-              <select
-                class="hl-input issues-page__status"
-                [ngModel]="report.status"
-                (change)="onStatusChange(report.id, $event)"
-              >
-                @for (status of statuses; track status) {
-                  <option [value]="status">{{ statusLabel[status] }}</option>
-                }
-              </select>
-            </li>
+            </div>
           }
-        </ul>
+        </div>
       }
     </section>
   }

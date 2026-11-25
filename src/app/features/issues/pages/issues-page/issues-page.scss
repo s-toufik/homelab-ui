@@ -24,6 +24,17 @@
   justify-content: space-between;
 }
 
+.issues-page__groups {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.issues-page__group-title {
+  margin: 0 0 0.6rem;
+  font-size: 0.95rem;
+}
+
 .issues-page__list {
   display: flex;
   flex-direction: column;
@@ -43,9 +54,17 @@
   background: var(--surface-raised);
 }
 
-.issues-page__thumb {
+.issues-page__thumb-wrap {
+  position: relative;
   flex-shrink: 0;
+}
+
+.issues-page__thumb {
   display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: zoom-in;
 
   img {
     width: 5rem;
@@ -53,6 +72,26 @@
     object-fit: cover;
     border-radius: var(--radius);
     border: var(--border-width) solid var(--border);
+    display: block;
+  }
+}
+
+.issues-page__preview {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 30;
+  padding: 0.35rem;
+  border-radius: var(--radius-card);
+  border: var(--card-border);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-float);
+
+  img {
+    display: block;
+    max-width: min(28rem, 80vw);
+    max-height: min(22rem, 70vh);
+    border-radius: calc(var(--radius-card) - 0.25rem);
   }
 }
 
