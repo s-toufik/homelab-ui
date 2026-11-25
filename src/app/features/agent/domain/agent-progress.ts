@@ -90,7 +90,7 @@ function apply(node: ProgressNode, event: ProgressEvent): ProgressNode {
         callId: event.callId,
         name: event.name,
         state,
-        detail: state === 'done' ? (known?.detail ?? event.detail ?? '') : (event.detail ?? ''),
+        detail: state === 'done' ? event.detail || known?.detail || '' : (event.detail ?? ''),
       };
       return {
         ...node,
