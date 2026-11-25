@@ -27,4 +27,15 @@ export class RecipeListStore {
       this.state.set('error');
     }
   }
+
+  async remove(recipeId: string): Promise<boolean> {
+    try {
+      await this.repository.delete(recipeId);
+      this.recipes.update((recipes) => recipes.filter((recipe) => recipe.id !== recipeId));
+      return true;
+    } catch (error) {
+      this.error.set((error as Error).message);
+      return false;
+    }
+  }
 }

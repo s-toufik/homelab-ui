@@ -41,4 +41,8 @@ export class RecipeRepository {
     );
     return recipeVersionFromJson(json);
   }
+
+  async delete(recipeId: string): Promise<void> {
+    await this.client.delete<void>(`/v1/recipes/${encodeURIComponent(recipeId)}`);
+  }
 }

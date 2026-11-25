@@ -1,0 +1,18 @@
+@if (loading() || error() || ingredient()) {
+  <div class="ingredient-detail-modal-backdrop" appScrollLock (click)="close()">
+    <div class="ingredient-detail-modal" (click)="$event.stopPropagation()">
+      <div class="ingredient-detail-modal__head">
+        <h3>Full ingredient card</h3>
+        <button type="button" class="ingredient-detail-modal__close" (click)="close()">✕</button>
+      </div>
+
+      @if (loading()) {
+        <p class="ingredient-detail-modal__loading">Loading…</p>
+      } @else if (error(); as message) {
+        <p class="hl-error" role="alert">{{ message }}</p>
+      } @else if (ingredient(); as food) {
+        <app-ingredient-detail-card [ingredient]="food" />
+      }
+    </div>
+  </div>
+}

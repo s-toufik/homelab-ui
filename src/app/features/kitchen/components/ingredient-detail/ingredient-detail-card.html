@@ -25,7 +25,7 @@
       <section class="ingredient-detail__section">
         <h4>{{ group.title }}</h4>
         <dl class="ingredient-detail__grid">
-          @for (entry of group.entries; track entry.label) {
+          @for (entry of group.entries; track entry.label + $index) {
             <div class="ingredient-detail__row">
               <dt>{{ entry.label }}</dt>
               <dd>{{ entry.value }}</dd>

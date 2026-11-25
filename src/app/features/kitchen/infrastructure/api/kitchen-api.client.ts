@@ -23,6 +23,13 @@ export class KitchenApiClient {
     });
   }
 
+  async delete<T>(path: string): Promise<T> {
+    return this.request<T>(path, {
+      method: 'DELETE',
+      headers: { 'X-Homelab-Request': '1' },
+    });
+  }
+
   private async request<T>(path: string, init: RequestInit = {}): Promise<T> {
     let response: Response;
     try {
@@ -52,6 +59,8 @@ export class KitchenApiClient {
 async function detail(response: Response, fallback: string): Promise<string> {
   return response
     .json()
-    .then((body: { detail?: string }) => body?.detail ?? fallback)
+    .then((body: { detail?: unknown }) =>
+      typeof body?.detail === 'string' ? body.detail : fallback,
+    )
     .catch(() => fallback);
 }

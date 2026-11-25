@@ -34,13 +34,24 @@
       <h2 class="recipes-page__title">{{ group.course }}</h2>
       <div class="hl-grid">
         @for (recipe of group.recipes; track recipe.id) {
-          <button type="button" class="hl-card recipes-page__card" (click)="open(recipe)">
-            <strong class="recipes-page__name">{{ recipe.title || 'Untitled recipe' }}</strong>
-            <span class="hl-muted"
-              >v{{ recipe.currentVersionNumber }} · updated
-              {{ recipe.updatedAt | date: 'MMM d, y' }}</span
+          <div class="hl-card recipes-page__card">
+            <button type="button" class="recipes-page__card-open" (click)="open(recipe)">
+              <strong class="recipes-page__name">{{ recipe.title || 'Untitled recipe' }}</strong>
+              <span class="hl-muted"
+                >v{{ recipe.currentVersionNumber }} · updated
+                {{ recipe.updatedAt | date: 'MMM d, y' }}</span
+              >
+            </button>
+            <button
+              type="button"
+              class="hl-btn hl-btn--small hl-btn--danger recipes-page__delete"
+              title="Delete this recipe and all its versions"
+              aria-label="Delete this recipe and all its versions"
+              (click)="remove(recipe, $event)"
             >
-          </button>
+              Delete
+            </button>
+          </div>
         }
       </div>
     </section>
@@ -51,13 +62,24 @@
       <h2 class="recipes-page__title">Other</h2>
       <div class="hl-grid">
         @for (recipe of uncategorized(); track recipe.id) {
-          <button type="button" class="hl-card recipes-page__card" (click)="open(recipe)">
-            <strong class="recipes-page__name">{{ recipe.title || 'Untitled recipe' }}</strong>
-            <span class="hl-muted"
-              >v{{ recipe.currentVersionNumber }} · updated
-              {{ recipe.updatedAt | date: 'MMM d, y' }}</span
+          <div class="hl-card recipes-page__card">
+            <button type="button" class="recipes-page__card-open" (click)="open(recipe)">
+              <strong class="recipes-page__name">{{ recipe.title || 'Untitled recipe' }}</strong>
+              <span class="hl-muted"
+                >v{{ recipe.currentVersionNumber }} · updated
+                {{ recipe.updatedAt | date: 'MMM d, y' }}</span
+              >
+            </button>
+            <button
+              type="button"
+              class="hl-btn hl-btn--small hl-btn--danger recipes-page__delete"
+              title="Delete this recipe and all its versions"
+              aria-label="Delete this recipe and all its versions"
+              (click)="remove(recipe, $event)"
             >
-          </button>
+              Delete
+            </button>
+          </div>
         }
       </div>
     </section>

@@ -1,5 +1,5 @@
 @if (store.isOpen()) {
-  <div class="palette__backdrop" (click)="store.close()"></div>
+  <div class="palette__backdrop" appScrollLock (click)="store.close()"></div>
   <div class="palette" role="dialog" aria-modal="true" aria-label="Search or ask">
     <div class="palette__field">
       <svg

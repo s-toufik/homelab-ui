@@ -9,6 +9,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ScrollLockDirective } from '@shared/ui/scroll-lock/scroll-lock.directive';
 import {
   COMMAND_GROUPS,
   COMMAND_SOURCES,
@@ -19,7 +20,7 @@ import {
 
 @Component({
   selector: 'app-command-palette',
-  imports: [FormsModule],
+  imports: [FormsModule, ScrollLockDirective],
   templateUrl: './command-palette.html',
   styleUrl: './command-palette.scss',
 })

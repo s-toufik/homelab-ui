@@ -1,0 +1,79 @@
+// app-ingredient-detail-card (nested below) is styled with the atelier's --k-* tokens, which
+// only exist where kitchen-theme.scss's :host applies — not guaranteed here, since this modal
+// is also opened from the plain Ingredients list page. Re-declare just the ones it reads,
+// mapped to the same underlying tokens kitchen-theme.scss uses, without its layout/background
+// side effects (that stylesheet also sets display/background/font on :host).
+:host {
+  --k-font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  --k-font-mono: 'JetBrains Mono', monospace;
+  --k-ink: var(--text);
+  --k-stone-100: var(--surface-hover);
+  --k-stone-200: var(--border);
+  --k-stone-400: var(--text-muted);
+  --k-stone-500: var(--text-muted);
+  --k-stone-600: color-mix(in srgb, var(--text) 55%, var(--text-muted) 45%);
+  --k-sage-100: var(--hue-green-soft);
+  --k-sage-700: var(--hue-green);
+  --k-radius-pill: 999px;
+}
+
+.ingredient-detail-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(0 0 0 / 45%);
+}
+
+.ingredient-detail-modal {
+  width: 100%;
+  max-width: 42rem;
+  max-height: 90vh;
+  overflow-y: auto;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-float);
+  padding: 1.25rem;
+}
+
+.ingredient-detail-modal__loading {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.88rem;
+}
+
+.ingredient-detail-modal__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+}
+
+.ingredient-detail-modal__close {
+  width: 2.25rem;
+  height: 2.25rem;
+  flex-shrink: 0;
+  border: var(--border-width) solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  color: var(--text-muted);
+  font-weight: 700;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--surface-hover);
+    color: var(--text);
+  }
+}

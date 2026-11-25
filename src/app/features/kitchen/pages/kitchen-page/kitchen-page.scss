@@ -314,7 +314,14 @@
 
 @media (max-width: 767px) {
   :host {
-    padding-bottom: 6rem;
+    padding-bottom: calc(6rem + var(--safe-bottom));
+  }
+
+  .kitchen-header__actions {
+    app-recipe-picker,
+    .kitchen-header__btn--copy {
+      display: none;
+    }
   }
 
   .kitchen-main__grid {
@@ -327,7 +334,7 @@
     inset-inline: 0;
     bottom: 0;
     z-index: 40;
-    padding: 0.6rem 0.9rem;
+    padding: 0.6rem 0.9rem calc(0.6rem + var(--safe-bottom));
     background: var(--k-ink);
     color: var(--k-ink-on);
     border-top: 1px solid var(--k-stone-800);
