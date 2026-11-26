@@ -119,7 +119,7 @@ export class McpClientService {
       signal: AbortSignal.timeout(timeoutMs),
     });
     if (!response.ok) {
-      if (response.status === 401 && this.gateway.enabled) this.gateway.signIn();
+      if (response.status === 401 && this.gateway.enabled) void this.gateway.verify();
       throw new Error(`The toolbox answered ${response.status}.`);
     }
     this.session = response.headers.get('Mcp-Session-Id') ?? this.session;

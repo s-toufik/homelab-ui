@@ -69,48 +69,80 @@ describe('GatewaySession', () => {
     expect([admin, current.isAdmin()]).toEqual([true, false]);
   });
 
-  it('sends the browser to sign in when the session has ended', async () => {
+  it('sends the browser to sign in when the page opens without a session', async () => {
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 401 })));
+    const assign = stubAssign();
     const current = session('gateway');
-    const signIn = vi.spyOn(current, 'signIn').mockImplementation(() => true);
 
     await current.load();
 
-    expect(signIn).toHaveBeenCalledOnce();
+    expect(assign).toHaveBeenCalledWith(expect.stringContaining('/oauth2/sign_in?rd='));
     expect(current.user()).toBeNull();
   });
 
-  it('redirects to sign-in', () => {
+  it('asks before signing in again when the session ends while the page is open', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 401 })));
     const assign = stubAssign();
     const current = session('gateway');
 
-    const redirected = current.signIn();
+    await current.verify();
 
-    expect(redirected).toBe(true);
-    expect(assign).toHaveBeenCalledWith(expect.stringContaining('/oauth2/sign_in?rd='));
+    expect(current.expired()).toBe(true);
+    expect(assign).not.toHaveBeenCalled();
   });
 
-  it('does not bounce back and forth once a redirect already failed to fix it', () => {
+  it('closes the prompt once the session is back, e.g. after signing in from another tab', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response('', { status: 401 }))
+        .mockResolvedValueOnce(new Response(JSON.stringify({ preferredUsername: 'toufik' }))),
+    );
+    const current = session('gateway');
+
+    await current.verify();
+    await current.verify();
+
+    expect(current.expired()).toBe(false);
+  });
+
+  it('keeps the session when the gateway cannot be reached', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new TypeError('offline')));
+    const current = session('gateway');
+
+    await current.verify();
+
+    expect(current.expired()).toBe(false);
+  });
+
+  it('does not bounce back and forth once a redirect already failed to fix it', async () => {
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 401 })));
     const assign = stubAssign();
     const current = session('gateway');
 
-    current.signIn();
-    const redirectedAgain = current.signIn();
+    await current.load();
+    await current.load();
 
-    expect(redirectedAgain).toBe(false);
     expect(assign).toHaveBeenCalledOnce();
+    expect(current.expired()).toBe(true);
   });
 
   it('does not let an unrelated successful load clear the retry guard', async () => {
     const assign = stubAssign();
     const current = session('gateway');
     current.signIn();
-    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(JSON.stringify({}))));
+    vi.stubGlobal(
+      'fetch',
+      vi
+        .fn()
+        .mockResolvedValueOnce(new Response(JSON.stringify({})))
+        .mockResolvedValueOnce(new Response('', { status: 401 })),
+    );
 
     await current.load();
-    const redirected = current.signIn();
+    await current.load();
 
-    expect(redirected).toBe(false);
     expect(assign).toHaveBeenCalledOnce();
   });
 

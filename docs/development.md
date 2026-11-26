@@ -118,7 +118,7 @@ Every address is built from `shared/infrastructure/homelab-server.json` and the 
 
 In production the server address is the page's own host (`HOMELAB_SERVER_URL` follows `location`), unless a host is saved in Settings → Connectors; `homelab-server.json` is only used by `npm start`.
 
-`GatewaySession` reads the signed-in account and its groups from `/oauth2/userinfo` at start-up (each Keycloak realm role arrives as `role:<name>`), checks again every minute and when the tab comes back, and sends the browser to the sign-in page when the session has ended. Tasker keeps unsaved canvases per account (`homelab-ui.tasker.workspace.<account>`).
+`GatewaySession` reads the signed-in account and its groups from `/oauth2/userinfo` at start-up (each Keycloak realm role arrives as `role:<name>`), and sends the browser to the sign-in page if there is no session yet. It checks again every minute, when the tab comes back and whenever an API call answers 401. If the session has ended by then, the shell shows a "Your session has ended" dialog and only starts a new sign-in when you click it. Tasker keeps unsaved canvases per account (`homelab-ui.tasker.workspace.<account>`).
 
 What the UI calls must exist on the gateway (homelab-infra's `gateway/caddy/Caddyfile`):
 

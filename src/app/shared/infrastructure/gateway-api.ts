@@ -63,13 +63,8 @@ export class GatewayApi {
     });
 
     if (response.status === 401 && this.session.enabled) {
-      const redirecting = this.session.signIn();
-      throw new GatewayApiError(
-        401,
-        redirecting
-          ? 'Your session has ended. Signing in again…'
-          : "You don't have access to this, or your session needs a refresh. Try reloading the page.",
-      );
+      void this.session.verify();
+      throw new GatewayApiError(401, "Your session has ended, or you don't have access to this.");
     }
     if (!response.ok) {
       throw new GatewayApiError(response.status, await errorMessage(response));
