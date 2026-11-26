@@ -1,3 +1,9 @@
+// Cards adapt to their own width, so they read the same in a phone column or a desktop column.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .tasting-notes {
   display: flex;
   flex-direction: column;
@@ -66,7 +72,7 @@
     align-items: center;
     justify-content: center;
     min-width: 0;
-    min-height: 2.1rem;
+    min-height: 2.75rem;
     padding: 0.25rem 0.15rem;
     border: 1px solid color-mix(in srgb, var(--k-stone-200) 70%, transparent);
     border-radius: 0.5rem;
@@ -74,7 +80,7 @@
     color: var(--k-stone-600);
     font-family: var(--k-font-sans);
     font-weight: 700;
-    font-size: 0.6rem;
+    font-size: 0.72rem;
     line-height: 1.15;
     text-align: center;
     white-space: normal;
@@ -124,6 +130,12 @@
 }
 
 @media (max-width: 767px) {
+  .tasting-notes {
+    padding: 1rem;
+  }
+}
+
+@container (max-width: 36rem) {
   .tasting-notes__sensory {
     grid-template-columns: 1fr;
   }
