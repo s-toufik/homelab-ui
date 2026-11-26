@@ -57,15 +57,15 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 2.75rem;
+  height: 2.75rem;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: 0.75rem;
   background: var(--k-sage-100);
   color: var(--k-sage-700);
   font: inherit;
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   font-weight: 700;
   line-height: 1;
   cursor: pointer;
@@ -101,6 +101,8 @@
     text-align: left;
     cursor: pointer;
 
+    min-height: 2.75rem;
+
     &:last-child {
       border-bottom: 0;
     }
@@ -128,27 +130,27 @@
   display: flex;
   align-items: center;
   gap: 0.4rem;
-  flex-wrap: wrap;
 }
 
 .ingredient-row__stepper {
   display: flex;
   align-items: center;
   height: 2.75rem;
-  padding: 0 0.2rem;
+  min-width: 0;
   border-radius: 0.75rem;
   background: var(--k-stone-50);
   border: 1px solid var(--k-stone-200);
 
   button {
-    width: 2.1rem;
-    height: 2.1rem;
+    flex-shrink: 0;
+    width: 2.75rem;
+    height: 100%;
     border: 0;
     border-radius: 0.5rem;
     background: none;
     color: var(--k-stone-600);
     font-weight: 700;
-    font-size: 1rem;
+    font-size: 1.15rem;
     cursor: pointer;
 
     &:hover:not(:disabled) {
@@ -163,6 +165,7 @@
 
   input {
     width: 3.5rem;
+    min-width: 0;
     text-align: center;
     border: 0;
     background: none;
@@ -232,7 +235,6 @@
 
 .ingredient-row__delete {
   flex-shrink: 0;
-  margin-inline-start: auto;
   width: 2.75rem;
   height: 2.75rem;
   display: flex;
@@ -252,5 +254,20 @@
   &:hover {
     background: color-mix(in srgb, var(--k-terracotta-600) 8%, var(--k-stone-50));
     color: var(--k-terracotta-600);
+  }
+}
+
+@media (max-width: 767px) {
+  .ingredient-row__grip {
+    display: none;
+  }
+
+  .ingredient-row__stepper {
+    flex: 1;
+
+    input {
+      flex: 1;
+      width: auto;
+    }
   }
 }
