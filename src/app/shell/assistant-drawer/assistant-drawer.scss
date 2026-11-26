@@ -95,3 +95,24 @@
   flex: 1 1 auto;
   min-height: 0;
 }
+
+// Phone: the page scrolls as a whole, so the panel pins to the screen and fills it.
+@media (max-width: 767px) {
+  .assistant-drawer {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    max-width: none;
+    padding: var(--safe-top) var(--safe-right) var(--safe-bottom) var(--safe-left);
+    border-left: 0;
+  }
+
+  .assistant-drawer__handle {
+    display: none;
+  }
+
+  .assistant-drawer__close {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+}
