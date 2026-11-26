@@ -21,3 +21,14 @@
   color: var(--k-terracotta-600);
   font-weight: 600;
 }
+
+:host(.recipe-picker--block) {
+  display: block;
+
+  .recipe-picker__select {
+    width: 100%;
+    max-width: none;
+    height: 3rem;
+    font-size: 1rem;
+  }
+}
