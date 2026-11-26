@@ -2,50 +2,34 @@
 @let editable = store.isEditingLatest();
 
 <section id="sec-overview" class="recipe-overview">
-  <div class="recipe-overview__top">
-    <div class="recipe-overview__courses">
-      @for (course of courses; track course) {
-        <button
-          type="button"
-          class="recipe-overview__course"
-          [class.recipe-overview__course--active]="draft.course === course"
-          [disabled]="!editable"
-          (click)="setCourse(course)"
-        >
-          {{ course }}
-        </button>
-      }
+  @if (store.versions().length > 0) {
+    <div class="recipe-overview__version">
+      <button
+        type="button"
+        class="recipe-overview__version-btn"
+        [disabled]="!hasPrevVersion()"
+        (click)="stepVersion(-1)"
+        aria-label="Previous version"
+      >
+        −
+      </button>
+      <span class="recipe-overview__version-label">v{{ store.viewingVersionNumber() }}</span>
+      <button
+        type="button"
+        class="recipe-overview__version-btn"
+        [disabled]="!hasNextVersion()"
+        (click)="stepVersion(1)"
+        aria-label="Next version"
+      >
+        +
+      </button>
     </div>
-
-    @if (store.versions().length > 0) {
-      <div class="recipe-overview__version">
-        <button
-          type="button"
-          class="recipe-overview__version-btn"
-          [disabled]="!hasPrevVersion()"
-          (click)="stepVersion(-1)"
-          aria-label="Previous version"
-        >
-          −
-        </button>
-        <span class="recipe-overview__version-label">v{{ store.viewingVersionNumber() }}</span>
-        <button
-          type="button"
-          class="recipe-overview__version-btn"
-          [disabled]="!hasNextVersion()"
-          (click)="stepVersion(1)"
-          aria-label="Next version"
-        >
-          +
-        </button>
-      </div>
-    }
-  </div>
+  }
 
   <input
     type="text"
     class="recipe-overview__title"
-    placeholder="Untitled Culinary Creation…"
+    placeholder="Untitled recipe"
     [ngModel]="draft.title"
     [disabled]="!editable"
     (ngModelChange)="store.updateDraft({ title: $event })"
@@ -53,13 +37,27 @@
   <input
     type="text"
     class="recipe-overview__subtitle"
-    placeholder="Add plating concept, garnish notes, or menu pairing…"
+    placeholder="Plating, garnish or pairing notes…"
     [ngModel]="draft.subtitle"
     [disabled]="!editable"
     (ngModelChange)="store.updateDraft({ subtitle: $event })"
   />
 
   <div class="recipe-overview__steppers">
+    <label class="recipe-overview__stepper-card">
+      <span class="recipe-overview__stepper-label">Course</span>
+      <select
+        class="recipe-overview__course-select"
+        [ngModel]="draft.course"
+        [disabled]="!editable"
+        (ngModelChange)="setCourse($event)"
+      >
+        @for (course of courses; track course) {
+          <option [value]="course">{{ course }}</option>
+        }
+      </select>
+    </label>
+
     <div class="recipe-overview__stepper-card">
       <div class="recipe-overview__stepper-head">
         <span class="recipe-overview__stepper-label">Portions</span>
