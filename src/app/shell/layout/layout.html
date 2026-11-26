@@ -3,6 +3,7 @@
   [class.layout--resizing]="ui.resizing()"
   [class.layout--drawer]="ui.drawerOpen()"
   [style.--assistant-width]="ui.assistantWidth() + 'px'"
+  [style.--page-bottom-inset]="chrome.bottomInset() + 'px'"
   (touchstart)="touchStart($event)"
   (touchend)="touchEnd($event)"
 >
@@ -77,4 +78,5 @@
 
   <app-settings-modal />
   <app-command-palette />
+  <app-session-expired />
 </div>

@@ -52,7 +52,7 @@
     display: block;
     height: auto;
     min-height: 100dvh;
-    overflow-x: hidden;
+    overflow-x: clip;
     overflow-y: visible;
   }
 
@@ -133,8 +133,8 @@
 .layout__floating-tool {
   position: fixed;
   right: calc(1.25rem + var(--safe-right));
-  bottom: calc(1.25rem + var(--safe-bottom));
-  z-index: 25;
+  bottom: calc(1.25rem + max(var(--safe-bottom), var(--page-bottom-inset, 0px)));
+  z-index: 15;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -160,7 +160,11 @@
 
 @media (max-width: 767px) {
   .layout__floating-tool {
-    display: none;
+    right: calc(1rem + var(--safe-right));
+    bottom: calc(1rem + max(var(--safe-bottom), var(--page-bottom-inset, 0px)));
+    width: 2.75rem;
+    height: 2.75rem;
+    border-radius: 0.85rem;
   }
 }
 

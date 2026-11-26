@@ -2,17 +2,20 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 2.75rem;
+  gap: 0.45rem;
+  min-width: 5.5rem;
   height: 2.75rem;
   flex-shrink: 0;
+  padding: 0 1.1rem;
   border: 0;
-  border-radius: 0.75rem;
-  background: var(--k-ink);
-  color: var(--k-ink-on);
+  border-radius: 0.85rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--k-font-sans);
+  font-weight: 700;
+  font-size: 0.95rem;
   cursor: pointer;
-  transition:
-    transform 0.08s ease,
-    background-color 0.15s ease;
+  transition: transform 0.08s ease;
 
   svg {
     width: 1.15rem;
@@ -20,7 +23,7 @@
   }
 
   &:hover:not(:disabled) {
-    background: var(--k-stone-800);
+    filter: brightness(1.08);
   }
 
   &:active:not(:disabled) {

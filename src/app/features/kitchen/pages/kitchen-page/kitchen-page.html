@@ -1,122 +1,72 @@
 @let perPortion = store.displayedNutritionPerPortion();
-@let batchWeight = store.displayedNutritionTotal().weightGrams;
 
 <header #header class="kitchen-header">
-  <div class="kitchen-header__top">
-    <div class="kitchen-header__brand">
-      <div class="kitchen-header__brand-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2M7 2v20M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"
-          />
-        </svg>
-      </div>
-      <div>
-        <div class="kitchen-header__brand-row">
-          <span class="kitchen-header__brand-name">ATELIER</span>
-          <span class="kitchen-header__brand-badge">KITCHEN CARD</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="kitchen-header__telemetry">
-      <div class="kitchen-header__telemetry-group">
-        <span class="kitchen-header__telemetry-label">Per Portion</span>
-        <span class="kitchen-header__telemetry-kcal"
-          >{{ perPortion.kcal | number: '1.0-0' }} kcal</span
+  <div class="kitchen-header__bar">
+    <nav class="kitchen-tabs" aria-label="Recipe sections">
+      @for (section of sections; track section.id) {
+        <button
+          type="button"
+          [class.active]="activeSection() === section.id"
+          [attr.aria-current]="activeSection() === section.id ? 'location' : null"
+          (click)="scrollTo(section.id)"
         >
-      </div>
-      <div class="kitchen-header__divider"></div>
-      <div class="kitchen-header__telemetry-macros">
-        <div>
-          <span>Protein</span>
-          <b class="kitchen-header__protein">{{ perPortion.proteinG | number: '1.0-1' }}g</b>
-        </div>
-        <div>
-          <span>Carbs</span>
-          <b class="kitchen-header__carb">{{ perPortion.carbG | number: '1.0-1' }}g</b>
-        </div>
-        <div>
-          <span>Fat</span>
-          <b>{{ perPortion.fatG | number: '1.0-1' }}g</b>
-        </div>
-      </div>
-      <div class="kitchen-header__divider"></div>
-      <div class="kitchen-header__telemetry-group">
-        <span class="kitchen-header__telemetry-label">Batch Yield</span>
-        <span class="kitchen-header__telemetry-weight">{{ batchWeight | number: '1.0-0' }}g</span>
-      </div>
-    </div>
+          {{ section.label }}
+        </button>
+      }
+    </nav>
 
-    <div class="kitchen-header__actions">
-      <app-recipe-picker />
-      <app-version-history />
-      <a
-        class="kitchen-header__btn"
-        routerLink="/kitchen/recipes"
-        title="Browse saved recipes"
-        aria-label="Browse saved recipes"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15Z"
-          />
-        </svg>
-      </a>
-      <a
-        class="kitchen-header__btn"
-        routerLink="/kitchen/ingredients"
-        title="Browse the ingredient catalog"
-        aria-label="Browse the ingredient catalog"
-      >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            d="M12 2a7 7 0 0 0-7 7c0 2.5 1.3 4.2 2.5 5.7C8.6 16 9 17 9 18v1a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1c0-1 .4-2 1.5-3.3C17.7 13.2 19 11.5 19 9a7 7 0 0 0-7-7ZM9 21h6"
-          />
-        </svg>
-      </a>
+    <!-- In the header on wider screens, pinned to the bottom of the screen on a phone. -->
+    <div #actions class="kitchen-actions">
       <button
         type="button"
-        class="kitchen-header__btn kitchen-header__btn--copy"
-        title="Copy recipe sheet"
-        aria-label="Copy recipe sheet"
-        (click)="copySheet()"
+        class="kitchen-actions__macros"
+        [attr.aria-label]="
+          'Per portion ' + (perPortion.kcal | number: '1.0-0') + ' kcal. Show macros'
+        "
+        (click)="scrollTo('sec-nutrition')"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9 9h10v12H9zM6 15H4V3h12v2" />
-        </svg>
+        <span class="kitchen-actions__kcal">
+          <b>{{ perPortion.kcal | number: '1.0-0' }}</b> kcal <small>/ portion</small>
+        </span>
+        <span class="kitchen-actions__split" aria-hidden="true">
+          <span
+            ><i class="kitchen-actions__dot kitchen-actions__dot--protein"></i>P
+            {{ perPortion.proteinG | number: '1.0-0' }}g</span
+          >
+          <span
+            ><i class="kitchen-actions__dot kitchen-actions__dot--carb"></i>C
+            {{ perPortion.carbG | number: '1.0-0' }}g</span
+          >
+          <span
+            ><i class="kitchen-actions__dot kitchen-actions__dot--fat"></i>F
+            {{ perPortion.fatG | number: '1.0-0' }}g</span
+          >
+        </span>
       </button>
       <button
         type="button"
-        class="kitchen-header__btn"
-        title="Start a new recipe"
-        aria-label="Start a new recipe"
-        (click)="startNew()"
+        class="kitchen-actions__more"
+        title="More recipe actions"
+        aria-label="More recipe actions"
+        aria-haspopup="dialog"
+        [attr.aria-expanded]="actionsOpen()"
+        (click)="openActions($event)"
       >
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <circle cx="5" cy="12" r="1.8" />
+          <circle cx="12" cy="12" r="1.8" />
+          <circle cx="19" cy="12" r="1.8" />
         </svg>
       </button>
+      @if (store.isEditingLatest()) {
+        <app-version-history />
+      } @else {
+        <button type="button" class="kitchen-actions__fork" (click)="store.forkToEdit()">
+          Fork to edit
+        </button>
+      }
     </div>
   </div>
-
-  <nav class="kitchen-header__nav">
-    @for (section of sections; track section.id) {
-      <button
-        type="button"
-        [class.active]="activeSection() === section.id"
-        (click)="scrollTo(section.id)"
-      >
-        {{ section.label }}
-      </button>
-    }
-  </nav>
 </header>
 
 @if (store.error()) {
@@ -124,8 +74,7 @@
 }
 @if (!store.isEditingLatest()) {
   <div class="kitchen-banner kitchen-banner--warn">
-    Viewing v{{ store.viewingVersionNumber() }} — read-only
-    <button type="button" (click)="store.forkToEdit()">Fork to edit</button>
+    Viewing v{{ store.viewingVersionNumber() }}, read-only. Fork to edit it.
   </div>
 }
 
@@ -136,33 +85,70 @@
       <app-ingredient-list />
     </div>
     <div class="kitchen-main__column">
-      <app-nutrition-panel />
       <app-method-steps />
+      <app-nutrition-panel />
       <app-tasting-notes />
     </div>
   </div>
 </main>
 
-<div class="kitchen-mobile-bar">
-  <div class="kitchen-mobile-bar__stats" (click)="scrollTo('sec-nutrition')">
-    <div>
-      <span>Per Portion</span>
-      <b>{{ perPortion.kcal | number: '1.0-0' }} kcal</b>
+@if (actionsOpen()) {
+  <div class="kitchen-sheet-backdrop" appScrollLock (click)="closeActions()"></div>
+  <div
+    #sheet
+    class="kitchen-sheet"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="kitchen-sheet-title"
+    tabindex="-1"
+    [style.--menu-top.px]="menuAnchor().top"
+    [style.--menu-right.px]="menuAnchor().right"
+  >
+    <span class="kitchen-sheet__grabber" aria-hidden="true"></span>
+    <h2 id="kitchen-sheet-title" class="kitchen-sheet__title">Recipe</h2>
+    <label class="kitchen-sheet__field">
+      <span>Open a saved recipe</span>
+      <app-recipe-picker class="recipe-picker--block" (change)="closeActions()" />
+    </label>
+    <div class="kitchen-sheet__group">
+      <button type="button" class="kitchen-sheet__item" (click)="startNew()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 5v14M5 12h14" />
+        </svg>
+        New recipe
+      </button>
+      <button type="button" class="kitchen-sheet__item" (click)="copySheet()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 9h10v12H9zM6 15H4V3h12v2" />
+        </svg>
+        Copy recipe sheet
+      </button>
+      <a class="kitchen-sheet__item" routerLink="/kitchen/recipes" (click)="closeActions()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15Z"
+          />
+        </svg>
+        Saved recipes
+      </a>
+      <a class="kitchen-sheet__item" routerLink="/kitchen/ingredients" (click)="closeActions()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="M12 2a7 7 0 0 0-7 7c0 2.5 1.3 4.2 2.5 5.7C8.6 16 9 17 9 18v1a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-1c0-1 .4-2 1.5-3.3C17.7 13.2 19 11.5 19 9a7 7 0 0 0-7-7ZM9 21h6"
+          />
+        </svg>
+        Ingredient catalog
+      </a>
     </div>
-    <div class="kitchen-mobile-bar__divider"></div>
-    <div class="kitchen-mobile-bar__macros">
-      <span class="kitchen-mobile-bar__protein"
-        >P: {{ perPortion.proteinG | number: '1.0-0' }}g</span
-      >
-      <span
-        >C: {{ perPortion.carbG | number: '1.0-0' }}g · F:
-        {{ perPortion.fatG | number: '1.0-0' }}g</span
-      >
-    </div>
+    <button type="button" class="kitchen-sheet__cancel" (click)="closeActions()">Cancel</button>
   </div>
-</div>
+}
 
-<div class="kitchen-toasts" [style.top.px]="headerHeight() + 12">
+<div class="kitchen-toasts" role="status">
   @for (item of toast.toasts(); track item.id) {
     <div class="kitchen-toast">
       <span class="kitchen-toast__dot"></span>

@@ -1,3 +1,9 @@
+// Cards adapt to their own width, so they read the same in a phone column or a desktop column.
+:host {
+  display: block;
+  container-type: inline-size;
+}
+
 .method-steps {
   display: flex;
   flex-direction: column;
@@ -38,11 +44,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2.1rem;
-  height: 2.1rem;
+  width: 2.75rem;
+  height: 2.75rem;
   flex-shrink: 0;
   border: 0;
-  border-radius: 0.6rem;
+  border-radius: 0.75rem;
   background: var(--k-stone-100);
   color: var(--k-ink);
   cursor: pointer;
@@ -148,14 +154,15 @@
   display: inline-flex;
   align-items: center;
   gap: 0.3rem;
-  padding: 0.25rem 0.6rem;
-  border-radius: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 0.8rem;
+  border-radius: 0.6rem;
   border: 1px solid var(--k-stone-200);
   background: var(--k-stone-50);
   color: var(--k-stone-500);
   font-family: var(--k-font-mono);
   font-weight: 600;
-  font-size: 0.7rem;
+  font-size: 0.78rem;
   cursor: pointer;
 
   &:hover {
@@ -182,8 +189,8 @@
 
 .method-steps__delete {
   flex-shrink: 0;
-  width: 2.5rem;
-  height: 2.5rem;
+  width: 2.75rem;
+  height: 2.75rem;
   border: 1px solid var(--k-stone-200);
   border-radius: 0.75rem;
   background: var(--k-stone-50);
@@ -212,5 +219,37 @@
     border-color: var(--k-saffron-500);
     background: color-mix(in srgb, var(--k-saffron-50) 60%, transparent);
     color: var(--k-saffron-700);
+  }
+}
+
+@media (max-width: 767px) {
+  .method-steps {
+    padding: 1rem;
+  }
+}
+
+// In a narrow card the step number and bin share the top line, so the text gets the full width.
+@container (max-width: 32rem) {
+  .method-steps__row {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .method-steps__number {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+  }
+
+  .method-steps__delete {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .method-steps__body {
+    grid-column: 1 / -1;
+    grid-row: 2;
   }
 }

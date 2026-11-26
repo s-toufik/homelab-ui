@@ -1,181 +1,167 @@
+// One set of conventions at every width: the section tabs on top, then the actions
+// (macros, ⋯ menu, Save). Wider screens keep the actions in the header; a phone pins them
+// to the bottom of the screen, within thumb reach.
+
 :host {
   overflow-y: auto;
-  padding-bottom: 2rem;
 }
 
 .kitchen-header {
   position: sticky;
   top: 0;
   z-index: 20;
-  background: color-mix(in srgb, var(--k-stone-50) 95%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--surface);
   border-bottom: 1px solid var(--k-stone-200);
 }
 
-.kitchen-header__top {
+.kitchen-header__bar {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 0.75rem;
-  min-height: 4rem;
-  padding: 0.5rem 1rem;
+  gap: 0.5rem 1rem;
   max-width: 90rem;
   margin: 0 auto;
+  padding: 0.6rem 1rem;
 }
 
-.kitchen-header__brand {
-  display: flex;
-  align-items: center;
-  gap: 0.65rem;
-  flex-shrink: 0;
-}
+// --- section tabs ------------------------------------------------------------
 
-.kitchen-header__brand-icon {
-  width: 2.5rem;
-  height: 2.5rem;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 0.9rem;
-  background: var(--k-ink);
-  color: var(--k-ink-on);
+.kitchen-tabs {
+  flex: 1 1 22rem;
+  max-width: 34rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.2rem;
+  padding: 0.2rem;
+  border-radius: 0.85rem;
+  background: var(--k-stone-100);
 
-  svg {
-    width: 1.2rem;
-    height: 1.2rem;
+  button {
+    height: 2.75rem;
+    min-width: 0;
+    padding: 0 0.25rem;
+    border: 0;
+    border-radius: 0.7rem;
+    background: transparent;
+    color: var(--k-stone-600);
+    font-family: var(--k-font-sans);
+    font-weight: 700;
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+
+    &:hover {
+      color: var(--k-ink);
+    }
+
+    &.active {
+      background: var(--k-stone-50);
+      color: var(--k-ink);
+      box-shadow: var(--k-shadow-sm);
+    }
   }
 }
 
-.kitchen-header__brand-row {
+// --- actions: macros summary, ⋯ menu, Save -----------------------------------------
+
+.kitchen-actions {
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  margin-left: auto;
 }
 
-.kitchen-header__brand-name {
-  font-family: var(--k-font-sans);
-  font-weight: 800;
-  font-size: 1.05rem;
-  letter-spacing: -0.01em;
-  color: var(--k-ink);
-}
-
-.kitchen-header__brand-badge {
-  padding: 0.1rem 0.5rem;
-  border-radius: 0.4rem;
-  background: var(--k-saffron-100);
-  border: 1px solid color-mix(in srgb, var(--k-saffron-500) 25%, transparent);
-  color: var(--k-saffron-700);
-  font-family: var(--k-font-mono);
-  font-weight: 700;
-  font-size: 0.65rem;
-}
-
-.kitchen-header__telemetry {
-  display: none;
-  align-items: center;
-  gap: 1.25rem;
-  padding: 0.3rem 1rem;
-  border-radius: 1rem;
-  background: var(--k-parchment);
-  border: 1px solid var(--k-stone-200);
-}
-
-.kitchen-header__telemetry-group {
+.kitchen-actions__macros {
+  min-width: 0;
+  min-height: 2.75rem;
   display: flex;
   flex-direction: column;
-}
-
-.kitchen-header__telemetry-label {
-  font-size: 0.62rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--k-stone-400);
-}
-
-.kitchen-header__telemetry-kcal {
-  font-family: var(--k-font-mono);
-  font-weight: 800;
-  font-size: 0.95rem;
-  color: var(--k-terracotta-600);
-}
-
-.kitchen-header__telemetry-weight {
-  font-family: var(--k-font-mono);
-  font-weight: 800;
-  font-size: 0.85rem;
+  justify-content: center;
+  gap: 0.15rem;
+  padding: 0 0.5rem;
+  border: 0;
+  border-radius: 0.75rem;
+  background: transparent;
   color: var(--k-ink);
+  text-align: left;
+  cursor: pointer;
+
+  &:hover,
+  &:active {
+    background: var(--k-stone-100);
+  }
 }
 
-.kitchen-header__divider {
-  width: 1px;
-  height: 1.75rem;
-  background: var(--k-stone-200);
-}
-
-.kitchen-header__telemetry-macros {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-family: var(--k-font-mono);
-  font-size: 0.72rem;
-
-  div {
-    display: flex;
-    flex-direction: column;
-  }
-
-  span {
-    font-family: var(--k-font-sans);
-    font-size: 0.6rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    color: var(--k-stone-400);
-  }
+.kitchen-actions__kcal {
+  font-size: 0.78rem;
+  color: var(--k-stone-500);
+  white-space: nowrap;
 
   b {
-    font-size: 0.82rem;
-    color: var(--k-stone-800);
+    font-family: var(--k-font-mono);
+    font-size: 1.05rem;
+    font-weight: 800;
+    color: var(--k-saffron-600);
+  }
+
+  small {
+    font-size: 0.72rem;
   }
 }
 
-.kitchen-header__protein {
-  color: var(--k-sage-700);
-}
-
-.kitchen-header__carb {
-  color: var(--k-saffron-700);
-}
-
-.kitchen-header__actions {
+.kitchen-actions__split {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.5rem;
-  flex-shrink: 0;
-  max-width: 100%;
+  gap: 0.6rem;
+  font-family: var(--k-font-mono);
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: var(--k-stone-600);
+  white-space: nowrap;
+  overflow: hidden;
+
+  > span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+  }
 }
 
-.kitchen-header__btn {
+.kitchen-actions__dot {
+  width: 0.45rem;
+  height: 0.45rem;
+  border-radius: 50%;
+
+  &--protein {
+    background: var(--k-sage-600);
+  }
+
+  &--carb {
+    background: var(--k-saffron-500);
+  }
+
+  &--fat {
+    background: var(--k-terracotta-600);
+  }
+}
+
+.kitchen-actions__more {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 2.75rem;
   height: 2.75rem;
   flex-shrink: 0;
-  border-radius: 0.75rem;
+  border: 1px solid var(--k-stone-200);
+  border-radius: 0.85rem;
   background: var(--k-stone-100);
-  border: 1px solid transparent;
   color: var(--k-ink);
   cursor: pointer;
 
   svg {
-    width: 1.15rem;
-    height: 1.15rem;
+    width: 1.25rem;
+    height: 1.25rem;
   }
 
   &:hover {
@@ -183,54 +169,28 @@
   }
 }
 
-.kitchen-header__nav {
-  display: none;
-  gap: 0.4rem;
-  padding: 0 1rem 0.6rem;
-  overflow-x: auto;
-
-  button {
-    flex-shrink: 0;
-    height: 2.3rem;
-    padding: 0 0.9rem;
-    border: 0;
-    border-radius: 0.75rem;
-    background: var(--k-stone-100);
-    color: var(--k-stone-600);
-    font-family: var(--k-font-sans);
-    font-weight: 700;
-    font-size: 0.75rem;
-    cursor: pointer;
-
-    &.active {
-      background: var(--k-ink);
-      color: var(--k-ink-on);
-    }
-  }
+.kitchen-actions__fork {
+  height: 2.75rem;
+  flex-shrink: 0;
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 0.85rem;
+  background: var(--accent);
+  color: var(--on-accent);
+  font-family: var(--k-font-sans);
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
 }
 
+// --- banners and content ----------------------------------------------------------
+
 .kitchen-banner {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.75rem;
   padding: 0.6rem 1rem;
   font-family: var(--k-font-sans);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   text-align: center;
-
-  button {
-    height: 2rem;
-    padding: 0 0.75rem;
-    border: 0;
-    border-radius: 0.5rem;
-    background: var(--k-ink);
-    color: var(--k-ink-on);
-    font-weight: 700;
-    font-size: 0.75rem;
-    cursor: pointer;
-  }
 }
 
 .kitchen-banner--error {
@@ -245,9 +205,10 @@
 
 .kitchen-main {
   flex: 1;
-  padding: 1.25rem 1rem;
+  padding: 1.25rem 1rem 5rem;
 }
 
+// Reading order at every width: overview and ingredients, then method, macros and notes.
 .kitchen-main__grid {
   max-width: 90rem;
   margin: 0 auto;
@@ -264,16 +225,16 @@
   min-width: 0;
 }
 
-.kitchen-mobile-bar {
-  display: none;
-}
+// --- toasts -------------------------------------------------------------------------
 
 .kitchen-toasts {
   position: fixed;
-  right: 1rem;
+  inset-inline: 1rem;
+  bottom: calc(1.5rem + var(--kitchen-dock-height, 0px) + var(--safe-bottom));
   z-index: 70;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
   pointer-events: none;
 }
@@ -289,7 +250,7 @@
   border: 1px solid var(--k-stone-800);
   font-family: var(--k-font-sans);
   font-weight: 600;
-  font-size: 0.82rem;
+  font-size: 0.85rem;
   box-shadow: var(--k-shadow-xl);
 }
 
@@ -300,85 +261,239 @@
   background: var(--k-saffron-500);
 }
 
-@media (min-width: 1024px) {
-  .kitchen-header__telemetry {
-    display: flex;
+// --- ⋯ menu: a popover under the button, a sheet from the bottom on a phone ---------
+
+.kitchen-sheet-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: transparent;
+}
+
+.kitchen-sheet {
+  position: fixed;
+  top: var(--menu-top, 4rem);
+  right: var(--menu-right, 1rem);
+  z-index: 61;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 20rem;
+  max-height: calc(100dvh - var(--menu-top, 4rem) - 1rem);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.75rem;
+  border-radius: 1rem;
+  border: 1px solid var(--k-stone-200);
+  background: var(--k-stone-50);
+  box-shadow: var(--k-shadow-xl);
+  animation: kitchen-fade 0.14s ease;
+
+  &:focus-visible {
+    outline: none;
+  }
+}
+
+.kitchen-sheet__grabber,
+.kitchen-sheet__cancel {
+  display: none;
+}
+
+.kitchen-sheet__title {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--k-ink);
+}
+
+.kitchen-sheet__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+
+  > span {
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: var(--k-stone-500);
+  }
+}
+
+.kitchen-sheet__group {
+  display: flex;
+  flex-direction: column;
+  border-radius: 1rem;
+  border: 1px solid var(--k-stone-200);
+  background: var(--k-parchment);
+  overflow: hidden;
+}
+
+.kitchen-sheet__item {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  min-height: 3rem;
+  padding: 0 1rem;
+  border: 0;
+  border-top: 1px solid var(--k-stone-200);
+  background: transparent;
+  color: var(--k-ink);
+  font-family: var(--k-font-sans);
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+
+  &:first-child {
+    border-top: 0;
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+    flex-shrink: 0;
+    color: var(--k-saffron-600);
+  }
+
+  &:active,
+  &:hover {
+    background: var(--k-stone-100);
+  }
+}
+
+.kitchen-sheet__cancel {
+  min-height: 3.25rem;
+  border: 0;
+  border-radius: 1rem;
+  background: var(--k-stone-100);
+  color: var(--k-ink);
+  font-family: var(--k-font-sans);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+@keyframes kitchen-sheet-up {
+  from {
+    transform: translateY(100%);
+  }
+}
+
+@keyframes kitchen-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kitchen-sheet,
+  .kitchen-sheet-backdrop {
+    animation: none;
   }
 }
 
 @media (max-width: 1023px) {
-  .kitchen-header__nav {
-    display: flex;
-  }
-
   .kitchen-main__grid {
     grid-template-columns: 1fr;
   }
 }
 
+// --- phone ---------------------------------------------------------------------------
+
 @media (max-width: 767px) {
   :host {
-    padding-bottom: calc(6rem + var(--safe-bottom));
+    overflow: visible;
   }
 
-  .kitchen-header__actions {
-    app-recipe-picker,
-    .kitchen-header__btn--copy {
-      display: none;
+  // No backdrop-filter here: it would pin the fixed actions bar to the header, not the screen.
+  .kitchen-header {
+    top: calc(2.9rem + var(--safe-top));
+  }
+
+  .kitchen-header__bar {
+    padding: 0.5rem calc(0.75rem + var(--safe-right)) 0.5rem calc(0.75rem + var(--safe-left));
+  }
+
+  .kitchen-tabs {
+    flex-basis: 100%;
+    max-width: none;
+
+    button {
+      font-size: 0.8rem;
     }
   }
 
-  .kitchen-mobile-bar {
-    display: flex;
+  .kitchen-actions {
     position: fixed;
     inset-inline: 0;
     bottom: 0;
     z-index: 40;
-    padding: 0.6rem 0.9rem calc(0.6rem + var(--safe-bottom));
-    background: var(--k-ink);
-    color: var(--k-ink-on);
-    border-top: 1px solid var(--k-stone-800);
+    margin: 0;
+    padding: 0.6rem calc(0.75rem + var(--safe-right)) calc(0.6rem + var(--safe-bottom))
+      calc(0.75rem + var(--safe-left));
+    background: color-mix(in srgb, var(--surface-raised) 92%, transparent);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border-top: 1px solid var(--k-stone-200);
   }
 
-  .kitchen-mobile-bar__stats {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    cursor: pointer;
-
-    > div:first-child {
-      display: flex;
-      flex-direction: column;
-
-      span {
-        font-size: 0.6rem;
-        text-transform: uppercase;
-        color: var(--k-stone-400);
-      }
-
-      b {
-        font-family: var(--k-font-mono);
-        font-weight: 800;
-        color: var(--k-saffron-500);
-      }
-    }
+  .kitchen-actions__macros {
+    flex: 1;
+    padding: 0 0.25rem;
   }
 
-  .kitchen-mobile-bar__divider {
-    width: 1px;
-    height: 1.75rem;
-    background: var(--k-stone-700);
+  .kitchen-main {
+    padding: 0.75rem calc(0.75rem + var(--safe-right))
+      calc(var(--kitchen-dock-height, 4.5rem) + 4.5rem) calc(0.75rem + var(--safe-left));
   }
 
-  .kitchen-mobile-bar__macros {
-    display: flex;
-    flex-direction: column;
-    font-family: var(--k-font-mono);
-    font-size: 0.68rem;
+  .kitchen-main__grid,
+  .kitchen-main__column {
+    gap: 0.9rem;
   }
 
-  .kitchen-mobile-bar__protein {
-    color: var(--k-ink-on);
-    font-weight: 700;
+  .kitchen-toasts {
+    bottom: calc(var(--kitchen-dock-height, 4.5rem) + 0.75rem);
+  }
+
+  .kitchen-sheet-backdrop {
+    background: rgb(0 0 0 / 45%);
+    animation: kitchen-fade 0.18s ease;
+  }
+
+  .kitchen-sheet {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-width: 32rem;
+    max-height: 85dvh;
+    margin: 0 auto;
+    padding: 0.5rem calc(1rem + var(--safe-right)) calc(1rem + var(--safe-bottom))
+      calc(1rem + var(--safe-left));
+    border-bottom: 0;
+    border-radius: 1.25rem 1.25rem 0 0;
+    animation: kitchen-sheet-up 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  .kitchen-sheet__grabber {
+    display: block;
+    align-self: center;
+    width: 2.25rem;
+    height: 0.3rem;
+    border-radius: 999px;
+    background: var(--k-stone-300);
+  }
+
+  .kitchen-sheet__cancel {
+    display: block;
+  }
+
+  .kitchen-sheet__item {
+    min-height: 3.25rem;
+    font-size: 1rem;
   }
 }

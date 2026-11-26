@@ -1,0 +1,19 @@
+@if (session.expired()) {
+  <div class="session-expired__backdrop" appScrollLock></div>
+
+  <div
+    class="session-expired"
+    role="alertdialog"
+    aria-modal="true"
+    aria-labelledby="session-expired-title"
+    aria-describedby="session-expired-text"
+  >
+    <h2 id="session-expired-title" class="session-expired__title">Your session has ended</h2>
+    <p id="session-expired-text" class="session-expired__text">
+      Sign in again to keep working. You'll come back to this page.
+    </p>
+    <button type="button" class="session-expired__action" (click)="session.signIn()" autofocus>
+      Sign in
+    </button>
+  </div>
+}

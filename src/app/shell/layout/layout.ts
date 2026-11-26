@@ -14,6 +14,7 @@ import { Sidebar } from '../sidebar/sidebar';
 import { Drawer } from '../drawer/drawer';
 import { PhoneBar } from '../phone-bar/phone-bar';
 import { PagePanel } from '../page-panel/page-panel';
+import { SessionExpired } from '../session-expired/session-expired';
 import { SettingsModal } from '../settings-modal/settings-modal';
 
 @Component({
@@ -27,6 +28,7 @@ import { SettingsModal } from '../settings-modal/settings-modal';
     PagePanel,
     AssistantDrawer,
     SettingsModal,
+    SessionExpired,
     SwarmAvatar,
     ScrollLockDirective,
   ],
