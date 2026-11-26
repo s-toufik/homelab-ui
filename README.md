@@ -97,7 +97,7 @@ Ask in plain words: _"Plan five dinners with what's in the fridge"_, _"Why did c
 - **Plans:** when a request needs real work (reading files, querying data, saving a report), the assistant first proposes a plan. A card under it offers **Approve and run**, **Change it** and **Dismiss**; nothing runs until you approve. A waiting plan also appears on Today and as a number next to Assistant.
 - **Answer details:** under each answer, the time it took and the tokens used, for example _(21s · ↑ 9.9k · ↓ 642 tokens)_. Open the details for the model, the tools used and the steps taken.
 - **Settings** (admins, button at the top right): the model, **Auto-approve plans**, the conversation id to pick up an old conversation, and the steps whose model is fixed by the server.
-- **Beside any tool page:** the assistant button at the top right opens it in a panel next to the page, for example to ask about an error on the Logs page. Drag its edge to resize it; **Esc** closes it.
+- **Beside any tool page:** the assistant button at the bottom right opens it in a panel next to the page, for example to ask about an error on the Logs page. Drag its edge to resize it; **Esc** closes it. On a phone the button sits above the page's bottom bar, if it has one, and the assistant opens full screen; ✕ brings the page back.
 
 <img src="docs/screenshots/assistant-progress.webp" alt="The Assistant answering &quot;What do the logs of caddy say?&quot;: its plan on top, then Observation and Security working side by side, each with its plan steps (done, current, to come) and its tool calls" />
 

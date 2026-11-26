@@ -312,7 +312,7 @@ That's the entire contract: register the template, and the shell shows/hides the
 
 ### 6. Verify
 
-`make run`, open `http://localhost:4200`: the new page appears in the sidebar (its section comes from its category) and in ⌘K, `/metrics` routes to it, the assistant button shows at the top right, and (if step 5 was done) its settings show in the right sidebar.
+`make run`, open `http://localhost:4200`: the new page appears in the sidebar (its section comes from its category) and in ⌘K, `/metrics` routes to it, the assistant button shows at the bottom right, and (if step 5 was done) its settings show in the right sidebar.
 
 ## The assistant drawer
 
