@@ -4,8 +4,10 @@ import { agentLook } from '@features/agent/domain/agent-looks';
 import { SpriteSheets } from '@features/agent/infrastructure/sprites/sprite-sheets';
 import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { CastStore } from '../application/cast.store';
+import { CenterStyleStore } from '../application/center-style.store';
 import { ThemeStore } from '../application/theme.store';
 import { CASTS, castForTheme, castOption } from '../domain/agent-cast';
+import { CENTER_STYLES } from '../domain/center-style';
 import {
   DAY_THEME,
   NIGHT_THEME,
@@ -24,6 +26,8 @@ export class Appearance {
   protected readonly theme = inject(ThemeStore);
   protected readonly cast = inject(CastStore);
   protected readonly casts = CASTS;
+  protected readonly center = inject(CenterStyleStore);
+  protected readonly centerStyles = CENTER_STYLES;
   protected readonly actors = [
     'supervisor',
     'kitchen',

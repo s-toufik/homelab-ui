@@ -207,7 +207,8 @@
   font-weight: 600;
 }
 
-.appearance__cast {
+.appearance__cast,
+.appearance__center {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
@@ -240,6 +241,61 @@
     font-size: 0.72rem;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+}
+
+/* A small picture of each Center style: always at night, like the styles themselves. */
+.appearance__glyph {
+  position: relative;
+  flex-shrink: 0;
+  width: 2.6rem;
+  height: 2.2rem;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  background: #04070f;
+
+  i {
+    position: absolute;
+    inset: 0.3rem 0.65rem;
+    border-radius: 50%;
+  }
+
+  &[data-style='sky'] i {
+    background:
+      radial-gradient(circle at 30% 35%, #fff 0 1px, transparent 1.5px),
+      radial-gradient(circle at 65% 55%, #fff 0 1px, transparent 1.5px),
+      radial-gradient(circle at 45% 75%, #cdd6ff 0 1px, transparent 1.5px),
+      radial-gradient(circle at 35% 30%, #1a2550, #03060f);
+    box-shadow: 0 0 6px #3d5bd6;
+  }
+
+  &[data-style='ferrofluid'] i {
+    background:
+      radial-gradient(circle at 35% 30%, #9aa3b5 0 6%, transparent 22%),
+      repeating-conic-gradient(#05060a 0 8deg, #2b3244 8deg 14deg);
+    box-shadow: 0 0 6px #3fb6ff;
+  }
+
+  &[data-style='atlas'] i {
+    background:
+      linear-gradient(#8c9eff, #8c9eff) 50% 15% / 2px 45% no-repeat,
+      radial-gradient(circle, #8db4ee 0 0.8px, transparent 1.2px) 0 0 / 4px 4px,
+      #0b1a35;
+    box-shadow: 0 0 6px #4a86ff;
+  }
+
+  &[data-style='starmap'] i {
+    inset: 0.45rem 0.85rem;
+    border: 1.5px solid #ff7a2f;
+    background: radial-gradient(circle, #e3b341 0 22%, transparent 26%);
+    box-shadow: 0 0 6px #ff7a2f;
+  }
+
+  &[data-style='contour'] i {
+    inset: 0.2rem 0.45rem;
+    background: repeating-radial-gradient(circle, transparent 0 2px, #14d9c8 2px 3px);
+    opacity: 0.85;
   }
 }
 
