@@ -14,7 +14,7 @@
 
 | Page           | Who                                          | What it does                                                                                                                                      |
 | -------------- | -------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Center**     | Everyone                                     | The first page: every page you may open, as stars in constellations on a globe you turn, zoom and fly through                                     |
+| **Center**     | Everyone                                     | The first page: every page you may open, grouped by scope, as a sky of constellations or one of four 3D scenes                                    |
 | **Today**      | Everyone                                     | The day at a glance: plans waiting for you, alerts, the homelab's health, your latest conversations                                               |
 | **Assistant**  | Everyone, for the assistants they were given | Conversations with the homelab's assistants: Kitchen, Travel, Observation, Analysis, Coding, Security, and the supervisor that hands work to them |
 | **Agents**     | Everyone, for the assistants they were given | A live map: the Assistant in the middle, each agent as an animated scene, lines when the Assistant asks one                                       |
@@ -22,7 +22,7 @@
 | **People**     | Admins                                       | Accounts, and the pages each person may open                                                                                                      |
 | **Tool pages** | Admins, or whoever was given the page        | Status, Dashboards, Metrics, Logs, Traces, Kafka, Pipeline, Models, Tools, Tool UIs, Kubernetes, Tasker, Kitchen                                  |
 | **Account**    | Everyone                                     | Profile, password, devices and sessions, deleting your account                                                                                    |
-| **Appearance** | Everyone                                     | Theme and agent cast                                                                                                                              |
+| **Appearance** | Everyone                                     | Theme, Center style and agent cast                                                                                                                |
 
 ## Center
 
@@ -45,6 +45,29 @@ The homelab opens on **Center** (`/`): a globe of the night sky where each page 
 | Arrow keys, **+**, **−**, **0**           | Turn, zoom, back to the whole sky                          |
 
 The globe turns slowly on its own when you leave it, and the Assistant's star pulses while a plan waits for you. Screen readers get the same pages as a list.
+
+### Center styles
+
+**Appearance › Center** chooses how Center shows the pages. **Sky** is the globe above; the four others are 3D scenes, dark whatever the theme, with the same scopes and pages.
+
+| Style          | What you see                                                                                                                                                                              |
+| -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Sky**        | The globe of constellations, one star per page (the default)                                                                                                                              |
+| **Ferrofluid** | A globe of black magnetic liquid in a wire shell, with orbit rings and drifting debris. Each scope is a field on it; bring one forward and the liquid rises in spikes there, one per page |
+| **Atlas**      | The Earth at night, its land in fine dots, with a glass tower per scope on its continent and a floor per page. The tower you bring forward stands upright and opens floor by floor        |
+| **Starmap**    | A film-style star chart: a planet per scope, its pages as moons on its orbits, and routes from the Assistant to every other scope                                                         |
+| **Contour**    | A map in glowing contour lines with a mountain per scope, as tall as its pages are many, and a survey marker per page on its slopes                                                       |
+
+| Do                                                 | To                                            |
+| -------------------------------------------------- | --------------------------------------------- |
+| Drag                                               | Turn the scene                                |
+| Scroll, pinch, **+** / **−**                       | Zoom                                          |
+| Click a scope's name, in the scene or on the right | Bring it forward; click it again to let it go |
+| Click a page or its name                           | See what it is, with **Open**                 |
+| **Esc**                                            | Put the page down, then the scope             |
+| Arrow keys, **0**                                  | Turn, back to the whole scene                 |
+
+Left alone for a few seconds, a 3D scene turns slowly; soon after, it tours the scopes, bringing each forward for a few seconds in turn, and starts again from the first. Touch it and the tour stops. With reduced motion set on the device the scenes stay still, and a device that cannot draw 3D gets the sky. As in the sky, the Assistant's page pulses while a plan waits for you.
 
 <table>
   <tr>
@@ -242,6 +265,10 @@ The choice is saved on your account, so it is the same on every device. Text mee
 <img src="docs/screenshots/themes.webp" alt="Today in the four storybook themes: Wizarding, Dragon Rider, Demigod and Regency" />
 
 <img src="docs/screenshots/wizarding-status.webp" alt="The Status page in the Wizarding theme: parchment cards, small-capital labels and a leather sidebar" />
+
+### Center
+
+**Appearance › Center** picks how Center shows the pages: **Sky**, **Ferrofluid**, **Atlas**, **Starmap** or **Contour**, each with a small preview (see [Center styles](#center-styles)). The choice is saved on your account (`homelabCenter`) like the theme.
 
 ### Agent casts
 
