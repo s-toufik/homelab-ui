@@ -11,20 +11,6 @@
     </div>
   </div>
 
-  @if (editable) {
-    <div class="ingredient-list__pantry">
-      <span class="ingredient-list__pantry-label">Quick-Tap Pantry Staples</span>
-      <div class="ingredient-list__pantry-strip">
-        @for (staple of pantryStaples; track staple) {
-          <button type="button" (click)="quickAdd(staple)">
-            <span>+</span>
-            {{ staple }}
-          </button>
-        }
-      </div>
-    </div>
-  }
-
   @if (draft.ingredients.length === 0) {
     <p class="ingredient-list__empty">No ingredients yet.</p>
   } @else {

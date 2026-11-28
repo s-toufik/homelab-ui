@@ -79,7 +79,50 @@ describe('KitchenPage', () => {
       removeEventListener: () => {},
     }));
   });
-  afterEach(() => vi.unstubAllGlobals());
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.useRealTimers();
+    document.querySelectorAll('[data-fake-section]').forEach((section) => section.remove());
+  });
+
+  it('keeps the tapped tab lit while the page scrolls to its section', () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    vi.stubGlobal('requestAnimationFrame', (callback: FrameRequestCallback) => {
+      callback(0);
+      return 1;
+    });
+    vi.stubGlobal('cancelAnimationFrame', () => {});
+    const tops = {
+      'sec-overview': -600,
+      'sec-ingredients': -200,
+      'sec-method': 40,
+      'sec-nutrition': 500,
+    };
+    for (const [id, top] of Object.entries(tops)) {
+      const section = document.createElement('section');
+      section.id = id;
+      section.dataset['fakeSection'] = '';
+      section.getBoundingClientRect = () => ({ top }) as DOMRect;
+      section.scrollIntoView = () => {};
+      document.body.append(section);
+    }
+    const fixture = render();
+    const lit = () =>
+      (fixture.nativeElement as HTMLElement)
+        .querySelector('[aria-current="location"]')
+        ?.textContent?.trim();
+
+    button(fixture, 'Ingredients')!.click();
+    globalThis.dispatchEvent(new Event('scroll'));
+    fixture.detectChanges();
+    expect(lit()).toBe('Ingredients');
+
+    // Once the scroll has stopped, scrolling by hand moves the tabs again.
+    vi.advanceTimersByTime(1000);
+    globalThis.dispatchEvent(new Event('scroll'));
+    fixture.detectChanges();
+    expect(lit()).toBe('Macros');
+  });
 
   it('opens the recipe actions from ⋯ and closes them with Esc', () => {
     const fixture = render();

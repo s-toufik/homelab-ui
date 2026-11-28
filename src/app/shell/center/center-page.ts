@@ -3,6 +3,7 @@ import {
   DestroyRef,
   ElementRef,
   afterNextRender,
+  afterRenderEffect,
   computed,
   effect,
   inject,
@@ -14,8 +15,19 @@ import { Router, RouterLink } from '@angular/router';
 import { AccessStore } from '../application/access.store';
 import { ASSISTANT_PANEL } from '../application/assistant-panel';
 import { AppsStore } from '../application/apps.store';
+import { CenterStyleStore } from '../application/center-style.store';
 import { NavigationStore } from '../application/navigation.store';
+import type { CenterStyleId } from '../domain/center-style';
 import type { Hue } from '../domain/homelab-feature';
+import { tourScope } from './idle-tour';
+import {
+  CENTER_SCENES,
+  NIGHT_HUES,
+  type CenterScene,
+  type SceneEvents,
+  type SceneScope,
+  type SceneTarget,
+} from './scenes/center-scene';
 import {
   clampPitch,
   clampZoom,
@@ -116,6 +128,10 @@ interface Flight {
   imports: [RouterLink],
   templateUrl: './center-page.html',
   styleUrl: './center-page.scss',
+  host: {
+    '[class.is-scene]': 'threeD()',
+    '(keydown.escape)': 'onEscape()',
+  },
 })
 export class CenterPage {
   private readonly router = inject(Router);
@@ -124,7 +140,20 @@ export class CenterPage {
   private readonly access = inject(AccessStore);
   private readonly assistant = inject(ASSISTANT_PANEL, { optional: true });
   private readonly canvas = viewChild.required<ElementRef<HTMLCanvasElement>>('sky');
+  private readonly sceneHost = viewChild.required<ElementRef<HTMLElement>>('scene');
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly sceneLoaders = inject(CENTER_SCENES);
+
+  /* The look chosen in Appearance; a 3D style falls back to the sky where the browser cannot draw it. */
+  protected readonly style = inject(CenterStyleStore).style;
+  protected readonly sceneFailed = signal(false);
+  protected readonly threeD = computed(() => this.style() !== 'sky' && !this.sceneFailed());
+  protected readonly scopeFocus = signal<string | null>(null);
+  private readonly tour = signal<string | null>(null);
+  private scene: CenterScene | null = null;
+  private sceneKey = '';
+  private mounting = 0;
+  private sceneIdle = false;
 
   protected readonly constellations = computed<Constellation[]>(() => {
     const inputs: ConstellationInput[] = [
@@ -225,6 +254,49 @@ export class CenterPage {
   protected readonly hovered = signal<SkyStar | null>(null);
   protected readonly zoom = signal(1);
   protected readonly waiting = computed(() => this.assistant?.waiting() ?? 0);
+  protected readonly hint = computed(() =>
+    this.threeD()
+      ? 'Drag to turn · scroll or pinch to zoom · pick a scope, then a page'
+      : 'Drag to turn · scroll or pinch to zoom · shift-drag to move · click a star',
+  );
+
+  /* The 3D styles draw the same constellations: a scope per constellation, a part per star. */
+  private readonly sceneScopes = computed<SceneScope[]>(() =>
+    this.constellations().map((constellation) => ({
+      id: constellation.id,
+      name: constellation.name,
+      color: NIGHT_HUES[constellation.hue],
+      parts: constellation.stars.map((star) => ({
+        id: star.id,
+        label: star.label,
+        color: NIGHT_HUES[star.hue],
+      })),
+    })),
+  );
+  /* What a 3D style brings forward: the picked page's scope, else the scope chosen, else the idle tour's. */
+  private readonly sceneTarget = computed<SceneTarget>(() => {
+    const picked = this.selected();
+    return {
+      scope: picked?.constellation ?? this.scopeFocus() ?? this.tour(),
+      part: picked?.id ?? null,
+    };
+  });
+  private readonly sceneEvents: SceneEvents = {
+    pick: (id) => {
+      this.touch();
+      const star = id ? this.starById(id) : null;
+      if (star) this.selected.set(star);
+      else if (this.selected()) this.selected.set(null);
+      else this.scopeFocus.set(null);
+    },
+    focus: (id) => {
+      this.touch();
+      this.focusScope(id);
+    },
+    hover: (id) => this.hovered.set(id ? this.starById(id) : null),
+    interact: () => this.touch(),
+    isWaiting: (id) => id === 'assistant' && this.waiting() > 0,
+  };
 
   private view: View = { ...facing(37, 24), zoom: 1, panX: 0, panY: 0 };
   private flight: Flight | null = null;
@@ -240,7 +312,8 @@ export class CenterPage {
   private dragged = 0;
   private pinch: { distance: number; x: number; y: number } | null = null;
   private colors: Record<string, string> = {};
-  private reducedMotion = false;
+  private reducedMotion =
+    globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false;
 
   constructor() {
     const destroyRef = inject(DestroyRef);
@@ -248,6 +321,20 @@ export class CenterPage {
     effect(() => {
       this.constellations();
       untracked(() => this.requestDraw());
+    });
+    afterRenderEffect(() => {
+      const style = this.style();
+      const scopes = this.sceneScopes();
+      untracked(() => void this.mountScene(style, scopes));
+    });
+    effect(() => {
+      const target = this.sceneTarget();
+      untracked(() => this.scene?.show(target));
+    });
+    destroyRef.onDestroy(() => {
+      this.mounting++;
+      this.scene?.dispose();
+      this.scene = null;
     });
     afterNextRender(() => {
       this.reducedMotion = globalThis.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -275,8 +362,38 @@ export class CenterPage {
   }
 
   protected fly(constellation: Constellation): void {
+    if (this.threeD()) {
+      this.touch();
+      this.focusScope(constellation.id);
+      return;
+    }
     this.selected.set(null);
     this.flyTo(constellation.lon, constellation.lat, 2.2);
+  }
+
+  protected onEscape(): void {
+    if (!this.threeD()) return;
+    if (this.selected()) this.selected.set(null);
+    else this.scopeFocus.set(null);
+  }
+
+  /* The 3D styles take the sky's keys: arrows turn, plus and minus zoom, 0 shows everything. */
+  protected onSceneKey(event: KeyboardEvent): void {
+    const keys: Record<string, () => void> = {
+      ArrowLeft: () => this.scene?.turn(0.2, 0),
+      ArrowRight: () => this.scene?.turn(-0.2, 0),
+      ArrowUp: () => this.scene?.turn(0, 0.12),
+      ArrowDown: () => this.scene?.turn(0, -0.12),
+      '+': () => this.zoomBy(1.25),
+      '=': () => this.zoomBy(1.25),
+      '-': () => this.zoomBy(0.8),
+      '0': () => this.reset(),
+    };
+    const press = keys[event.key];
+    if (!press) return;
+    event.preventDefault();
+    this.touch();
+    press();
   }
 
   protected pick(star: SkyStar): void {
@@ -294,10 +411,21 @@ export class CenterPage {
 
   protected reset(): void {
     this.selected.set(null);
+    if (this.threeD()) {
+      this.touch();
+      this.scopeFocus.set(null);
+      this.scene?.reset();
+      return;
+    }
     this.flyTo(37, 24, 1);
   }
 
   protected zoomBy(factor: number): void {
+    if (this.threeD()) {
+      this.touch();
+      this.scene?.zoom(factor);
+      return;
+    }
     this.flight = null;
     this.setView(
       zoomAt(this.view, factor, this.width / 2, this.height / 2, this.width, this.height),
@@ -440,6 +568,10 @@ export class CenterPage {
   }
 
   private tick(time: number): void {
+    if (this.threeD()) {
+      this.idleTour(time);
+      return;
+    }
     if (this.flight) {
       const t = Math.min(1, (time - this.flight.start) / this.flight.duration);
       const ease = 1 - Math.pow(1 - t, 3);
@@ -466,6 +598,66 @@ export class CenterPage {
       }
     }
     this.draw(time);
+  }
+
+  /* While nobody touches a 3D style it turns slowly, and after a while tours the scopes one by one. */
+  private idleTour(time: number): void {
+    const idleMs = time - this.lastInteraction;
+    const quiet = !this.reducedMotion && !this.selected() && !this.scopeFocus();
+    const idle = quiet && idleMs > 4000;
+    if (idle !== this.sceneIdle) {
+      this.sceneIdle = idle;
+      this.scene?.idle(idle);
+    }
+    const next = quiet
+      ? tourScope(
+          idleMs,
+          this.constellations().map((constellation) => constellation.id),
+        )
+      : null;
+    if (next !== this.tour()) this.tour.set(next);
+  }
+
+  /* Picking the focused scope again lets go of it; a picked page elsewhere is put down. */
+  private focusScope(id: string): void {
+    const next = this.scopeFocus() === id ? null : id;
+    this.scopeFocus.set(next);
+    if (this.selected() && this.selected()?.constellation !== next) this.selected.set(null);
+  }
+
+  private starById(id: string): SkyStar | null {
+    for (const constellation of this.constellations()) {
+      const star = constellation.stars.find((candidate) => candidate.id === id);
+      if (star) return star;
+    }
+    return null;
+  }
+
+  /* Mounts the chosen 3D style, once per style and set of pages; a failure (no WebGL) falls back to the sky. */
+  private async mountScene(style: CenterStyleId, scopes: SceneScope[]): Promise<void> {
+    const key =
+      style === 'sky'
+        ? 'sky'
+        : `${style}|${scopes.map((s) => `${s.id}:${s.parts.map((p) => p.id).join(',')}`).join(';')}`;
+    if (key === this.sceneKey) return;
+    this.sceneKey = key;
+    const ticket = ++this.mounting;
+    this.scene?.dispose();
+    this.scene = null;
+    this.sceneFailed.set(false);
+    if (style === 'sky' || scopes.length === 0) return;
+    try {
+      const mount = await this.sceneLoaders[style]();
+      if (ticket !== this.mounting) return;
+      this.scene = mount(this.sceneHost().nativeElement, scopes, this.sceneEvents, {
+        reducedMotion: this.reducedMotion,
+      });
+      this.touch();
+      this.sceneIdle = false;
+      this.scene.show(this.sceneTarget());
+    } catch {
+      if (ticket === this.mounting) this.sceneFailed.set(true);
+    }
   }
 
   private setView(view: View): void {

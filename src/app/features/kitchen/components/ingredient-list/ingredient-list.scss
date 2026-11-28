@@ -2,7 +2,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
-  scroll-margin-top: 8rem;
+  scroll-margin-top: var(--kitchen-scroll-offset, 8rem);
   background: var(--k-stone-50);
   border: 1px solid color-mix(in srgb, var(--k-stone-200) 90%, transparent);
   border-radius: var(--k-radius-card);
@@ -36,56 +36,6 @@
   font-family: var(--k-font-mono);
   font-weight: 700;
   font-size: 0.72rem;
-}
-
-.ingredient-list__pantry {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35rem;
-}
-
-.ingredient-list__pantry-label {
-  font-size: 0.68rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--k-stone-400);
-}
-
-.ingredient-list__pantry-strip {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.4rem;
-
-  button {
-    flex-shrink: 0;
-    display: inline-flex;
-    align-items: center;
-    gap: 0.3rem;
-    height: 2.75rem;
-    padding: 0 0.85rem;
-    border-radius: 0.75rem;
-    background: var(--k-parchment);
-    border: 1px solid var(--k-stone-200);
-    color: var(--k-stone-600);
-    font-family: var(--k-font-sans);
-    font-weight: 600;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    cursor: pointer;
-
-    span {
-      color: var(--k-saffron-600);
-      font-weight: 800;
-    }
-
-    &:hover {
-      background: var(--k-saffron-50);
-      border-color: color-mix(in srgb, var(--k-saffron-500) 40%, transparent);
-      color: var(--k-saffron-700);
-    }
-  }
 }
 
 .ingredient-list__rows {

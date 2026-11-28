@@ -67,6 +67,46 @@
     </div>
   }
 
+  <section class="appearance__center" aria-labelledby="appearance-center">
+    <span class="appearance__group" id="appearance-center">Center</span>
+    <p class="appearance__muted">
+      How the Center shows every page. The 3D styles turn on their own and tour the scopes one by
+      one while you leave them be.
+    </p>
+    <div class="appearance__list" role="radiogroup" aria-label="Center styles">
+      @for (option of centerStyles; track option.id) {
+        <button
+          type="button"
+          role="radio"
+          class="appearance__option"
+          [attr.aria-checked]="center.style() === option.id"
+          (click)="center.choose(option.id)"
+        >
+          <span class="appearance__glyph" [attr.data-style]="option.id" aria-hidden="true"
+            ><i></i
+          ></span>
+          <span class="appearance__text">
+            <strong class="appearance__name">{{ option.name }}</strong>
+            <span class="appearance__muted">{{ option.description }}</span>
+          </span>
+          @if (center.style() === option.id) {
+            <svg
+              viewBox="0 0 24 24"
+              width="18"
+              height="18"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.6"
+              aria-hidden="true"
+            >
+              <path d="M5 12l5 5L20 7" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+          }
+        </button>
+      }
+    </div>
+  </section>
+
   <section class="appearance__cast" aria-labelledby="appearance-cast">
     <span class="appearance__group" id="appearance-cast">Agents</span>
     <p class="appearance__muted">

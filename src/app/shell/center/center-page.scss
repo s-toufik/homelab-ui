@@ -26,6 +26,166 @@
   }
 }
 
+/* The 3D styles: a night scene whatever the theme, with glass name chips that follow its objects. */
+.center__scene {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #04070f;
+  outline: none;
+
+  /* Drawn over the canvas and the names, which would cover a ring on the host itself. */
+  &:focus-visible::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 0 2px var(--accent);
+    pointer-events: none;
+  }
+}
+
+.center__scene ::ng-deep canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  touch-action: none;
+  cursor: grab;
+  outline: none;
+}
+
+.center__scene ::ng-deep .scene-leaders {
+  pointer-events: none;
+  cursor: auto;
+}
+
+.center__scene ::ng-deep .scene-labels {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.center__scene ::ng-deep .scene-chip {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin: 0;
+  padding: 0.32rem 0.65rem 0.32rem 0.5rem;
+  border: 1px solid rgba(170, 196, 235, 0.16);
+  border-radius: 999px;
+  background: rgba(10, 16, 28, 0.66);
+  backdrop-filter: blur(10px);
+  color: #e8edf6;
+  font: inherit;
+  font-size: 0.75rem;
+  white-space: nowrap;
+  cursor: pointer;
+  pointer-events: auto;
+  transition:
+    opacity 0.45s ease,
+    border-color 0.25s,
+    background-color 0.25s;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: -0.55rem -0.25rem;
+  }
+
+  i {
+    flex: none;
+    width: 0.4rem;
+    height: 0.4rem;
+    border-radius: 50%;
+    background: var(--c);
+    box-shadow: 0 0 8px var(--c);
+  }
+
+  small {
+    color: #8d9bb0;
+    font-size: 0.68rem;
+  }
+
+  &.is-scope {
+    font-size: 0.68rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  &.is-on {
+    border-color: color-mix(in srgb, var(--c) 75%, transparent);
+    background: color-mix(in srgb, var(--c) 16%, rgba(10, 16, 28, 0.82));
+  }
+
+  &.is-dim {
+    opacity: 0.3;
+  }
+
+  &.is-off {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+}
+
+/* Starmap names in the chart's own lettering, without glass. */
+.center__scene.is-chart ::ng-deep .scene-chip {
+  border-color: transparent;
+  background: none;
+  backdrop-filter: none;
+  font-family: var(--font-caps, inherit);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  i {
+    border-radius: 1px;
+    background: #c9ced6;
+    box-shadow: none;
+  }
+
+  &.is-scope {
+    font-size: 0.95rem;
+    letter-spacing: 0.06em;
+  }
+
+  small {
+    color: #ff8a4c;
+  }
+}
+
+:host(.is-scene) {
+  background: #04070f;
+
+  .center__head {
+    color: #e8edf6;
+  }
+
+  .center__hint {
+    color: #8d9bb0;
+  }
+}
+
+.center__chip[aria-pressed='true'] {
+  border-color: var(--h);
+  background: color-mix(in srgb, var(--h) 18%, var(--surface-raised));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .center__scene ::ng-deep .scene-chip {
+    transition: none;
+  }
+}
+
 .center__head {
   position: absolute;
   top: 1.25rem;
@@ -220,5 +380,19 @@
     right: 0.75rem;
     width: auto;
     bottom: calc(3.6rem + var(--safe-bottom));
+  }
+
+  /* Slimmer names, so a scope's pages all find room round it; the tap area stays as large. */
+  .center__scene ::ng-deep .scene-chip {
+    padding: 0.2rem 0.5rem 0.2rem 0.4rem;
+    font-size: 0.7rem;
+
+    &::before {
+      inset: -0.65rem -0.3rem;
+    }
+
+    &.is-scope {
+      font-size: 0.64rem;
+    }
   }
 }

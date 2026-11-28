@@ -9,6 +9,7 @@ import { GatewaySession } from '@shared/infrastructure/gateway-session';
 import { provideShellCommands } from '@shell/application/shell-commands';
 import { ThemeStore } from '@shell/application/theme.store';
 import { CastStore } from '@shell/application/cast.store';
+import { CenterStyleStore } from '@shell/application/center-style.store';
 
 import { provideAccountFeature } from '@features/account/account.feature';
 import { provideAgentFeature } from '@features/agent/agent.feature';
@@ -38,10 +39,12 @@ export const appConfig: ApplicationConfig = {
       const session = inject(GatewaySession);
       const theme = inject(ThemeStore);
       const cast = inject(CastStore);
+      const center = inject(CenterStyleStore);
       session.watch();
       return session.load().then(() => {
         void theme.loadFromAccount();
         void cast.loadFromAccount();
+        void center.loadFromAccount();
       });
     }),
     provideRouter(routes),
