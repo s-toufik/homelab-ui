@@ -8,8 +8,6 @@ import { IngredientRepository } from '../../infrastructure/api/ingredient.reposi
 import { IngredientDetailModal } from '../ingredient-detail/ingredient-detail-modal';
 import { IngredientRow } from './ingredient-row';
 
-const PANTRY_STAPLES = ['Beurre doux', 'Huile d’olive', 'Sel fin', 'Farine T55', 'Échalote', 'Ail'];
-
 @Component({
   selector: 'app-ingredient-list',
   imports: [IngredientRow, FormsModule, IngredientDetailModal, ScrollLockDirective],
@@ -21,7 +19,6 @@ export class IngredientList {
   private readonly ingredients = inject(IngredientRepository);
   private readonly toast = inject(KitchenToastStore);
 
-  protected readonly pantryStaples = PANTRY_STAPLES;
   protected readonly editingIndex = signal<number | null>(null);
   protected readonly editingLine = computed(() => {
     const index = this.editingIndex();
@@ -36,27 +33,6 @@ export class IngredientList {
 
   protected onChanged(index: number, patch: Partial<IngredientLine>): void {
     this.store.updateIngredient(index, patch);
-  }
-
-  protected async quickAdd(name: string): Promise<void> {
-    const results = await this.ingredients.search(name, 1);
-    const match = results[0];
-    this.store.addIngredient();
-    const index = this.store.draft().ingredients.length - 1;
-    if (match) {
-      this.store.updateIngredient(index, {
-        name: match.nameFr,
-        ingredientRefId: match.ciqualCode,
-        kcalPer100g: match.kcalPer100g,
-        proteinPer100g: match.proteinPer100g,
-        carbPer100g: match.carbPer100g,
-        fatPer100g: match.fatPer100g,
-      });
-      this.toast.show(`Added ${match.nameFr}`);
-    } else {
-      this.store.updateIngredient(index, { name });
-      this.toast.show(`${name} isn't in the catalog yet — add its macros manually`);
-    }
   }
 
   protected readonly modalKcal = signal(0);
