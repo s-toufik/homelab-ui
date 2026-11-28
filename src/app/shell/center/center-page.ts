@@ -19,6 +19,7 @@ import { CenterStyleStore } from '../application/center-style.store';
 import { NavigationStore } from '../application/navigation.store';
 import type { CenterStyleId } from '../domain/center-style';
 import type { Hue } from '../domain/homelab-feature';
+import { tourScope } from './idle-tour';
 import {
   CENTER_SCENES,
   NIGHT_HUES,
@@ -148,9 +149,11 @@ export class CenterPage {
   protected readonly sceneFailed = signal(false);
   protected readonly threeD = computed(() => this.style() !== 'sky' && !this.sceneFailed());
   protected readonly scopeFocus = signal<string | null>(null);
+  private readonly tour = signal<string | null>(null);
   private scene: CenterScene | null = null;
   private sceneKey = '';
   private mounting = 0;
+  private sceneIdle = false;
 
   protected readonly constellations = computed<Constellation[]>(() => {
     const inputs: ConstellationInput[] = [
@@ -270,11 +273,11 @@ export class CenterPage {
       })),
     })),
   );
-  /* What a 3D style brings forward: the picked page's scope, else the scope chosen. */
+  /* What a 3D style brings forward: the picked page's scope, else the scope chosen, else the idle tour's. */
   private readonly sceneTarget = computed<SceneTarget>(() => {
     const picked = this.selected();
     return {
-      scope: picked?.constellation ?? this.scopeFocus(),
+      scope: picked?.constellation ?? this.scopeFocus() ?? this.tour(),
       part: picked?.id ?? null,
     };
   });
@@ -565,7 +568,10 @@ export class CenterPage {
   }
 
   private tick(time: number): void {
-    if (this.threeD()) return;
+    if (this.threeD()) {
+      this.idleTour(time);
+      return;
+    }
     if (this.flight) {
       const t = Math.min(1, (time - this.flight.start) / this.flight.duration);
       const ease = 1 - Math.pow(1 - t, 3);
@@ -592,6 +598,24 @@ export class CenterPage {
       }
     }
     this.draw(time);
+  }
+
+  /* While nobody touches a 3D style it turns slowly, and after a while tours the scopes one by one. */
+  private idleTour(time: number): void {
+    const idleMs = time - this.lastInteraction;
+    const quiet = !this.reducedMotion && !this.selected() && !this.scopeFocus();
+    const idle = quiet && idleMs > 4000;
+    if (idle !== this.sceneIdle) {
+      this.sceneIdle = idle;
+      this.scene?.idle(idle);
+    }
+    const next = quiet
+      ? tourScope(
+          idleMs,
+          this.constellations().map((constellation) => constellation.id),
+        )
+      : null;
+    if (next !== this.tour()) this.tour.set(next);
   }
 
   /* Picking the focused scope again lets go of it; a picked page elsewhere is put down. */
@@ -629,6 +653,7 @@ export class CenterPage {
         reducedMotion: this.reducedMotion,
       });
       this.touch();
+      this.sceneIdle = false;
       this.scene.show(this.sceneTarget());
     } catch {
       if (ticket === this.mounting) this.sceneFailed.set(true);
