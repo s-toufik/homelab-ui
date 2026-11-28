@@ -27,6 +27,11 @@ import { activeSection } from '../../domain/section-spy';
 /** Below this width the actions leave the header for a bar at the bottom of the screen. */
 const PHONE_QUERY = '(max-width: 767px)';
 
+/** How long scrolling must pause before a jump from a tab counts as finished. */
+const JUMP_SETTLE_MS = 150;
+/** Room left between the sticky header and a section the tabs jump to. */
+const SECTION_GAP_PX = 12;
+
 const SECTIONS = [
   { id: 'sec-overview', label: 'Overview' },
   { id: 'sec-ingredients', label: 'Ingredients' },
@@ -52,6 +57,7 @@ const SECTIONS = [
   styleUrls: ['./kitchen-page.scss', '../../kitchen-theme.scss'],
   host: {
     '[style.--kitchen-dock-height.px]': 'dockHeight() || null',
+    '[style.--kitchen-scroll-offset.px]': 'scrollOffset()',
     '(document:keydown.escape)': 'closeActions()',
   },
 })
@@ -67,6 +73,8 @@ export class KitchenPage implements AfterViewInit {
   protected readonly activeSection = signal<string>(SECTIONS[0].id);
   /** Height of the actions bar while it is pinned to the bottom of a phone screen, else 0. */
   protected readonly dockHeight = signal(0);
+  /** Where a section's top lands after a jump: just under the sticky header(s), in px from the top. */
+  protected readonly scrollOffset = signal(128);
   /** The ⋯ menu: open a recipe, browse, copy, start a new one. A sheet on a phone, a popover elsewhere. */
   protected readonly actionsOpen = signal(false);
   /** Where the popover hangs from the ⋯ button, in px from the top and right of the window. */
@@ -75,6 +83,9 @@ export class KitchenPage implements AfterViewInit {
   private readonly header = viewChild<ElementRef<HTMLElement>>('header');
   private readonly actions = viewChild<ElementRef<HTMLElement>>('actions');
   private readonly sheet = viewChild<ElementRef<HTMLElement>>('sheet');
+  /** The section a tab jumped to; the scroll tracker leaves the tabs alone until the jump settles. */
+  private jumpingTo: string | null = null;
+  private settleTimer: ReturnType<typeof setTimeout> | undefined;
   private readonly query = toSignal(this.route.queryParamMap, {
     initialValue: this.route.snapshot.queryParamMap,
   });
@@ -89,18 +100,29 @@ export class KitchenPage implements AfterViewInit {
 
   ngAfterViewInit(): void {
     const actions = this.actions()?.nativeElement;
+    const header = this.header()?.nativeElement;
     const phone = globalThis.matchMedia?.(PHONE_QUERY);
-    const publishDock = () => {
+    const measure = () => {
       const height = actions && phone?.matches ? actions.getBoundingClientRect().height : 0;
       this.dockHeight.set(height);
       this.chrome.bottomInset.set(height);
+      if (header) {
+        // The header sticks below the phone's top bar, so its own `top` is part of the offset.
+        const stuckAt = parseFloat(getComputedStyle(header).top) || 0;
+        this.scrollOffset.set(Math.round(stuckAt + header.offsetHeight + SECTION_GAP_PX));
+      }
     };
-    const observer = new ResizeObserver(publishDock);
+    const observer = new ResizeObserver(measure);
     if (actions) observer.observe(actions);
-    phone?.addEventListener('change', publishDock);
+    if (header) observer.observe(header);
+    phone?.addEventListener('change', measure);
 
     let frame = 0;
     const onScroll = () => {
+      if (this.jumpingTo) {
+        this.settleJumpSoon();
+        return;
+      }
       cancelAnimationFrame(frame);
       frame = requestAnimationFrame(() => this.spySection());
     };
@@ -109,8 +131,9 @@ export class KitchenPage implements AfterViewInit {
     globalThis.addEventListener('scroll', onScroll, { passive: true });
     this.destroyRef.onDestroy(() => {
       observer.disconnect();
-      phone?.removeEventListener('change', publishDock);
+      phone?.removeEventListener('change', measure);
       cancelAnimationFrame(frame);
+      clearTimeout(this.settleTimer);
       host.removeEventListener('scroll', onScroll);
       globalThis.removeEventListener('scroll', onScroll);
     });
@@ -118,7 +141,16 @@ export class KitchenPage implements AfterViewInit {
 
   protected scrollTo(id: string): void {
     this.activeSection.set(id);
+    // A section near the end may not reach the top, so the tab you tapped stays lit
+    // until the smooth scroll has stopped, instead of following the page back.
+    this.jumpingTo = id;
+    this.settleJumpSoon(4 * JUMP_SETTLE_MS);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  private settleJumpSoon(delay = JUMP_SETTLE_MS): void {
+    clearTimeout(this.settleTimer);
+    this.settleTimer = setTimeout(() => (this.jumpingTo = null), delay);
   }
 
   protected openActions(event: MouseEvent): void {
@@ -166,13 +198,12 @@ export class KitchenPage implements AfterViewInit {
   }
 
   private spySection(): void {
-    const header = this.header()?.nativeElement;
-    if (!header) return;
     const positions = SECTIONS.flatMap(({ id }) => {
       const element = document.getElementById(id);
       return element ? [{ id, top: element.getBoundingClientRect().top }] : [];
     });
-    const id = activeSection(positions, header.getBoundingClientRect().bottom + 8, this.atEnd());
+    // A section counts as reached once its top is where a jump from its tab would put it.
+    const id = activeSection(positions, this.scrollOffset() + 4, this.atEnd());
     if (id) this.activeSection.set(id);
   }
 
