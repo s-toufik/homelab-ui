@@ -1,6 +1,7 @@
 <canvas
   #sky
   class="center__sky"
+  [hidden]="threeD()"
   tabindex="0"
   role="img"
   aria-label="The homelab as a sky of constellations. Drag to turn it, scroll or pinch to zoom, click a star to see it, double-click to open it. Arrow keys turn it, plus and minus zoom, 0 resets."
@@ -14,12 +15,19 @@
   (contextmenu)="$event.preventDefault()"
   (keydown)="onKey($event)"
 ></canvas>
+<div
+  #scene
+  class="center__scene"
+  [hidden]="!threeD()"
+  tabindex="0"
+  role="group"
+  aria-label="Every page of the homelab, grouped by scope. Drag to turn, scroll or pinch to zoom, pick a scope or a page. Arrow keys turn it, plus and minus zoom, 0 shows everything, Escape lets go."
+  (keydown)="onSceneKey($event)"
+></div>
 
 <header class="center__head">
   <h1 class="center__title">Center</h1>
-  <p class="center__hint">
-    Drag to turn · scroll or pinch to zoom · shift-drag to move · click a star
-  </p>
+  <p class="center__hint">{{ hint() }}</p>
 </header>
 
 <nav class="center__constellations" aria-label="Constellations">
@@ -28,6 +36,7 @@
       type="button"
       class="center__chip"
       [class]="'center__chip hue-' + constellation.hue"
+      [attr.aria-pressed]="threeD() ? scopeFocus() === constellation.id : null"
       (click)="fly(constellation)"
     >
       <span class="hl-dot"></span>{{ constellation.name }}

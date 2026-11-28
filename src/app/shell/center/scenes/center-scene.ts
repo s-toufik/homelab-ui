@@ -1,3 +1,5 @@
+import { InjectionToken } from '@angular/core';
+import type { CenterStyleId } from '../../domain/center-style';
 import type { Hue } from '../../domain/homelab-feature';
 
 /* What a 3D Center style draws: the Center's constellations as scopes, each with its pages as parts. */
@@ -49,6 +51,19 @@ export type MountScene = (
   events: SceneEvents,
   options: SceneOptions,
 ) => CenterScene;
+
+export type SceneStyle = Exclude<CenterStyleId, 'sky'>;
+export type SceneLoaders = Readonly<Record<SceneStyle, () => Promise<MountScene>>>;
+
+/* Each style is its own chunk, so three.js only downloads once a 3D style is in use. */
+export const CENTER_SCENES = new InjectionToken<SceneLoaders>('CENTER_SCENES', {
+  factory: () => ({
+    ferrofluid: () => import('./ferrofluid.scene').then((m) => m.mountFerrofluid),
+    atlas: () => import('./atlas.scene').then((m) => m.mountAtlas),
+    starmap: () => import('./starmap.scene').then((m) => m.mountStarmap),
+    contour: () => import('./contour.scene').then((m) => m.mountContour),
+  }),
+});
 
 /* The hues as they read on a night background, whatever the page's theme: the scenes are always at night. */
 export const NIGHT_HUES: Readonly<Record<Hue, string>> = {
